@@ -9,19 +9,86 @@ namespace AgentLibrary
     {
         private AgentScheduler scheduler;
         private List<AgentRole> roles;
-        private int name;
-        private int ip_address;
-        private int port;
-        private int UUID;
-        private int workbench;
-        private int workScheduleStart;
-        private int workScheduleEnd;
+        private AgentWorkbench workbench;
+        private List<AgentJob> jobs;
 
         public event EventHandler onJobReceived;
 
         public Agent()
         {
             throw new System.NotImplementedException();
+        }
+
+        public Guid UUID
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+
+            set
+            {
+            }
+        }
+
+        public string ip_address
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+
+            set
+            {
+            }
+        }
+
+        public string port
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+
+            set
+            {
+            }
+        }
+
+        public string name
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+
+            set
+            {
+            }
+        }
+
+        public DateTime workScheduleEnd
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+
+            set
+            {
+            }
+        }
+
+        public DateTime workScheduleStart
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+
+            set
+            {
+            }
         }
 
         public void manageDepartment()

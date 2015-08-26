@@ -52,7 +52,7 @@
     <Position X="12.75" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAIAAAAMAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Schedule.cs</FileName>
+      <FileName>Scheduler\Schedule.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Field Name="jobHeader" />
@@ -63,7 +63,7 @@
     <Position X="6.75" Y="1" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAA=</HashCode>
-      <FileName>AgentScheduler.cs</FileName>
+      <FileName>Scheduler\AgentScheduler.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
       <Field Name="schedules" />
@@ -79,7 +79,7 @@
   <Class Name="AgentLibrary.Agent">
     <Position X="0.5" Y="3" Width="2" />
     <TypeIdentifier>
-      <HashCode>gAIBAAAAAAAQAAAAEAACAAAAAAAEAAxAAAAAAAAIQAA=</HashCode>
+      <HashCode>gAIBAAAAAAAQAAAAEAACAABAAAAEAAxAAAAAAAAIQAA=</HashCode>
       <FileName>Agent.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -87,7 +87,15 @@
     </ShowAsAssociation>
     <ShowAsCollectionAssociation>
       <Field Name="roles" />
+      <Field Name="jobs" />
     </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="AgentLibrary.AgentWorkbench">
+    <Position X="5.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>AgentWorkbench.cs</FileName>
+    </TypeIdentifier>
   </Class>
   <Enum Name="AgentLibrary.TRIGGER_TYPE" Collapsed="true">
     <Position X="19.25" Y="1.75" Width="1.5" />
@@ -100,7 +108,7 @@
     <Position X="17.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAABAAAAIgAAAAAAAAAgAAAAAAAAAAAA=</HashCode>
-      <FileName>SCHEDULING_TYPE.cs</FileName>
+      <FileName>Scheduler\SCHEDULING_TYPE.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="AgentLibrary.AgentJobResult" Collapsed="true">

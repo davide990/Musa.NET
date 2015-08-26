@@ -5,6 +5,9 @@ using System.Text;
 
 namespace AgentLibrary
 {
+    /// <summary>
+    /// Si identifica con il concetto di capability
+    /// </summary>
     public class AgentJob
     {
         private List<AgentRole> AgentRole;
