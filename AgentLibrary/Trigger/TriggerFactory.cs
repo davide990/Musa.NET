@@ -5,11 +5,7 @@ using System.Text;
 
 namespace AgentLibrary
 {
-    public enum SCHEDULING_TYPE
+    public static class TriggerFactory
     {
-        CRITICAL,
-        RECURRENT,
-        DAILY,
-        STANDARD
     }
 }

@@ -2,43 +2,35 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Quartz;
 
 namespace AgentLibrary
 {
     /// <summary>
     /// Si identifica con il concetto di capability
     /// </summary>
-    public class AgentJob
+    public abstract class AgentJob : IJob
     {
-        private List<AgentRole> AgentRole;
-
+        private List<AgentRole> allowed_roles;
+        
         public AgentJob(string name)
         {
-            throw new System.NotImplementedException();
+            this._job_name = name;
         }
 
+        private AgentJobResult _job_result;
         public AgentJobResult job_result
         {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-
-            set
-            {
-            }
+            get { return _job_result; }
         }
 
-        public int job_name
+        private string _job_name;
+        public string job_name
         {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-
-            set
-            {
-            }
+            get { return _job_name; }
+            protected set { _job_name = value; }
         }
+
+        public abstract void Execute(IJobExecutionContext context);
     }
 }

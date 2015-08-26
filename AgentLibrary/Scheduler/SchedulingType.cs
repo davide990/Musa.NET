@@ -5,10 +5,11 @@ using System.Text;
 
 namespace AgentLibrary
 {
-    public enum TRIGGER_TYPE
+    public enum SchedulingType
     {
-        CRON_TRIGGER,
-        SIMPLE_TRIGGER,
-        CONDITIONAL_TRIGGER
+        CRITICAL,
+        RECURRENT,
+        DAILY,
+        STANDARD
     }
 }

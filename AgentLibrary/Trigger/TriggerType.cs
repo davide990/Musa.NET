@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Quartz;
 
 namespace AgentLibrary
 {
-    public abstract class Trigger
+    public enum TriggerType
     {
-        public abstract TriggerType getType();
+        CRON_TRIGGER,
+        SIMPLE_TRIGGER,
+        CONDITIONAL_TRIGGER
     }
 }

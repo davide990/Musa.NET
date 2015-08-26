@@ -23,5 +23,10 @@ namespace AgentLibrary
             {
             }
         }
+
+        public override TriggerType getType()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
