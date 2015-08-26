@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="AgentLibrary.Trigger">
+    <Position X="12.75" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Trigger\Trigger.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AgentLibrary.AgentJob">
+    <Position X="6.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQACAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>AgentJob\AgentJob.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="AgentRole" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="AgentLibrary.CronTrigger">
+    <Position X="10.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAAAAAAAgECBAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Trigger\CronTrigger.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AgentLibrary.SimpleTrigger">
+    <Position X="12.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Trigger\SimpleTrigger.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AgentLibrary.ConditionalTrigger">
+    <Position X="15" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAA=</HashCode>
+      <FileName>Trigger\ConditionalTrigger.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AgentLibrary.AgentJobHeader">
+    <Position X="9.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAgAAAAIIAAAAAAAAAAACA=</HashCode>
+      <FileName>AgentJob\AgentJobHeader.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="AgentJob" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="AgentLibrary.Schedule">
+    <Position X="12.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAMAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Schedule.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="jobHeader" />
+      <Field Name="trigger" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="AgentLibrary.AgentScheduler">
+    <Position X="6.75" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAA=</HashCode>
+      <FileName>AgentScheduler.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="schedules" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="AgentLibrary.AgentRole">
+    <Position X="3.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>AgentRole.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AgentLibrary.Agent">
+    <Position X="0.5" Y="3" Width="2" />
+    <TypeIdentifier>
+      <HashCode>gAIBAAAAAAAQAAAAEAACAAAAAAAEAAxAAAAAAAAIQAA=</HashCode>
+      <FileName>Agent.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="scheduler" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Field Name="roles" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Enum Name="AgentLibrary.TRIGGER_TYPE" Collapsed="true">
+    <Position X="19.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAEAAAAAAAAACAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Trigger\TRIGGER_TYPE.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="AgentLibrary.SCHEDULING_TYPE" Collapsed="true">
+    <Position X="17.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAIgAAAAAAAAAgAAAAAAAAAAAA=</HashCode>
+      <FileName>SCHEDULING_TYPE.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="AgentLibrary.AgentJobResult" Collapsed="true">
+    <Position X="17.5" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAAAAAAAAAAAAABAAAAAAAAAAAABBAAAAAAA=</HashCode>
+      <FileName>AgentJob\AgentJobResult.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="AgentLibrary.AgentJobState" Collapsed="true">
+    <Position X="19.25" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAAAAAAAAAAAAAAAAAAAgABAAAAAAAAA=</HashCode>
+      <FileName>AgentJob\AgentJobState.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
