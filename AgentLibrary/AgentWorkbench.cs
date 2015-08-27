@@ -1,7 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿/**
+         __  __                                     _   
+        |  \/  |                                   | |  
+        | \  / | _   _  ___   __ _     _ __    ___ | |_ 
+        | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
+        | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
+        |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+
+*/
 
 namespace AgentLibrary
 {

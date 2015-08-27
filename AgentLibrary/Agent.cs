@@ -1,4 +1,13 @@
-﻿using System;
+﻿/**
+         __  __                                     _   
+        |  \/  |                                   | |  
+        | \  / | _   _  ___   __ _     _ __    ___ | |_ 
+        | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
+        | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
+        |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+
+*/
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
@@ -45,7 +54,7 @@ namespace AgentLibrary
         /// <summary>
         /// Check if actually is working time for this agent.
         /// </summary>
-        public bool isWorking
+        public bool isWorkingTime
         {
             get { DateTime now = DateTime.UtcNow;  return now >= this.workScheduleStart && now < this.workScheduleEnd; }
         }
@@ -97,6 +106,8 @@ namespace AgentLibrary
         {
             //start the scheduler
             scheduler.Start();
+
+            
         }
 
         /// <summary>

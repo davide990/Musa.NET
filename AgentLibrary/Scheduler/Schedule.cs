@@ -11,12 +11,12 @@ namespace AgentLibrary
 
         public Schedule()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void onScheduleTriggered()
         {
-            throw new System.NotImplementedException();
+            
         }
         private AgentJobHeader jobHeader;
         private Trigger trigger;
