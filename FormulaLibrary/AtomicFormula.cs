@@ -63,6 +63,25 @@ namespace FormulaLibrary
             return b.ToString();
         }
 
+        /// <summary>
+        /// Try parsing a string representing an atomic formula. If this operation 
+        /// succeeds, a new <see cref="AtomicFormula"/> object is returned.
+        /// </summary>
+        public static void FromString(string formula)
+        {
+            string functor = formula.Substring(0, formula.IndexOf('('));
+
+        }
+
+        /// <summary>
+        /// XML -> atomic formula
+        /// </summary>
+        public static void FromXML()
+        {
+            //TODO to implement
+        }
+
+
         public override bool Equals(object obj)
         {
             throw new NotImplementedException();
@@ -71,6 +90,25 @@ namespace FormulaLibrary
         public override int GetHashCode()
         {
             throw new NotImplementedException();
+        }
+    }
+
+
+
+    sealed internal class InvalidFormulaFormatException : Exception
+    {
+        public InvalidFormulaFormatException()
+        {
+        }
+
+        public InvalidFormulaFormatException(string message)
+        : base(message)
+        {
+        }
+
+        public InvalidFormulaFormatException(string message, Exception inner)
+        : base(message, inner)
+        {
         }
     }
 }

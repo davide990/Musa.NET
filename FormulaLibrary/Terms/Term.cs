@@ -10,30 +10,25 @@
 
 namespace FormulaLibrary
 {
-    public sealed class Term
+    public class Term
     {
         /// <summary>
         /// This term's name
         /// </summary>
         private readonly string name;
-        
+        public string Name
+        {
+            get { return name; }
+        }
+
         public Term(string name)
         {
             this.name = name;
         }
-        
+
         public override string ToString()
         {
             return name;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if(obj.GetType() == typeof(Term))
-            {
-                return ((Term)obj).ToString().Equals(base.ToString());
-            }
-            return false;
         }
     }
 }

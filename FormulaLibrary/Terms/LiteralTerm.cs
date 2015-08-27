@@ -9,10 +9,19 @@
 */
 namespace FormulaLibrary
 {
-    public abstract class Formula
+    public class LiteralTerm : Term
     {
-        public abstract FormulaType getType();
-        public abstract override string ToString();
-        public abstract override bool Equals(object obj);
+        public LiteralTerm(string name)
+            : base(name)
+        {
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj.GetType() == typeof(Term))
+                return ((Term)obj).ToString().Equals(base.ToString());
+            return false;
+        }
+        
     }
 }

@@ -40,15 +40,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AndFormula.cs" />
+    <Compile Include="CompositeFormula\AndFormula.cs" />
     <Compile Include="Assignment.cs" />
     <Compile Include="AtomicFormula.cs" />
     <Compile Include="Formula.cs" />
     <Compile Include="FormulaType.cs" />
-    <Compile Include="NotFormula.cs" />
-    <Compile Include="OrFormula.cs" />
+    <Compile Include="CompositeFormula\NotFormula.cs" />
+    <Compile Include="CompositeFormula\OrFormula.cs" />
+    <Compile Include="IUnifiable.cs" />
+    <Compile Include="Terms\LiteralTerm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Term.cs" />
+    <Compile Include="Terms\Term.cs" />
+    <Compile Include="Terms\VariableTerm.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="UML\FormulaLibrary.cd" />

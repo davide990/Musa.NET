@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="FormulaLibrary.Formula">
-    <Position X="3.75" Y="0.5" Width="1.5" />
+    <Position X="4" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAEgAAAAAAAAQAAAIAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAEgAAAAAAAAQAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Formula.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FormulaLibrary.AtomicFormula">
-    <Position X="7.25" Y="3" Width="1.5" />
+    <Position X="7.5" Y="2.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAABAAAAAgAAAAEgAAAAAAAAQAAAIAAAAAAAAAAAAQ=</HashCode>
+      <HashCode>AAAABAAAAAgAAAAEkAAAAAAAAQAAAIAAAAAAAAAgAAQ=</HashCode>
       <FileName>AtomicFormula.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
@@ -18,42 +18,64 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="FormulaLibrary.AndFormula">
-    <Position X="0.5" Y="3" Width="1.5" />
+    <Position X="0.75" Y="2.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAECAAAAAAAAQAIAAAAAAAAAAAAgAA=</HashCode>
-      <FileName>AndFormula.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAEiAAAAAAAAQAIAIAAAAAAAAAAgAA=</HashCode>
+      <FileName>CompositeFormula\AndFormula.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FormulaLibrary.OrFormula">
-    <Position X="5" Y="3" Width="1.5" />
+    <Position X="5.25" Y="2.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAECAAAAAAAAQAIAAAAAAAAAAAAgAA=</HashCode>
-      <FileName>OrFormula.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAEiAAAAAAAAQAIAIAAAAAAAAAAgAA=</HashCode>
+      <FileName>CompositeFormula\OrFormula.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FormulaLibrary.NotFormula">
-    <Position X="2.75" Y="3" Width="1.5" />
+    <Position X="3" Y="2.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAEAQAABAAAAAAAAAAAAAA=</HashCode>
-      <FileName>NotFormula.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAEgAAAAAAEAQAABIAAAAAAAAAAAAA=</HashCode>
+      <FileName>CompositeFormula\NotFormula.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FormulaLibrary.Term">
-    <Position X="10.25" Y="3.5" Width="1.5" />
+    <Position X="1.75" Y="6.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAEAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Term.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAQAAAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Terms\Term.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="FormulaLibrary.Assignment" Collapsed="true">
-    <Position X="12.75" Y="0.5" Width="1.5" />
+  <Class Name="FormulaLibrary.Assignment&lt;T&gt;" Collapsed="true">
+    <Position X="10" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAEgAAAAAQAAAAEACAAAAAgAAAAAAA=</HashCode>
       <FileName>Assignment.cs</FileName>
     </TypeIdentifier>
   </Class>
+  <Class Name="FormulaLibrary.LiteralTerm">
+    <Position X="0.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Terms\LiteralTerm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FormulaLibrary.VariableTerm&lt;T&gt;">
+    <Position X="2.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAAAACAAAAAgAAAAAQA=</HashCode>
+      <FileName>Terms\VariableTerm.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="FormulaLibrary.IUnifiable&lt;T&gt;" Collapsed="true">
+    <Position X="10" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>IUnifiable.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
   <Enum Name="FormulaLibrary.FormulaType" Collapsed="true">
-    <Position X="12.75" Y="1.75" Width="1.5" />
+    <Position X="10" Y="2.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAgAAQAAAAAAAAEAAAABAAAAAAAA=</HashCode>
       <FileName>FormulaType.cs</FileName>
