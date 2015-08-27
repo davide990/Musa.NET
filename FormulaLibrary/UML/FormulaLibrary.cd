@@ -1,4 +1,63 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="FormulaLibrary.Formula">
+    <Position X="3.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEgAAAAAAAAQAAAIAAAAAAAAAAAAA=</HashCode>
+      <FileName>Formula.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FormulaLibrary.AtomicFormula">
+    <Position X="7.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAgAAAAEgAAAAAAAAQAAAIAAAAAAAAAAAAQ=</HashCode>
+      <FileName>AtomicFormula.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="terms" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="FormulaLibrary.AndFormula">
+    <Position X="0.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAECAAAAAAAAQAIAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>AndFormula.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FormulaLibrary.OrFormula">
+    <Position X="5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAECAAAAAAAAQAIAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>OrFormula.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FormulaLibrary.NotFormula">
+    <Position X="2.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAEAQAABAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NotFormula.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FormulaLibrary.Term">
+    <Position X="10.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Term.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FormulaLibrary.Assignment" Collapsed="true">
+    <Position X="12.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assignment.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="FormulaLibrary.FormulaType" Collapsed="true">
+    <Position X="12.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAQAAAAAAAAEAAAABAAAAAAAA=</HashCode>
+      <FileName>FormulaType.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>
