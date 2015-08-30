@@ -68,7 +68,7 @@ namespace FormulaLibrary
         
         public override string ToString()
         {
-            return "("+base.ToString()+","+Value.ToString()+")";
+            return "["+base.ToString()+","+Value.ToString()+"]";
         }
     }
 }

@@ -18,17 +18,9 @@ namespace AgentTest
     {
         static void Main(string[] args)
         {
-            LiteralTerm a = new LiteralTerm("a");
-            Console.WriteLine("ho creato " + a.ToString());
+            AtomicFormula a = new AtomicFormula("f", new LiteralTerm("x"), new VariableTerm<short>("y", 1));
 
-            VariableTerm<int> var_a = a.toVariableTerm(5);
-            Console.WriteLine("ho convertito " + a.ToString() + " in " + var_a.ToString());
-
-            Term aaa = a.toVariableTerm(5);
-            Console.WriteLine("aaa è " + aaa.GetType().ToString());
-
-            aaa = ((VariableTerm<int>)aaa).toLiteralTerm();
-            Console.WriteLine("aaa è " + aaa.GetType().ToString());
+            Console.WriteLine(a.ToString(false));
 
 
             Console.ReadKey(true);

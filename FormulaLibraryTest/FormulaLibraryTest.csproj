@@ -66,6 +66,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="AtomicFormulaTest.cs" />
     <Compile Include="LiteralTermTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VariableTermTest.cs" />

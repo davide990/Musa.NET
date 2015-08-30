@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace FormulaLibrary
 {
@@ -34,6 +35,10 @@ namespace FormulaLibrary
         /// <summary>
         /// The list of terms of this formula
         /// </summary>
+        public List<Term> Terms
+        {
+            get { return terms; }
+        }
         private List<Term> terms;
 
         public AtomicFormula(string functor, params Term[] terms)
@@ -41,6 +46,7 @@ namespace FormulaLibrary
             this.functor = functor;
             this.terms = new List<Term>(terms);
         }
+        
 
         public override FormulaType getType()
         {
@@ -64,13 +70,42 @@ namespace FormulaLibrary
         }
 
         /// <summary>
+        /// Return a string representation for this formula, i.e.
+        ///
+        /// f(x,y,z)
+        /// 
+        /// If compactVisualization is true, then each term's name is printed. Otherwise,
+        /// for each variable term is printed also its value.
+        /// </summary>
+        public string ToString(bool compactVisualization)
+        {
+            if (!compactVisualization)
+                return ToString();
+
+            StringBuilder b = new StringBuilder();
+            b.Append(functor);
+            b.Append("(");
+            for (byte i = 0; i < terms.Count; i++)
+            {
+                b.Append(terms[i].Name);
+                if (i != terms.Count - 1)
+                    b.Append(",");
+            }
+
+            b.Append(")");
+            return b.ToString();
+        }
+
+
+        /// <summary>
         /// Try parsing a string representing an atomic formula. If this operation 
         /// succeeds, a new <see cref="AtomicFormula"/> object is returned.
         /// </summary>
         public static void FromString(string formula)
         {
-            string functor = formula.Substring(0, formula.IndexOf('('));
+            //esempio: f(x<-int(1),k,[u,int(2)])
 
+            //vedere Type.getType(..)
         }
 
         /// <summary>
@@ -84,12 +119,26 @@ namespace FormulaLibrary
 
         public override bool Equals(object obj)
         {
-            throw new NotImplementedException();
+            if (!(obj is AtomicFormula))
+                return false;
+
+            AtomicFormula other = (AtomicFormula)obj;
+
+            if (!other.Functor.Equals(Functor))
+                return false;
+
+            foreach(Term t in terms)
+            {
+                if (!other.terms.Contains(t))
+                    return false;
+            }
+
+            return true;
         }
 
         public override int GetHashCode()
         {
-            throw new NotImplementedException();
+            return base.GetHashCode();
         }
     }
 
