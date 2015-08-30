@@ -39,7 +39,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="FormulaLibrary.Term">
-    <Position X="1.75" Y="6.5" Width="1.5" />
+    <Position X="1.75" Y="6.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAEAAAAAAQAAAAEAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Terms\Term.cs</FileName>
@@ -55,7 +55,7 @@
   <Class Name="FormulaLibrary.LiteralTerm">
     <Position X="0.5" Y="9.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
       <FileName>Terms\LiteralTerm.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -66,6 +66,13 @@
       <FileName>Terms\VariableTerm.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="FormulaLibrary.TermConverter">
+    <Position X="9.75" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>TermConverter.cs</FileName>
+    </TypeIdentifier>
   </Class>
   <Interface Name="FormulaLibrary.IUnifiable&lt;T&gt;" Collapsed="true">
     <Position X="10" Y="1.75" Width="1.5" />

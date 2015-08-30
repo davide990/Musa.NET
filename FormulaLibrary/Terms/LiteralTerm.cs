@@ -16,12 +16,22 @@ namespace FormulaLibrary
         {
         }
 
+        public override string ToString()
+        {
+            return base.ToString();
+        }
+
         public override bool Equals(object obj)
         {
-            if (obj.GetType() == typeof(Term))
-                return ((Term)obj).ToString().Equals(base.ToString());
+            if (obj.GetType() == typeof(LiteralTerm))
+                return Name.Equals(((LiteralTerm)obj).Name);
+
             return false;
         }
         
+        public VariableTerm<type> toVariableTerm<type>(type value)
+        {
+            return new VariableTerm<type>(Name, value);
+        }
     }
 }

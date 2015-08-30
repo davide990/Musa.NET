@@ -8,13 +8,33 @@
 
 */
 using AgentLibrary;
+using FormulaLibrary;
 using Quartz;
+using System;
 
 namespace AgentTest
 {
     class Program
     {
         static void Main(string[] args)
+        {
+            LiteralTerm a = new LiteralTerm("a");
+            Console.WriteLine("ho creato " + a.ToString());
+
+            VariableTerm<int> var_a = a.toVariableTerm(5);
+            Console.WriteLine("ho convertito " + a.ToString() + " in " + var_a.ToString());
+
+            Term aaa = a.toVariableTerm(5);
+            Console.WriteLine("aaa è " + aaa.GetType().ToString());
+
+            aaa = ((VariableTerm<int>)aaa).toLiteralTerm();
+            Console.WriteLine("aaa è " + aaa.GetType().ToString());
+
+
+            Console.ReadKey(true);
+        }
+
+        private void quartz_test_0()
         {
             Agent worker = new Agent("worker");
 
