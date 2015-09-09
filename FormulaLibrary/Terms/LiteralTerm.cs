@@ -1,19 +1,25 @@
-﻿/**
-         __  __                                     _   
-        |  \/  |                                   | |  
-        | \  / | _   _  ___   __ _     _ __    ___ | |_ 
-        | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
-        | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
-        |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+﻿using System;
+/**
+__  __                                     _   
+|  \/  |                                   | |  
+| \  / | _   _  ___   __ _     _ __    ___ | |_ 
+| |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
+| |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
+|_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 
 */
 namespace FormulaLibrary
 {
-    public class LiteralTerm : Term
+    public class LiteralTerm : Term, IEquatable<LiteralTerm>
     {
         public LiteralTerm(string name)
             : base(name)
         {
+        }
+
+        public bool Equals(LiteralTerm other)
+        {
+            return Name.Equals(other.Name);
         }
 
         public override string ToString()
@@ -21,11 +27,11 @@ namespace FormulaLibrary
             return base.ToString();
         }
 
+        
         public override bool Equals(object obj)
         {
-            if (obj.GetType() == typeof(LiteralTerm))
-                return Name.Equals(((LiteralTerm)obj).Name);
-
+            if(obj is LiteralTerm)
+                return Equals((LiteralTerm)obj);
             return false;
         }
         
@@ -33,5 +39,7 @@ namespace FormulaLibrary
         {
             return new VariableTerm<type>(Name, value);
         }
+
+        
     }
 }

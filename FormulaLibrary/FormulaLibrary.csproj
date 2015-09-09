@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Antlr4.Runtime, Version=4.5.0.0, Culture=neutral, PublicKeyToken=e78b2c5abd1fcb3f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Downloads\Antlr4.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -41,6 +45,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ANTLR\formula_grammarBaseListener.cs" />
+    <Compile Include="ANTLR\formula_grammarBaseVisitor.cs" />
+    <Compile Include="ANTLR\formula_grammarLexer.cs" />
+    <Compile Include="ANTLR\formula_grammarListener.cs" />
+    <Compile Include="ANTLR\formula_grammarParser.cs" />
+    <Compile Include="ANTLR\formula_grammarVisitor.cs" />
+    <Compile Include="ANTLR\parser\FormulaParser.cs" />
+    <Compile Include="ANTLR\visitor\FormulaVisitor.cs" />
+    <Compile Include="ANTLR\visitor\PredicateVisitor.cs" />
     <Compile Include="CompositeFormula\AndFormula.cs" />
     <Compile Include="Assignment.cs" />
     <Compile Include="AtomicFormula.cs" />
@@ -55,6 +68,9 @@
     <Compile Include="Terms\VariableTerm.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ANTLR\formula_grammar.g" />
+    <None Include="ANTLR\formula_grammar.tokens" />
+    <None Include="ANTLR\formula_grammarLexer.tokens" />
     <None Include="UML\FormulaLibrary.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

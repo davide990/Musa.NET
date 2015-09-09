@@ -46,7 +46,14 @@ namespace FormulaLibrary
             this.functor = functor;
             this.terms = new List<Term>(terms);
         }
-        
+
+        public AtomicFormula(string functor, IEnumerable<Term> terms)
+        {
+            this.functor = functor;
+            this.terms = new List<Term>();
+            this.terms.AddRange(terms);
+        }
+
 
         public override FormulaType getType()
         {
@@ -96,27 +103,6 @@ namespace FormulaLibrary
             return b.ToString();
         }
 
-
-        /// <summary>
-        /// Try parsing a string representing an atomic formula. If this operation 
-        /// succeeds, a new <see cref="AtomicFormula"/> object is returned.
-        /// </summary>
-        public static void FromString(string formula)
-        {
-            //esempio: f(x<-int(1),k,[u,int(2)])
-
-            //vedere Type.getType(..)
-        }
-
-        /// <summary>
-        /// XML -> atomic formula
-        /// </summary>
-        public static void FromXML()
-        {
-            //TODO to implement
-        }
-
-
         public override bool Equals(object obj)
         {
             if (!(obj is AtomicFormula))
@@ -126,8 +112,8 @@ namespace FormulaLibrary
 
             if (!other.Functor.Equals(Functor))
                 return false;
-
-            foreach(Term t in terms)
+            
+            foreach (var t in terms)
             {
                 if (!other.terms.Contains(t))
                     return false;

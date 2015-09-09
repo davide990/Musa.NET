@@ -1,15 +1,18 @@
 ﻿/**
-         __  __                                     _   
-        |  \/  |                                   | |  
-        | \  / | _   _  ___   __ _     _ __    ___ | |_ 
-        | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
-        | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
-        |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+__  __                                     _   
+|  \/  |                                   | |  
+| \  / | _   _  ___   __ _     _ __    ___ | |_ 
+| |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
+| |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
+|_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 
 */
+
+using System;
+
 namespace FormulaLibrary
 {
-    public class VariableTerm<T> : Term, IUnifiable<T>
+    public class VariableTerm<T> : Term, IUnifiable<T>, IEquatable<VariableTerm<T>>
     {
         /// <summary>
         /// The value of this term
@@ -47,12 +50,7 @@ namespace FormulaLibrary
         {
             return new LiteralTerm(Name);
         }
-
-        public bool Equals<type>(VariableTerm<type> other)
-        {
-            return Value is type && other.Name.Equals(Name) && other.Value.Equals(Value);
-        }
-
+        
         /// <summary>
         /// Unify the value of this term with the given assignment. The unification
         /// succeeds only if the assignment's name is equal to the name of this term.
@@ -70,5 +68,21 @@ namespace FormulaLibrary
         {
             return "["+base.ToString()+","+Value.ToString()+"]";
         }
+
+        public bool Equals(VariableTerm<T> other)
+        {
+            return  Name.Equals(other.Name) &&
+                    Value.Equals(other.Value);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!obj.GetType().Equals(typeof(VariableTerm<T>)))
+                return false;
+
+            return Equals(obj as VariableTerm<T>);
+        }
+
+        
     }
 }
