@@ -4,7 +4,15 @@ using Antlr4.Runtime.Tree;
 namespace FormulaLibrary.ANTLR.visitor
 {
     public class FormulaVisitor : formula_grammarBaseVisitor<Formula>
-    {        
+    {
+
+        public override Formula VisitFormula([NotNull] formula_grammarParser.FormulaContext context)
+        {
+            base.VisitFormula(context);
+
+            return VisitDisjunction(context.disjunction());
+        }
+
         public override Formula VisitDisjunction([NotNull] formula_grammarParser.DisjunctionContext context)
         {
             //conjunction (OR conjunction)*
@@ -45,7 +53,10 @@ namespace FormulaLibrary.ANTLR.visitor
             }
             else if((tree = context.formula()) != null)
             {
-                return Visit(tree);
+                if (isNegated)
+                    return new NotFormula(VisitFormula(context.formula()));
+                else
+                    return VisitFormula(context.formula());
             }
             return null;
         }
