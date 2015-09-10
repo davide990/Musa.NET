@@ -43,6 +43,10 @@ namespace FormulaLibrary.ANTLR.visitor
                 else
                     return predicateVisitor.ToAtomicFormula();
             }
+            else if((tree = context.formula()) != null)
+            {
+                return Visit(tree);
+            }
             return null;
         }
 
