@@ -12,7 +12,7 @@ using System.Text;
 
 namespace FormulaLibrary
 {
-    public sealed class AndFormula : Formula
+    public sealed class AndFormula : Formula,IEquatable<AndFormula>
     {
         private readonly Formula left;
         private readonly Formula right;
@@ -41,14 +41,16 @@ namespace FormulaLibrary
             }
         }
 
-        public override bool Equals(object obj)
+        public bool Equals(AndFormula other)
         {
-            throw new NotImplementedException();
+            return left.Equals(other.left) && right.Equals(other.right);
         }
 
-        public override int GetHashCode()
+        public override bool Equals(object obj)
         {
-            throw new NotImplementedException();
+            if (obj is AndFormula)
+                return Equals(obj as AndFormula);
+            return false;
         }
 
         public override FormulaType getType()

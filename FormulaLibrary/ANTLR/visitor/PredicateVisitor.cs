@@ -81,7 +81,7 @@ namespace FormulaLibrary.ANTLR.visitor
             Type type = Type.GetType(Visit(context.varType().children[0]));
 
             //Get the term name and value
-            string str_value = context.value.GetText();
+            string str_value = context.value.expr;
             string name = context.name.expr;
 
             //Create a new VariableTerm object
@@ -91,6 +91,10 @@ namespace FormulaLibrary.ANTLR.visitor
 
             //Cast the term value to the specified type
             object value = null;
+
+            //In case the value is a char or a string, trim the initial and the ending (double)quotes
+            TrimQuotesChar(ref str_value);
+
             if (typeof(string).Equals(type))
             {
                 //In the simplest case, the type if a string. No casting operations are needed here
@@ -124,6 +128,16 @@ namespace FormulaLibrary.ANTLR.visitor
 
             return "";
         }
+
+        private void TrimQuotesChar(ref string str)
+        {
+            if (str.StartsWith("\"") || str.StartsWith("'"))
+                str = str.Substring(1);
+
+            if (str.EndsWith("\"") || str.EndsWith("'"))
+                str = str.Substring(0, str.Length - 1);
+        }
+
 
         public override string VisitSimple_type([NotNull] formula_grammarParser.Simple_typeContext context)
         {

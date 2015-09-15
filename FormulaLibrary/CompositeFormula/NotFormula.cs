@@ -12,7 +12,7 @@ using System.Text;
 
 namespace FormulaLibrary
 {
-    public sealed class NotFormula : Formula
+    public sealed class NotFormula : Formula, IEquatable<NotFormula>
     {
         public Formula Formula
         {
@@ -41,12 +41,14 @@ namespace FormulaLibrary
 
         public override bool Equals(object obj)
         {
-            throw new NotImplementedException();
+            if (obj is NotFormula)
+                return Equals(obj as NotFormula);
+            return false;
         }
 
-        public override int GetHashCode()
+        public bool Equals(NotFormula other)
         {
-            throw new NotImplementedException();
+            return other.Formula.Equals(Formula);
         }
     }
 }

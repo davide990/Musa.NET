@@ -7,7 +7,7 @@ options
 
 condition
 	:
-		formula EOF
+		formula EOF	
 	;
 
 formula
@@ -15,15 +15,15 @@ formula
 		disjunction
 	;
 
-disjunction:
+disjunction: 
 	conjunction (OR conjunction)*
 	;
 
-conjunction:
+conjunction: 
 	negation (AND negation)*
 	;
 
-negation:
+negation: 
 	NOT? (predicate | LPAREN formula RPAREN)
 	;
 
@@ -36,11 +36,11 @@ predicateTuple
 		term (',' term)*
 	;
 
-term
+term	
 	:
 		literal_term
 	|	variable_term
-	;
+	;	
 
 literal_term:	name=identifier;
 
@@ -48,16 +48,17 @@ variable_term
 	:
 		name=identifier ASSIGNMENT_OP type=varType LPAREN value=varValue RPAREN
 	;
-
-varValue
+	
+varValue returns [String expr]
 	:
-		INT
-	|	FLOAT
-	|	String
+		INT {$expr = $INT.text;}
+	|	FLOAT {$expr = $FLOAT.text;}
+	|	String {$expr = $String.text;}
+	|	CHAR  {$expr = $CHAR.text;}
 	;
 
 identifier returns [String expr]
-	:
+	:	
 		ID {$expr = $ID.text;}
 	;
 
@@ -77,7 +78,7 @@ WS  :   ( ' '
         | '\t'
         | '\r'
         | '\n'
-        )//{$channel=HIDDEN;}
+        ) -> channel(HIDDEN)
     ;
 
 String : ('a'..'z'|'A'..'Z'|'0'..'9'|'_')+ | ('"' (~'"')* '"');
@@ -111,7 +112,7 @@ fragment
 UNICODE_ESC
     :   '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
     ;
-
+  
 LPAREN
     : '('
     ;
@@ -119,7 +120,7 @@ LPAREN
 RPAREN
     : ')'
     ;
-
+    
 ASSIGNMENT_OP
 	:
 	'<-'
@@ -136,13 +137,13 @@ OR
 NOT
     : '!'
     ;
-
-/** primitive types */
+  
+/** primitive types */  
 varType
-  : simple_type
+  : simple_type		
   | nullable_type
   ;
-
+  
 simple_type returns [String expr]
 	: numeric_type			{$expr = $numeric_type.expr; }
 	| 'bool'			{$expr = "System.Boolean";}
@@ -152,7 +153,7 @@ numeric_type returns [String expr]
 	| floating_point_type	 	{$expr = $floating_point_type.expr; }
 	| 'decimal'			{$expr = "System.Decimal";}
 	;
-
+	
 integral_type returns [String expr]
 	: 'sbyte'	{$expr = "System.SByte";}
 	| 'byte'	{$expr = "System.Byte";}
@@ -168,7 +169,7 @@ floating_point_type returns [String expr]
 	: 'float'	 {$expr = "System.Single";}
 	| 'double'	 {$expr = "System.Double";}
 	;
-
+	
 nullable_type returns  [String expr]
 	:
 		string_type {$expr = $string_type.expr; }
@@ -177,3 +178,4 @@ string_type returns [String expr]
 	:
 		'string' {$expr = "System.String";}
 	;
+    

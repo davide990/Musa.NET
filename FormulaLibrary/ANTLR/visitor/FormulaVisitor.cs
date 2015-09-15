@@ -1,21 +1,28 @@
-﻿using Antlr4.Runtime.Misc;
+﻿/**
+__  __                                     _   
+|  \/  |                                   | |  
+| \  / | _   _  ___   __ _     _ __    ___ | |_ 
+| |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
+| |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
+|_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+
+*/
+
+using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 
 namespace FormulaLibrary.ANTLR.visitor
 {
     public class FormulaVisitor : formula_grammarBaseVisitor<Formula>
     {
-
         public override Formula VisitFormula([NotNull] formula_grammarParser.FormulaContext context)
         {
             base.VisitFormula(context);
-
             return VisitDisjunction(context.disjunction());
         }
 
         public override Formula VisitDisjunction([NotNull] formula_grammarParser.DisjunctionContext context)
         {
-            //conjunction (OR conjunction)*
             base.VisitDisjunction(context);
 
             if (context.ChildCount > 1)
@@ -27,7 +34,7 @@ namespace FormulaLibrary.ANTLR.visitor
         public override Formula VisitConjunction([NotNull] formula_grammarParser.ConjunctionContext context)
         {
             base.VisitConjunction(context);
-            //negation (AND negation)*
+
             if (context.ChildCount > 1)
                 return new AndFormula(VisitNegation(context.negation(0)), VisitNegation(context.negation(1)));
 
@@ -37,7 +44,6 @@ namespace FormulaLibrary.ANTLR.visitor
         public override Formula VisitNegation([NotNull] formula_grammarParser.NegationContext context)
         {
             base.VisitNegation(context);
-            //NOT? (predicate | LPAREN formula RPAREN)
             bool isNegated = context.NOT() != null;
             IParseTree tree = null;
 

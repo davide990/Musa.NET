@@ -104,10 +104,9 @@ namespace FormulaLibraryTest.ANTLRTest
         }
 
         [TestCase(Result = true)]
-        [Test]
         public bool formula_test_8()
         {
-            string formula = "f(x<-string(hi))";
+            string formula = "f(x<-string(\"hi\"))";
 
             Formula generatedFormula = FormulaParser.ConvertStringToFormula(formula);
             Formula expectedFormula = new AtomicFormula("f", new VariableTerm<string>("x", "hi"));
@@ -119,8 +118,9 @@ namespace FormulaLibraryTest.ANTLRTest
         [Test]
         public bool formula_test_9()
         {
-            string formula = "f(x<-char(c))";
+            string formula = "f(x<-char(\'c\'))";
 
+            
             Formula generatedFormula = FormulaParser.ConvertStringToFormula(formula);
             Formula expectedFormula = new AtomicFormula("f", new VariableTerm<char>("x", 'c'));
 
@@ -139,6 +139,18 @@ namespace FormulaLibraryTest.ANTLRTest
             return generatedFormula.Equals(expectedFormula);
         }
 
+
+        [TestCase(Result = true)]
+        [Test]
+        public bool formula_test_11()
+        {
+            string formula = "f(x<-string(\"hi mate\"))";
+
+            Formula generatedFormula = FormulaParser.ConvertStringToFormula(formula);
+            Formula expectedFormula = new AtomicFormula("f", new VariableTerm<string>("x", "hi mate"));
+
+            return generatedFormula.Equals(expectedFormula);
+        }
 
     }
 }

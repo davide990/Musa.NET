@@ -12,7 +12,7 @@ using System.Text;
 
 namespace FormulaLibrary
 {
-    public sealed class OrFormula : Formula
+    public sealed class OrFormula : Formula, IEquatable<OrFormula>
     {
         private readonly Formula left;
         private readonly Formula right;
@@ -41,16 +41,18 @@ namespace FormulaLibrary
             }
         }
 
+        public bool Equals(OrFormula other)
+        {
+            return left.Equals(other.left) && right.Equals(other.right);
+        }
+
         public override bool Equals(object obj)
         {
-            throw new NotImplementedException();
+            if (obj is OrFormula)
+                return Equals(obj as OrFormula);
+            return false;
         }
-
-        public override int GetHashCode()
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public override FormulaType getType()
         {
             return FormulaType.OR_FORMULA;

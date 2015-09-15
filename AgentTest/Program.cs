@@ -26,7 +26,9 @@ namespace AgentTest
             //AtomicFormula a = new AtomicFormula("f", new LiteralTerm("x"), new VariableTerm<short>("y", 1));
             //Console.WriteLine(a.ToString(false));
             //Console.ReadKey(true);
-            visitor_test();
+            //visitor_test();
+            
+            
         }
 
 
