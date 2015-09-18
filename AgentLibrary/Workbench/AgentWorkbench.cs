@@ -45,6 +45,9 @@ namespace AgentLibrary
         /// </summary>
         private ObservableCollection<AtomicFormula> workbench;
 
+        /// <summary>
+        /// The set of assignment
+        /// </summary>
         private List<AssignmentType> assignment_set;
 
         /// <summary>
@@ -89,16 +92,15 @@ namespace AgentLibrary
         }
         
         /// <summary>
-        /// Add a belief (as atomic formula) into this workbench.
+        /// Add a statement (as atomic formula) into this workbench.
         /// </summary>
-        public void addCondition(params AtomicFormula[] f)
+        public void addStatement(params AtomicFormula[] f)
         {
             List<object> variableTerms = new List<object>();
             foreach (AtomicFormula ff in f)
             {
                 variableTerms = ff.ConvertToSimpleFormula();
 
-                //
                 if (workbench.Contains(ff))
                     continue;
 
@@ -126,6 +128,38 @@ namespace AgentLibrary
         /// Test if a formula is verified into this workbench.
         /// </summary>
         /// <returns>True if formula is satisfied in this workbench</returns>
+        public bool TestCondition(Formula formula, out List<AssignmentType> generatedAssignment)
+        {
+            if (formula is NotFormula)
+                return !TestCondition((formula as NotFormula).Formula, out generatedAssignment);
+            else
+            if (formula is OrFormula)
+            {
+                List<AssignmentType> l = null, r = null;
+                bool left_result = TestCondition((formula as OrFormula).Left, out l);
+                bool right_result = TestCondition((formula as OrFormula).Right, out r);
+                generatedAssignment = new List<AssignmentType>(l);
+                generatedAssignment.AddRange(r);
+                return left_result | right_result;
+            }
+            else
+            if (formula is AndFormula)
+            {
+                List<AssignmentType> l = null, r = null;
+                bool left_result = TestCondition((formula as AndFormula).Left, out l);
+                bool right_result = TestCondition((formula as AndFormula).Right, out r);
+                generatedAssignment = new List<AssignmentType>(l);
+                generatedAssignment.AddRange(r);
+                return left_result & right_result;
+            }
+            else
+                return testCondition(formula as AtomicFormula, out generatedAssignment);
+        }
+
+        /// <summary>
+        /// Test if a formula is verified into this workbench.
+        /// </summary>
+        /// <returns>True if formula is satisfied in this workbench</returns>
         public bool TestCondition(Formula formula)
         {
             if (formula is NotFormula)
@@ -137,7 +171,11 @@ namespace AgentLibrary
             if (formula is AndFormula)
                 return TestCondition((formula as AndFormula).Left) & TestCondition((formula as AndFormula).Right);
             else
-                return testCondition(formula as AtomicFormula);
+            {
+                List<AssignmentType> l;
+                return testCondition(formula as AtomicFormula, out l);
+                l.Clear();
+            }
         }
 
         /// <summary>
@@ -146,11 +184,11 @@ namespace AgentLibrary
         /// form of assignment, contained in this workbench.
         /// </summary>
         /// <returns>True if f is satisfied in this workbench</returns>
-        private bool testCondition(AtomicFormula f)
+        private bool testCondition(AtomicFormula f, out List<AssignmentType> generatedAssignment)
         {
             Term a, b;
             bool success = true;
-            List<AssignmentType> generatedAssignment = new List<AssignmentType>();
+            generatedAssignment = new List<AssignmentType>();
 
             bool belief_term_has_assignment;
 

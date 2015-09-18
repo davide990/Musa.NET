@@ -11,7 +11,6 @@ using FormulaLibrary;
 using FormulaLibrary.ANTLR;
 using NUnit.Framework;
 
-
 namespace FormulaLibraryTest.ANTLRTest
 {
     [TestFixture]

@@ -25,24 +25,18 @@ namespace AgentTest
     {
         static void Main(string[] args)
         {
-
-            AtomicFormula ff = (AtomicFormula)FormulaParser.Parse("f(x<-int(3),k,w)");
-            Formula before = (AtomicFormula)ff.Clone();
-            //(ff as AtomicFormula).ConvertToSimpleFormula();
-
             AgentWorkbench wb = new AgentWorkbench();
-            wb.addCondition(ff);
+            wb.addStatement(FormulaParser.Parse("y(x<-int(3))") as AtomicFormula,
+                            FormulaParser.Parse("f(x)") as AtomicFormula,
+                            FormulaParser.Parse("h(s,o,a<-string(\"ciao mondo\"))") as AtomicFormula,
+                            FormulaParser.Parse("o(m,s<-char('d')") as AtomicFormula);
 
+            Formula test = FormulaParser.Parse("o(l<-int(2),k)");
 
+            List<AssignmentType> generatedAssignment = null;
 
-            object prova = null;
-            wb.ExistsAssignmentForTerm("x", out prova);
-
-
-
-
-            //Console.WriteLine();
-            Console.ReadKey();
+            bool res = wb.TestCondition(test, out generatedAssignment);
+            //Console.ReadKey();
         }
 
 
