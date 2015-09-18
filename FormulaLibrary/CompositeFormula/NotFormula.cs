@@ -50,5 +50,10 @@ namespace FormulaLibrary
         {
             return other.Formula.Equals(Formula);
         }
+
+        public override bool IsParametric()
+        {
+            return Formula.IsParametric();
+        }
     }
 }

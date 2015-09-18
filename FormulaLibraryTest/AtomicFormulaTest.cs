@@ -1,7 +1,15 @@
-﻿using FormulaLibrary;
+﻿/**
+         __  __                                     _   
+        |  \/  |                                   | |  
+        | \  / | _   _  ___   __ _     _ __    ___ | |_ 
+        | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
+        | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
+        |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+
+*/
+using FormulaLibrary;
 using NUnit.Framework;
 using System.Collections.Generic;
-
 
 namespace FormulaLibraryTest
 {

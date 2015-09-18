@@ -10,7 +10,7 @@
   <Class Name="FormulaLibrary.AtomicFormula">
     <Position X="7.5" Y="2.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAADAAAAAgAAAAEkAAAAAAAAQAAAIAAAAAAAAAgAAQ=</HashCode>
+      <HashCode>AAAADAAAAAgAAAAEgAAAAAAAAQAAAIAAAAAAAAAAAAQ=</HashCode>
       <FileName>AtomicFormula.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
@@ -20,26 +20,29 @@
   <Class Name="FormulaLibrary.AndFormula">
     <Position X="0.75" Y="2.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAEiAAAAAAAAQAIAIAAAAAAAAAAgAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAEiAAAAAAAAQAIAAAAAAAAAAAAgAA=</HashCode>
       <FileName>CompositeFormula\AndFormula.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="FormulaLibrary.OrFormula">
     <Position X="5.25" Y="2.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAEiAAAAAAAAQAIAIAAAAAAAAAAgAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAEiAAAAAAAAQAIAAAAAAAAAAAAgAA=</HashCode>
       <FileName>CompositeFormula\OrFormula.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="FormulaLibrary.NotFormula">
     <Position X="3" Y="2.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAEgAAAAAAEAQAABIAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAEgAAAAAAEAQAABAAAAAAAAAAAAAA=</HashCode>
       <FileName>CompositeFormula\NotFormula.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="FormulaLibrary.Term">
-    <Position X="1.75" Y="6.25" Width="1.5" />
+    <Position X="1.75" Y="6.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAEAAAAAAQAAAAEAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Terms\Term.cs</FileName>
@@ -58,6 +61,7 @@
       <HashCode>AAAAAAAAAAAAAAAEgAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
       <FileName>Terms\LiteralTerm.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="FormulaLibrary.VariableTerm&lt;T&gt;">
     <Position X="2.75" Y="9.5" Width="1.5" />
@@ -66,6 +70,13 @@
       <FileName>Terms\VariableTerm.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="FormulaLibrary.ANTLR.FormulaParser">
+    <Position X="11.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAA=</HashCode>
+      <FileName>ANTLR\parser\FormulaParser.cs</FileName>
+    </TypeIdentifier>
   </Class>
   <Interface Name="FormulaLibrary.IUnifiable&lt;T&gt;" Collapsed="true">
     <Position X="10" Y="1.75" Width="1.5" />

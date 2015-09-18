@@ -11,9 +11,11 @@ using AgentLibrary;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using FormulaLibrary;
+using FormulaLibrary.ANTLR;
 using FormulaLibrary.ANTLR.visitor;
 using Quartz;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -23,12 +25,24 @@ namespace AgentTest
     {
         static void Main(string[] args)
         {
-            //AtomicFormula a = new AtomicFormula("f", new LiteralTerm("x"), new VariableTerm<short>("y", 1));
-            //Console.WriteLine(a.ToString(false));
-            //Console.ReadKey(true);
-            //visitor_test();
-            
-            
+
+            AtomicFormula ff = (AtomicFormula)FormulaParser.Parse("f(x<-int(3),k,w)");
+            Formula before = (AtomicFormula)ff.Clone();
+            //(ff as AtomicFormula).ConvertToSimpleFormula();
+
+            AgentWorkbench wb = new AgentWorkbench();
+            wb.addCondition(ff);
+
+
+
+            object prova = null;
+            wb.ExistsAssignmentForTerm("x", out prova);
+
+
+
+
+            //Console.WriteLine();
+            Console.ReadKey();
         }
 
 

@@ -17,6 +17,16 @@ namespace FormulaLibrary
         private readonly Formula left;
         private readonly Formula right;
 
+        public Formula Left
+        {
+            get { return left; }
+        }
+
+        public Formula Right
+        {
+            get { return right; }
+        }
+
         public AndFormula(Formula left, Formula right)
         {
             this.left   = left;
@@ -56,6 +66,11 @@ namespace FormulaLibrary
         public override FormulaType getType()
         {
             return FormulaType.AND_FORMULA;
+        }
+
+        public override bool IsParametric()
+        {
+            return left.IsParametric() & right.IsParametric();
         }
 
         public override string ToString()

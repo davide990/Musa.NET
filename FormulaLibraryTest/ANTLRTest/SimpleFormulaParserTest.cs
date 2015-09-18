@@ -1,4 +1,13 @@
-﻿using FormulaLibrary;
+﻿/**
+         __  __                                     _   
+        |  \/  |                                   | |  
+        | \  / | _   _  ___   __ _     _ __    ___ | |_ 
+        | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
+        | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
+        |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+
+*/
+using FormulaLibrary;
 using FormulaLibrary.ANTLR;
 using NUnit.Framework;
 
@@ -13,7 +22,7 @@ namespace FormulaLibraryTest.ANTLRTest
         {
             string formula = "f(x)";
 
-            Formula generatedFormula = FormulaParser.ConvertStringToFormula(formula);
+            Formula generatedFormula = FormulaParser.Parse(formula);
             Formula expectedFormula = new AtomicFormula("f", new LiteralTerm("x"));
 
             return generatedFormula.Equals(expectedFormula);
@@ -25,7 +34,7 @@ namespace FormulaLibraryTest.ANTLRTest
         {
             string formula = "f(x,y,k)";
 
-            Formula generatedFormula = FormulaParser.ConvertStringToFormula(formula);
+            Formula generatedFormula = FormulaParser.Parse(formula);
             Formula expectedFormula = new AtomicFormula("f", new LiteralTerm("x"), new LiteralTerm("y"), new LiteralTerm("k"));
 
             return generatedFormula.Equals(expectedFormula);
@@ -37,7 +46,7 @@ namespace FormulaLibraryTest.ANTLRTest
         {
             string formula = "tall(john)";
 
-            Formula generatedFormula = FormulaParser.ConvertStringToFormula(formula);
+            Formula generatedFormula = FormulaParser.Parse(formula);
             Formula expectedFormula = new AtomicFormula("tall", new LiteralTerm("john"));
 
             return generatedFormula.Equals(expectedFormula);
@@ -49,7 +58,7 @@ namespace FormulaLibraryTest.ANTLRTest
         {
             string formula = "tall(john)";
 
-            Formula generatedFormula = FormulaParser.ConvertStringToFormula(formula);
+            Formula generatedFormula = FormulaParser.Parse(formula);
             Formula expectedFormula = new AtomicFormula("tall", new LiteralTerm("john"), new LiteralTerm("185"));
 
             return generatedFormula.Equals(expectedFormula);
@@ -61,7 +70,7 @@ namespace FormulaLibraryTest.ANTLRTest
         {
             string formula = "f(x<-int(2))";
 
-            Formula generatedFormula = FormulaParser.ConvertStringToFormula(formula);
+            Formula generatedFormula = FormulaParser.Parse(formula);
             Formula expectedFormula = new AtomicFormula("f", new VariableTerm<int>("x",2));
 
             return generatedFormula.Equals(expectedFormula);
@@ -73,7 +82,7 @@ namespace FormulaLibraryTest.ANTLRTest
         {
             string formula = "f(x<-float(2.9))";
             
-            Formula generatedFormula = FormulaParser.ConvertStringToFormula(formula);
+            Formula generatedFormula = FormulaParser.Parse(formula);
             Formula expectedFormula = new AtomicFormula("f", new VariableTerm<float>("x", 2.9f));
 
             return generatedFormula.Equals(expectedFormula);
@@ -85,7 +94,7 @@ namespace FormulaLibraryTest.ANTLRTest
         {
             string formula = "f(x<-byte(128))";
 
-            Formula generatedFormula = FormulaParser.ConvertStringToFormula(formula);
+            Formula generatedFormula = FormulaParser.Parse(formula);
             Formula expectedFormula = new AtomicFormula("f", new VariableTerm<byte>("x", 128));
 
             return generatedFormula.Equals(expectedFormula);
@@ -97,7 +106,7 @@ namespace FormulaLibraryTest.ANTLRTest
         {
             string formula = "f(x<-double(128.3282732),l,k)";
 
-            Formula generatedFormula = FormulaParser.ConvertStringToFormula(formula);
+            Formula generatedFormula = FormulaParser.Parse(formula);
             Formula expectedFormula = new AtomicFormula("f", new VariableTerm<double>("x", 128.3282732), new LiteralTerm("l"), new LiteralTerm("k"));
 
             return generatedFormula.Equals(expectedFormula);
@@ -108,7 +117,7 @@ namespace FormulaLibraryTest.ANTLRTest
         {
             string formula = "f(x<-string(\"hi\"))";
 
-            Formula generatedFormula = FormulaParser.ConvertStringToFormula(formula);
+            Formula generatedFormula = FormulaParser.Parse(formula);
             Formula expectedFormula = new AtomicFormula("f", new VariableTerm<string>("x", "hi"));
 
             return generatedFormula.Equals(expectedFormula);
@@ -121,7 +130,7 @@ namespace FormulaLibraryTest.ANTLRTest
             string formula = "f(x<-char(\'c\'))";
 
             
-            Formula generatedFormula = FormulaParser.ConvertStringToFormula(formula);
+            Formula generatedFormula = FormulaParser.Parse(formula);
             Formula expectedFormula = new AtomicFormula("f", new VariableTerm<char>("x", 'c'));
 
             return generatedFormula.Equals(expectedFormula);
@@ -133,7 +142,7 @@ namespace FormulaLibraryTest.ANTLRTest
         {
             string formula = "f(x<-decimal(99.9m))";
 
-            Formula generatedFormula = FormulaParser.ConvertStringToFormula(formula);
+            Formula generatedFormula = FormulaParser.Parse(formula);
             Formula expectedFormula = new AtomicFormula("f", new VariableTerm<decimal>("x", 99.9m));
 
             return generatedFormula.Equals(expectedFormula);
@@ -146,7 +155,7 @@ namespace FormulaLibraryTest.ANTLRTest
         {
             string formula = "f(x<-string(\"hi mate\"))";
 
-            Formula generatedFormula = FormulaParser.ConvertStringToFormula(formula);
+            Formula generatedFormula = FormulaParser.Parse(formula);
             Formula expectedFormula = new AtomicFormula("f", new VariableTerm<string>("x", "hi mate"));
 
             return generatedFormula.Equals(expectedFormula);

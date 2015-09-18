@@ -129,6 +129,9 @@ namespace FormulaLibrary.ANTLR.visitor
             return "";
         }
 
+        /// <summary>
+        /// Trim (double)quotes from a string
+        /// </summary>
         private void TrimQuotesChar(ref string str)
         {
             if (str.StartsWith("\"") || str.StartsWith("'"))

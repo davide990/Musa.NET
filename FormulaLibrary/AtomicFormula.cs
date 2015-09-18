@@ -21,7 +21,7 @@ namespace FormulaLibrary
     /// - a list of terms
     /// 
     /// </summary>
-    public sealed class AtomicFormula : Formula
+    public sealed class AtomicFormula : Formula, ICloneable
     {
         /// <summary>
         /// The functor of this formula
@@ -135,6 +135,9 @@ namespace FormulaLibrary
             return base.GetHashCode();
         }
 
+        
+
+
         /// <summary>
         /// Check if this formula is simple or parametric (that is, check if
         /// this formula contains or not variable terms)
@@ -178,6 +181,41 @@ namespace FormulaLibrary
             }
 
             return variableTerms;
+        }
+
+        /// <summary>
+        /// Create a clone of this formula
+        /// </summary>
+        public object Clone()
+        {
+            AtomicFormula clone = new AtomicFormula(Functor);
+
+            //Iterate each term
+            for (int i = 0; i < terms.Count; i++)
+            {
+                //if a variable term occurs
+                if (terms[i].GetType().IsGenericType)
+                { 
+                    //get the type info for the current term
+                    Type variableTermType = typeof(VariableTerm<>).MakeGenericType(terms[i].GetType().GetGenericArguments()[0]);
+                    ConstructorInfo cinfo = variableTermType.GetConstructor(new[] { typeof(string), terms[i].GetType().GetGenericArguments()[0] });
+
+                    //get the value of the current term
+                    object value = variableTermType.GetProperty("Value").GetValue(terms[i]);
+                    value = Convert.ChangeType(value, terms[i].GetType().GetGenericArguments()[0]);
+
+                    //create a new variable term instance
+                    object varTerm = cinfo.Invoke(new[] { terms[i].Name, value });
+
+                    //add the new instance to the cloned formula
+                    clone.terms.Add((Term)varTerm);
+                }
+                else
+                {
+                    clone.terms.Add(new LiteralTerm(terms[i].Name));
+                }
+            }
+            return clone;
         }
     }
 

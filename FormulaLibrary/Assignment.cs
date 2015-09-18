@@ -9,7 +9,13 @@
 */
 namespace FormulaLibrary
 {
-    public sealed class Assignment<T>
+    /// <summary>
+    /// The only purpose of this class is to made possible to create containers of assignment of different types. In fact, since
+    /// Assignment is a template class, is not possible to create directly lists or other containes objects containing them. So,
+    /// by doing this separation between Assignment and AssignmentType it is possible to create a list of AssignmentType, and adding
+    /// to it any assignment.
+    /// </summary>
+    public abstract class AssignmentType
     {
         /// <summary>
         /// The name of this assignment. It coincide with the name of the term this assignment will assign its value to.
@@ -20,19 +26,29 @@ namespace FormulaLibrary
         }
         private readonly string name;
         
+        public AssignmentType(string name)
+        {
+            this.name = name;
+        }
+    }
+
+    public sealed class Assignment<T> : AssignmentType
+    {
         /// <summary>
         /// The value to assign
         /// </summary>
         public T Value
         {
             get { return value; }
-            set { this.value = value; }
         }
         private T value;
 
-        public Assignment(string name, T value )
+        public Assignment(string name) : base(name)
         {
-            this.name = name;
+        }
+
+        public Assignment(string name, T value) : base(name)
+        {
             this.value = value;
         }
 
@@ -56,6 +72,11 @@ namespace FormulaLibrary
 
             Assignment<T> other = (Assignment<T>)obj;
             return other.Name.Equals(Name) && other.Value.Equals(Value);
+        }
+
+        public void setValue(T value)
+        {
+            this.value = value;
         }
     }
 }
