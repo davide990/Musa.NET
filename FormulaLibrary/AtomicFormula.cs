@@ -9,6 +9,7 @@
 */
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
 namespace FormulaLibrary
@@ -39,6 +40,14 @@ namespace FormulaLibrary
             get { return terms; }
         }
         private List<Term> terms;
+        
+        /// <summary>
+        /// Return the number of terms this formula has
+        /// </summary>
+        public int TermsCount
+        {
+            get { return Terms.Count; }
+        }
 
         public AtomicFormula(string functor, params Term[] terms)
         {
@@ -124,6 +133,51 @@ namespace FormulaLibrary
         public override int GetHashCode()
         {
             return base.GetHashCode();
+        }
+
+        /// <summary>
+        /// Check if this formula is simple or parametric (that is, check if
+        /// this formula contains or not variable terms)
+        /// </summary>
+        public override bool IsParametric()
+        {
+            foreach (Term t in terms)
+            {
+                if (!(t is LiteralTerm))
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Convert this formula to a simple type formula. That is, if this formula
+        /// contains any variable term, convert them to literal terms. Found variable
+        /// terms are returned to the output list
+        /// </summary>
+        /// <returns>a list containing the variable terms this formula previously contained</returns>
+        public List<object> ConvertToSimpleFormula()
+        {
+            List<object> variableTerms = new List<object>();
+            
+            //Iterate each term
+            for (int i=0;i<terms.Count;i++)
+            {
+                //if a variable term occurs
+                if(terms[i].GetType().IsGenericType)
+                {
+                    //add the variable term to the output list
+                    variableTerms.Add(terms[i]);
+
+                    //get the type info for the current term
+                    Type variableTermType = typeof(VariableTerm<>).MakeGenericType(terms[i].GetType().GetGenericArguments()[0]);
+                    MethodInfo parse_method = variableTermType.GetMethod("toLiteralTerm");
+                    
+                    //convert to literal term
+                    terms[i] = (LiteralTerm)parse_method.Invoke(terms[i], new object[] { });
+                }
+            }
+
+            return variableTerms;
         }
     }
 
