@@ -25,18 +25,23 @@ namespace AgentTest
     {
         static void Main(string[] args)
         {
-            AgentWorkbench wb = new AgentWorkbench();
-            wb.addStatement(FormulaParser.Parse("y(x<-int(3))") as AtomicFormula,
+            //AgentWorkbench wb = new AgentWorkbench(a);
+            /*wb.addStatement(FormulaParser.Parse("y(x<-int(3))") as AtomicFormula,
                             FormulaParser.Parse("f(x)") as AtomicFormula,
                             FormulaParser.Parse("h(s,o,a<-string(\"ciao mondo\"))") as AtomicFormula,
-                            FormulaParser.Parse("o(m,s<-char('d')") as AtomicFormula);
+                            FormulaParser.Parse("o(m,s<-char('d')") as AtomicFormula);*/
 
-            Formula test = FormulaParser.Parse("o(l<-int(2),k)");
+            AgentEnvironement env = new AgentEnvironement();
+            Agent a = new Agent("agent_1");
+            
+            env.RegisterAgent(a);
 
-            List<AssignmentType> generatedAssignment = null;
+            env.RegisterStatement(FormulaParser.Parse("f(x)") as AtomicFormula);
 
-            bool res = wb.TestCondition(test, out generatedAssignment);
-            //Console.ReadKey();
+            Console.WriteLine(a.Workbench.ToString());
+
+
+            Console.ReadKey();
         }
 
 

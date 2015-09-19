@@ -13,12 +13,22 @@ using Quartz;
 namespace AgentLibrary
 {
     /// <summary>
-    /// TODO RINOMINARE IN AgentReasoner
+    /// A convinient enum to mark the changes that can occur within the environement
     /// </summary>
-    public sealed class AgentScheduler
+    public enum PerceptionType
+    {
+        Null                = 0x0,              //No changes occurred
+        AddBelief           = 0x1,              //A belief has been added
+        RemoveBelief        = 0x2,              //A belief has been removed
+        UpdateBeliefValue   = 0x3,              //A belief's value must be updated
+        SetBeliefValue      = 0x4,              //A belief's value must be set
+        UnSetBeliefValue    = 0x5               //A belief's value must be unset
+    }
+
+    public sealed class AgentReasoner
     {
         /// <summary>
-        /// The quart.net scheduler class
+        /// The quartz.net scheduler class
         /// </summary>
         private IScheduler job_scheduler;
         
@@ -32,15 +42,15 @@ namespace AgentLibrary
         /// </summary>
         private readonly Agent parentAgent;
 
-        public AgentScheduler(Agent agent)
+        public AgentReasoner(Agent agent)
         {
-            this.parentAgent = agent;
+            parentAgent = agent;
         }
 
         public void startReasoning()
         {
             //#Environement percept
-            //-> percept beliefs
+            //-> percept belief changes in environement
             //-> percept events
             //#Jobs scheduling
             //-> dequeue and execute

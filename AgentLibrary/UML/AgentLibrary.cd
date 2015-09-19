@@ -60,11 +60,11 @@
       <Field Name="trigger" />
     </ShowAsAssociation>
   </Class>
-  <Class Name="AgentLibrary.AgentScheduler">
+  <Class Name="AgentLibrary.AgentReasoner">
     <Position X="0.75" Y="3.75" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAASAAAAAAAAAAAAAAgABAAAAAAAAIJQAAAAAAAAAIA=</HashCode>
-      <FileName>Scheduler\AgentScheduler.cs</FileName>
+      <FileName>Scheduler\AgentReasoner.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
       <Field Name="schedules" />
@@ -79,8 +79,15 @@
   </Class>
   <Class Name="AgentLibrary.Agent">
     <Position X="13.25" Y="1.5" Width="2" />
+    <NestedTypes>
+      <Delegate Name="AgentLibrary.Agent.EnvironementChangesHandler" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Agent.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
     <TypeIdentifier>
-      <HashCode>gAIBEkAAAAAQgIAgAAACQAFAAAAEAAxAAABAAAA4QAA=</HashCode>
+      <HashCode>gAIBEkAAAAAQgIAgAAACQAFIAAAEAAwAAADAIAA4RAA=</HashCode>
       <FileName>Agent.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
@@ -88,10 +95,10 @@
       <Field Name="jobs" />
     </ShowAsCollectionAssociation>
   </Class>
-  <Class Name="AgentLibrary.AgentWorkbench" Collapsed="true">
-    <Position X="16.25" Y="0.5" Width="1.5" />
+  <Class Name="AgentLibrary.AgentWorkbench">
+    <Position X="15.5" Y="4" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAQAEICQAECAAAACAAAAAAQAAAAgCAgQAAQ=</HashCode>
+      <HashCode>EAAAAAAAAAQAEICQAACAAIACAAAAAAQAAAAgCAgAAAA=</HashCode>
       <FileName>Workbench\AgentWorkbench.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -100,6 +107,13 @@
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Trigger\TriggerFactory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AgentLibrary.AgentEnvironement">
+    <Position X="18" Y="4" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AACBAAAAAIAAAAAAAIAAAAAEAAAAAEAAAAAAEAACAAA=</HashCode>
+      <FileName>AgentEnvironement.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Enum Name="AgentLibrary.TriggerType" Collapsed="true">

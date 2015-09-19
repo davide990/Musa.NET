@@ -1,10 +1,12 @@
-﻿/**
-         __  __                                     _   
-        |  \/  |                                   | |  
-        | \  / | _   _  ___   __ _     _ __    ___ | |_ 
-        | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
-        | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
-        |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+﻿
+using System;
+/**
+__  __                                     _   
+|  \/  |                                   | |  
+| \  / | _   _  ___   __ _     _ __    ___ | |_ 
+| |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
+| |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
+|_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 
 */
 namespace FormulaLibrary
@@ -29,6 +31,16 @@ namespace FormulaLibrary
         public AssignmentType(string name)
         {
             this.name = name;
+        }
+
+        /// <summary>
+        /// Create a new assignment
+        /// </summary>
+        /// <returns></returns>
+        public static AssignmentType CreateAssignmentForTerm(string assignmentName, object value, Type type)
+        {
+            Type varTermType = typeof(Assignment<>).MakeGenericType(type);
+            return (AssignmentType)Activator.CreateInstance(varTermType, assignmentName, value);
         }
     }
 

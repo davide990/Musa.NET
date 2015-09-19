@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System;
 using System.Reflection;
 using System.Collections.ObjectModel;
+using System.Collections;
+using System.Text;
 /**
 __  __                                     _   
 |  \/  |                                   | |  
@@ -32,9 +34,11 @@ namespace AgentLibrary
         ThrowException
     }
 
+    
 
-    // Quando una formula viene aggiunta e questa contiene termini variabili, si dovrebbe valutare la possibilità di convertire tutti i termini variabili in letterali
-    // e inserire i valori come assignment
+    /// <summary>
+    /// 
+    /// </summary>
     public class AgentWorkbench
     {
         WorkbenchAddFormulaPolicy add_policy        = WorkbenchAddFormulaPolicy.Default;
@@ -48,17 +52,47 @@ namespace AgentLibrary
         /// <summary>
         /// The set of assignment
         /// </summary>
-        private List<AssignmentType> assignment_set;
+        private ObservableCollection<AssignmentType> assignment_set;
 
         /// <summary>
-        /// Create a new workbench
+        /// The agent this workbench belongs to
         /// </summary>
-        public AgentWorkbench()
+        private readonly Agent parentAgent;
+        
+        /// <summary>
+        /// Create a new agent workbench
+        /// </summary>
+        public AgentWorkbench(Agent agent)
         {
+            parentAgent     = agent;
             workbench       = new ObservableCollection<AtomicFormula>();
-            assignment_set  = new List<AssignmentType>();
+            assignment_set  = new ObservableCollection<AssignmentType>();
 
-            workbench.CollectionChanged += on_workbench_changed;
+            assignment_set.CollectionChanged    += on_assignment_set_changed;
+            workbench.CollectionChanged         += on_workbench_changed;
+        }
+
+        /// <summary>
+        /// This is invoked every time a change occurs into the formula collection
+        /// </summary>
+        private void on_assignment_set_changed(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            object assignment = e.NewItems[0];
+            Type assignmentType = typeof(VariableTerm<>).MakeGenericType(assignment.GetType().GetGenericArguments()[0]);
+            
+
+            switch (e.Action)
+            {
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                    Console.WriteLine("[WORKBENCH] ITEM ADDED");
+                    break;  
+
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+                    //ACTION ON REMOVE FORMULA
+                    //Console.WriteLine(e.OldItems[0].ToString());
+
+                    break;
+            }
         }
 
         /// <summary>
@@ -90,7 +124,16 @@ namespace AgentLibrary
         {
             return workbench.Contains(f);
         }
-        
+
+        /// <summary>
+        /// Add a statement (as atomic formula) into this workbench.
+        /// </summary>
+        public void addStatement(IList f)
+        {
+            foreach(AtomicFormula ff in f)
+                addStatement(ff);
+        }
+
         /// <summary>
         /// Add a statement (as atomic formula) into this workbench.
         /// </summary>
@@ -115,14 +158,39 @@ namespace AgentLibrary
                     object value = variableTermType.GetProperty("Value").GetValue(varTerm);
                     value = Convert.ChangeType(value, varTerm.GetType().GetGenericArguments()[0]);
 
-                    assignment_set.Add((AssignmentType)createAssignmentForTerm((string)name, value, varTerm.GetType().GetGenericArguments()[0]));
+                    assignment_set.Add(AssignmentType.CreateAssignmentForTerm((string)name, value, varTerm.GetType().GetGenericArguments()[0]));
                 }
 
                 //Add the formula to this workbench
                 workbench.Add(ff);
             }
-                
         }
+
+
+        /// <summary>
+        /// Add a statement (as atomic formula) into this workbench.
+        /// </summary>
+        public void removeStatement(IList f)
+        {
+            foreach (AtomicFormula ff in f)
+                removeStatement(ff);
+        }
+
+
+        /// <summary>
+        /// Remove a statement from this workbench
+        /// </summary>
+        public void removeStatement(params AtomicFormula[] f)
+        {
+            foreach (AtomicFormula ff in f)
+            {
+                ff.ConvertToSimpleFormula();
+
+                if (workbench.Contains(ff))
+                    workbench.Remove(ff);
+            }
+        }
+
 
         /// <summary>
         /// Test if a formula is verified into this workbench.
@@ -226,7 +294,7 @@ namespace AgentLibrary
                         else
                         {
                             //a is variable term, b is literal - CREA ASSIGNMENT
-                            generatedAssignment.Add((AssignmentType)createAssignmentForTerm(b.Name, a_value, a_value.GetType()));
+                            generatedAssignment.Add(AssignmentType.CreateAssignmentForTerm(b.Name, a_value, a_value.GetType()));
                         }
                     }
                     else
@@ -247,7 +315,7 @@ namespace AgentLibrary
                             //b is variable, a is literal - CREA ASSIGNMENT
                             Type type_of_b = b.GetType();
                             object b_value = type_of_b.GetProperty("Value").GetValue(b);
-                            generatedAssignment.Add((AssignmentType)createAssignmentForTerm(a.Name, b_value, type_of_b.GetGenericArguments()[0]));
+                            generatedAssignment.Add(AssignmentType.CreateAssignmentForTerm(a.Name, b_value, type_of_b.GetGenericArguments()[0]));
                         }
                     }
                 }
@@ -257,18 +325,30 @@ namespace AgentLibrary
             return false;
         }
         
-
         /// <summary>
-        /// Create a new assignment
+        /// Set a value for a term by creating a specific assignment
         /// </summary>
-        /// <returns></returns>
-        private object createAssignmentForTerm(string assignmentName, object value, Type type)
+        /// <param name="termName"></param>
+        /// <param name="value"></param>
+        public void SetValueForTerm(string termName, object value)
         {
-            Type varTermType = typeof(Assignment<>).MakeGenericType(type);
-            object theAssignment = Activator.CreateInstance(varTermType, assignmentName, value);
+            AssignmentType a = AssignmentType.CreateAssignmentForTerm(termName, value, value.GetType());
 
-            return theAssignment;
+            if (!assignment_set.Contains(a))
+                assignment_set.Add(a);
         }
+
+        ///// <summary>
+        ///// Create a new assignment
+        ///// </summary>
+        ///// <returns></returns>
+        //private object createAssignmentForTerm(string assignmentName, object value, Type type)
+        //{
+        //    Type varTermType = typeof(Assignment<>).MakeGenericType(type);
+        //    object theAssignment = Activator.CreateInstance(varTermType, assignmentName, value);
+
+        //    return theAssignment;
+        //}
 
         /// <summary>
         /// Check if this workbench contains an assignment for a given (literal) term
@@ -305,8 +385,7 @@ namespace AgentLibrary
             assignmentValue = null;
             return false;
         }
-
-
+        
         public void setAddFormulaPolicy(WorkbenchAddFormulaPolicy p)
         {
             add_policy = p;
@@ -315,6 +394,21 @@ namespace AgentLibrary
         public void setRemoveFormulaPolicy(WorkbenchRemoveFormulaPolicy p)
         {
             remove_policy = p;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder b = new StringBuilder();
+            b.Append("[" + parentAgent.Name + "] ");
+
+            for (byte i = 0; i < workbench.Count; i++)
+            {
+                b.Append(workbench[i]);
+                if (i != workbench.Count - 1)
+                    b.Append("; ");
+            }
+
+            return b.ToString();
         }
 
     }

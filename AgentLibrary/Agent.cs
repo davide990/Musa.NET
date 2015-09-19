@@ -13,6 +13,7 @@ using System.Net;
 using System.Threading;
 using Quartz;
 using Quartz.Impl;
+using System.Collections;
 
 namespace AgentLibrary
 {
@@ -22,7 +23,7 @@ namespace AgentLibrary
         /// <summary>
         /// The scheduler entity of this agent
         /// </summary>
-        private IScheduler scheduler;
+        private AgentReasoner reasoner;
         /// <summary>
         /// The roles this agent holds
         /// </summary>
@@ -30,6 +31,10 @@ namespace AgentLibrary
         /// <summary>
         /// The workbench this agent use to do reasoning activities
         /// </summary>
+        public AgentWorkbench Workbench
+        {
+            get { return workbench; }
+        }
         private AgentWorkbench workbench;
         /// <summary>
         /// The list of jobs this agent is appointed to do
@@ -42,6 +47,10 @@ namespace AgentLibrary
         /// <summary>
         /// The name  of this agent
         /// </summary>
+        public string Name
+        {
+            get { return name; }
+        }
         private readonly string name;
         /// <summary>
         /// The date in which this agent started its life cycle.
@@ -64,21 +73,59 @@ namespace AgentLibrary
         /// Event triggered when this agent receive a new job
         /// </summary>
         public event EventHandler jobReceived;
-
+        
+        /// <summary>
+        /// Create a new agent
+        /// </summary>
+        /// <param name="agent_name"></param>
         public Agent(string agent_name)
         {
-            this.name   = agent_name;
-            this.ID     = System.Guid.NewGuid();
+            name   = agent_name;
+            ID     = Guid.NewGuid();
             jobReceived += onJobReceived;
             creationDate = DateTime.UtcNow;
 
             jobs        = new List<AgentJob>();
             roles       = new List<AgentRole>();
-            workbench   = new AgentWorkbench();
-            //scheduler   = new AgentScheduler();
+            workbench   = new AgentWorkbench(this);
+            reasoner    = new AgentReasoner(this);
 
             CreateScheduler();
         }
+
+        /// <summary>
+        /// Notify to this agent a change occurred within the environement this agent is located.
+        /// </summary>
+        /// <param name="action">The type of change occurred</param>
+        /// <param name="changes">The data that involved in the environement change</param>
+        public void notifyEnvironementChanges(PerceptionType action, IList changes)
+        {
+            Console.WriteLine("[Agent " + name + "] received " + action.ToString() + " -> " + changes.ToString());
+            switch (action)
+            {
+                case PerceptionType.AddBelief:
+                        workbench.addStatement(changes);
+                    break;
+
+                case PerceptionType.RemoveBelief:
+                        workbench.addStatement(changes);
+                    break;
+
+                case PerceptionType.SetBeliefValue:
+                    break;
+
+                case PerceptionType.UnSetBeliefValue:
+                    break;
+
+                case PerceptionType.UpdateBeliefValue:
+                    break;
+
+                case PerceptionType.Null:
+                    break;
+            }
+        }
+
+
 
         private void CreateScheduler()
         {
@@ -86,7 +133,7 @@ namespace AgentLibrary
             ISchedulerFactory schedFact = new StdSchedulerFactory();
 
             // get a scheduler
-            scheduler = schedFact.GetScheduler();
+            //scheduler = schedFact.GetScheduler();
         }
 
         
@@ -96,20 +143,9 @@ namespace AgentLibrary
             jobs.Clear();
             roles.Clear();
             
-            scheduler.Shutdown();
+            //scheduler.Shutdown();
         }
-
-        /// <summary>
-        /// Start the agent activity
-        /// </summary>
-        public void start()
-        {
-            //start the scheduler
-            scheduler.Start();
-
-            
-        }
-
+        
         /// <summary>
         /// Return the IP address of the machine in which this agent is located
         /// </summary>
@@ -130,7 +166,7 @@ namespace AgentLibrary
         {
             get
             {
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
 
             set
@@ -176,7 +212,7 @@ namespace AgentLibrary
         /// </summary>
         public void scheduleJob(ITrigger jobTrigger, IJobDetail jobDetail)
         {
-            scheduler.ScheduleJob(jobDetail, jobTrigger);
+            //scheduler.ScheduleJob(jobDetail, jobTrigger);
         }
 
         /// <summary>
@@ -184,7 +220,7 @@ namespace AgentLibrary
         /// </summary>
         public void addJob(IJobDetail jobDetail)
         {
-            scheduler.AddJob(jobDetail, false);
+            //scheduler.AddJob(jobDetail, false);
         }
 
         /// <summary>
@@ -205,6 +241,20 @@ namespace AgentLibrary
         public void setWorkSchedule(DateTime start, DateTime end)
         {
             
+        }
+
+        /// <summary>
+        /// Start the agent activity
+        /// </summary>
+        public void start()
+        {
+            //start the scheduler
+            //scheduler.Start();
+        }
+
+        private void doPerception()
+        {
+
         }
 
         
