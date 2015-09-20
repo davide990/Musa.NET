@@ -15,7 +15,6 @@ using FormulaLibrary.ANTLR;
 using FormulaLibrary.ANTLR.visitor;
 using Quartz;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -33,10 +32,14 @@ namespace AgentTest
 
             AgentEnvironement env = new AgentEnvironement();
             Agent a = new Agent("agent_1");
-            
+            a.start();
             env.RegisterAgent(a);
 
+
+
             env.RegisterStatement(FormulaParser.Parse("f(x)") as AtomicFormula);
+            
+
 
             Console.WriteLine(a.Workbench.ToString());
 
@@ -45,39 +48,7 @@ namespace AgentTest
         }
 
 
-
-        private static void visitor_test()
-        {
-            // convert string to stream
-            //byte[] byteArray = Encoding.ASCII.GetBytes("!f(x,k<-int(2))");
-            byte[] byteArray = Encoding.ASCII.GetBytes("f(x,k)");
-            MemoryStream m_stream = new MemoryStream(byteArray);
-
-            // convert stream to string
-            StreamReader reader = new StreamReader(m_stream);
-
-            AntlrInputStream stream = new AntlrInputStream(reader);
-            ITokenSource lexer = new formula_grammarLexer(stream);
-            ITokenStream tokens = new CommonTokenStream(lexer);
-            formula_grammarParser parser = new formula_grammarParser(tokens);
-            parser.BuildParseTree = true;
-
-
-            IParseTree tree = parser.disjunction();
-            FormulaVisitor vv = new FormulaVisitor();
-
-
-            Formula ffff = vv.Visit(tree);
-
-
-            Console.WriteLine(vv.Visit(tree));
-            
-            Console.ReadKey();
-        }
-
-
-
-
+        
         private void quartz_test_0()
         {
             Agent worker = new Agent("worker");

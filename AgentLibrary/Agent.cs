@@ -59,14 +59,23 @@ namespace AgentLibrary
         /// <summary>
         /// 
         /// </summary>
-        private Thread agent_thread;
+        internal Thread agent_thread;
         /// <summary>
         /// Check if actually is working time for this agent.
         /// </summary>
         public bool isWorkingTime
         {
-            get { DateTime now = DateTime.UtcNow;  return now >= this.workScheduleStart && now < this.workScheduleEnd; }
+            get { DateTime now = DateTime.UtcNow;  return now >= workScheduleStart && now < workScheduleEnd; }
         }
+
+        /// <summary>
+        /// This queue contains the changes to the environement that this agent have to perceive. Since an agent can be busy in doing other
+        /// activities such event-handling or execution of plans, the perceived environement changes are accumulated temporarily in this
+        /// queue until the agent start a perception activity.
+        /// </summary>
+        internal Dictionary<IList, PerceptionType> perceivedEnvironementChanges;
+        internal object lock_perceivedEnvironementChanges = null;
+
 
 
         /// <summary>
@@ -89,40 +98,20 @@ namespace AgentLibrary
             roles       = new List<AgentRole>();
             workbench   = new AgentWorkbench(this);
             reasoner    = new AgentReasoner(this);
-
+            perceivedEnvironementChanges = new Dictionary<IList, PerceptionType>();
+            
             CreateScheduler();
         }
-
+        
         /// <summary>
         /// Notify to this agent a change occurred within the environement this agent is located.
         /// </summary>
         /// <param name="action">The type of change occurred</param>
         /// <param name="changes">The data that involved in the environement change</param>
-        public void notifyEnvironementChanges(PerceptionType action, IList changes)
+        internal void notifyEnvironementChanges(PerceptionType action, IList changes)
         {
             Console.WriteLine("[Agent " + name + "] received " + action.ToString() + " -> " + changes.ToString());
-            switch (action)
-            {
-                case PerceptionType.AddBelief:
-                        workbench.addStatement(changes);
-                    break;
-
-                case PerceptionType.RemoveBelief:
-                        workbench.addStatement(changes);
-                    break;
-
-                case PerceptionType.SetBeliefValue:
-                    break;
-
-                case PerceptionType.UnSetBeliefValue:
-                    break;
-
-                case PerceptionType.UpdateBeliefValue:
-                    break;
-
-                case PerceptionType.Null:
-                    break;
-            }
+            perceivedEnvironementChanges.Add(changes, action);
         }
 
 
@@ -248,6 +237,9 @@ namespace AgentLibrary
         /// </summary>
         public void start()
         {
+            //begin the agent reasoning activity
+            reasoner.startReasoning();
+
             //start the scheduler
             //scheduler.Start();
         }

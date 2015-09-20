@@ -134,10 +134,7 @@ namespace FormulaLibrary
         {
             return base.GetHashCode();
         }
-
         
-
-
         /// <summary>
         /// Check if this formula is simple or parametric (that is, check if
         /// this formula contains or not variable terms)
