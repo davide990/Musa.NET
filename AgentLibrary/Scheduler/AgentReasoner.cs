@@ -32,7 +32,7 @@ namespace AgentLibrary
     {
         private int currentReasoningCycle = 0;
 
-        private readonly int ReasoningUpdateTime = 10000;
+        private readonly int ReasoningUpdateTime = 5000;
 
         /// <summary>
         /// The quartz.net scheduler class

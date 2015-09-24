@@ -31,10 +31,11 @@ namespace AgentTest
                             FormulaParser.Parse("o(m,s<-char('d')") as AtomicFormula);*/
 
             AgentEnvironement env = new AgentEnvironement();
-            Agent a = new Agent("agent_1");
-            a.start();
-            env.RegisterAgent(a);
+            Agent a = new Agent("agent_1").start();
+            Agent b = new Agent("agent_2").start();
 
+            env.RegisterAgent(a);
+            env.RegisterAgent(b);
 
 
             env.RegisterStatement(FormulaParser.Parse("f(x)") as AtomicFormula);

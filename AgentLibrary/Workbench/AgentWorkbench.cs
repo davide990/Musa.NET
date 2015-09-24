@@ -47,7 +47,7 @@ namespace AgentLibrary
         /// <summary>
         /// The set of formula
         /// </summary>
-        private ObservableCollection<AtomicFormula> workbench;
+        private ObservableCollection<AtomicFormula> statements;
 
         /// <summary>
         /// The set of assignment
@@ -65,11 +65,11 @@ namespace AgentLibrary
         public AgentWorkbench(Agent agent)
         {
             parentAgent     = agent;
-            workbench       = new ObservableCollection<AtomicFormula>();
+            statements       = new ObservableCollection<AtomicFormula>();
             assignment_set  = new ObservableCollection<AssignmentType>();
 
             assignment_set.CollectionChanged    += on_assignment_set_changed;
-            workbench.CollectionChanged         += on_workbench_changed;
+            statements.CollectionChanged         += on_workbench_changed;
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace AgentLibrary
         /// </summary>
         public bool containsFormula(AtomicFormula f)
         {
-            return workbench.Contains(f);
+            return statements.Contains(f);
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace AgentLibrary
             {
                 variableTerms = ff.ConvertToSimpleFormula();
 
-                if (workbench.Contains(ff))
+                if (statements.Contains(ff))
                     continue;
 
                 foreach (object varTerm in variableTerms)
@@ -162,7 +162,7 @@ namespace AgentLibrary
                 }
 
                 //Add the formula to this workbench
-                workbench.Add(ff);
+                statements.Add(ff);
             }
         }
 
@@ -186,8 +186,8 @@ namespace AgentLibrary
             {
                 ff.ConvertToSimpleFormula();
 
-                if (workbench.Contains(ff))
-                    workbench.Remove(ff);
+                if (statements.Contains(ff))
+                    statements.Remove(ff);
             }
         }
 
@@ -260,7 +260,7 @@ namespace AgentLibrary
 
             bool belief_term_has_assignment;
 
-            foreach (AtomicFormula belief in workbench)
+            foreach (AtomicFormula belief in statements)
             {
                 if (belief.TermsCount != f.TermsCount || !belief.Functor.Equals(f.Functor))
                     continue;
@@ -338,18 +338,6 @@ namespace AgentLibrary
                 assignment_set.Add(a);
         }
 
-        ///// <summary>
-        ///// Create a new assignment
-        ///// </summary>
-        ///// <returns></returns>
-        //private object createAssignmentForTerm(string assignmentName, object value, Type type)
-        //{
-        //    Type varTermType = typeof(Assignment<>).MakeGenericType(type);
-        //    object theAssignment = Activator.CreateInstance(varTermType, assignmentName, value);
-
-        //    return theAssignment;
-        //}
-
         /// <summary>
         /// Check if this workbench contains an assignment for a given (literal) term
         /// </summary>
@@ -401,10 +389,10 @@ namespace AgentLibrary
             StringBuilder b = new StringBuilder();
             b.Append("[" + parentAgent.Name + "] ");
 
-            for (byte i = 0; i < workbench.Count; i++)
+            for (byte i = 0; i < statements.Count; i++)
             {
-                b.Append(workbench[i]);
-                if (i != workbench.Count - 1)
+                b.Append(statements[i]);
+                if (i != statements.Count - 1)
                     b.Append("; ");
             }
 

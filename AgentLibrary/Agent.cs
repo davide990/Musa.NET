@@ -19,7 +19,6 @@ namespace AgentLibrary
 {
     public class Agent
     {
-        
         /// <summary>
         /// The scheduler entity of this agent
         /// </summary>
@@ -74,7 +73,7 @@ namespace AgentLibrary
         /// queue until the agent start a perception activity.
         /// </summary>
         internal Dictionary<IList, PerceptionType> perceivedEnvironementChanges;
-        internal object lock_perceivedEnvironementChanges = null;
+        internal object lock_perceivedEnvironementChanges = new object();
 
 
 
@@ -185,7 +184,7 @@ namespace AgentLibrary
 
         public void manageDepartment()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -193,7 +192,7 @@ namespace AgentLibrary
         /// </summary>
         public void scheduleJobToWorker()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -235,13 +234,15 @@ namespace AgentLibrary
         /// <summary>
         /// Start the agent activity
         /// </summary>
-        public void start()
+        public Agent start()
         {
             //begin the agent reasoning activity
             reasoner.startReasoning();
 
             //start the scheduler
             //scheduler.Start();
+
+            return this;
         }
 
         private void doPerception()

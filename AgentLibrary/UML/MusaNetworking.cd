@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="AgentLibrary.Networking.MusaCommunicationService" BaseTypeListCollapsed="true">
+    <Position X="6" Y="0.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAECAAAAAAAAAAACAAAAAAAAAAgAAAAAAAAAA=</HashCode>
+      <FileName>Networking\MusaCommunicationService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="AgentLibrary.Networking.AgentMessage">
+    <Position X="0.75" Y="0.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAAAAEQAAAAEAAAAAAAAEAAAAIIAAAICA=</HashCode>
+      <FileName>Networking\AgentMessage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AgentLibrary.Networking.AgentPassport">
+    <Position X="3.5" Y="0.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAECAAAEAAAAAAGQAAAAIAAgAAEAAAAAAAgAAIAAAA=</HashCode>
+      <FileName>Networking\AgentPassport.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AgentLibrary.Networking.EnvironementData">
+    <Position X="6" Y="4.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAAAAAAAEAEEAAAAAgAAAAgAAEAAAAAAAAAA=</HashCode>
+      <FileName>Networking\BroadcastMessage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AgentLibrary.Networking.BroadcastMessage">
+    <Position X="0.75" Y="4" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAIAAAACA=</HashCode>
+      <FileName>Networking\BroadcastMessage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="AgentLibrary.Networking.IMusaCommunicationService">
+    <Position X="6" Y="2.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAECAAAAAAAAAAACAAAAAAAAAAgAAAAAAAAAA=</HashCode>
+      <FileName>Networking\IMusaCommunicationService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="AgentLibrary.Networking.MessageScope">
+    <Position X="3.5" Y="4.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAAAAEAAIAAAAAAAAA=</HashCode>
+      <FileName>Networking\BroadcastMessage.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
