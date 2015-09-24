@@ -5,12 +5,21 @@ namespace AgentLibrary.Networking
     [DataContract(Name = "MessageScope")]
     public enum MessageScope
     {
+        /// <summary>
+        /// The scope of a message is restricted to all the agents/environements in the machine hosting the sender agent
+        /// </summary>
         [EnumMember]
         All,
+        /// <summary>
+        /// The scope of a message is restricted to a specific environement
+        /// </summary>
         [EnumMember]
         Environement,
+        /// <summary>
+        /// The scope of a message is restricted to a specific workgroup
+        /// </summary>
         [EnumMember]
-        Collaborators
+        Workgroup
     }
 
     [DataContract]
@@ -51,10 +60,10 @@ namespace AgentLibrary.Networking
     public class BroadcastMessage
     {
         private MessageScope scope;
-        private string message;
+        private object message;
 
         [DataMember]
-        public string Message
+        public object Message
         {
             get { return message; }
             set { message = value; }

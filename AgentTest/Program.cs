@@ -30,7 +30,7 @@ namespace AgentTest
                             FormulaParser.Parse("h(s,o,a<-string(\"ciao mondo\"))") as AtomicFormula,
                             FormulaParser.Parse("o(m,s<-char('d')") as AtomicFormula);*/
 
-            AgentEnvironement env = new AgentEnvironement();
+            AgentEnvironement env = new AgentEnvironement("8080");
             Agent a = new Agent("agent_1").start();
             Agent b = new Agent("agent_2").start();
 

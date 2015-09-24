@@ -1,14 +1,18 @@
-﻿using FormulaLibrary;
+﻿using AgentLibrary.Networking;
+using FormulaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net;
 using System.Reflection;
+using System.ServiceModel;
 
 namespace AgentLibrary
 {
     public sealed class AgentEnvironement
     {
+        #region Fields
+
         /// <summary>
         /// The statements for this environement
         /// </summary>
@@ -24,6 +28,22 @@ namespace AgentLibrary
         /// </summary>
         private HashSet<Agent> registeredAgents;
 
+        #endregion Fields
+
+        #region Properties
+
+        /// <summary>
+        /// The communication service interface used by this environement. This object act like
+        /// a bridge for communication between agents located in different (or within the same) 
+        /// environement. Every communication of agents is forwarded to an environement that will
+        /// forward to the receiver agent, agent group or environement (depending on the communication
+        /// type)
+        /// </summary>
+        private MusaCommunicationService CommunicationService
+        {
+            get { return MusaCommunicationService.getInstance(); }
+        }
+
         /// <summary>
         /// Return the IP address of the machine in which this environement is located
         /// </summary>
@@ -31,7 +51,27 @@ namespace AgentLibrary
         {
             get { return Dns.GetHostEntry(Dns.GetHostName()).AddressList[0].ToString(); }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ServiceHost Host
+        {
+            get { return host; }
+            set { host = value; }
+        }
+        private ServiceHost host;
+
+        #endregion Properties
+
+        #region Events
+
+        public EventHandler onNetworkServiceStart = null;
+
+        #endregion
         
+        #region Constructors
+
         /// <summary>
         /// Create a new environement
         /// </summary>
@@ -44,6 +84,53 @@ namespace AgentLibrary
             statements.CollectionChanged += Statements_CollectionChanged;
             attributes.CollectionChanged += Attributes_CollectionChanged;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="port"></param>
+        /// <param name="local_ip_address"></param>
+        public AgentEnvironement(string port, string local_ip_address = "localhost")
+        {
+            statements = new ObservableCollection<AtomicFormula>();
+            attributes = new ObservableCollection<AssignmentType>();
+            registeredAgents = new HashSet<Agent>();
+
+            statements.CollectionChanged += Statements_CollectionChanged;
+            attributes.CollectionChanged += Attributes_CollectionChanged;
+
+            StartNetworking(port, local_ip_address);
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Setup and start the networking service for this environement
+        /// </summary>
+        /// <param name="address">the IP address of the machine in which this environement is located</param>
+        /// <param name="port">the port used by this environement</param>
+        public void StartNetworking(string port, string local_ip_address = "localhost")
+        {
+            //var address = new Uri("http://localhost:8080");
+            Uri address = new Uri("http://" + local_ip_address + ":" + port);
+            ServiceHost host = new ServiceHost(typeof(MusaCommunicationService));
+            host.AddServiceEndpoint(typeof(IMusaCommunicationService), new BasicHttpBinding(), address);
+            host.Open();
+
+            if (onNetworkServiceStart != null)
+                onNetworkServiceStart.Invoke(this, null);
+        }
+
+        /// <summary>
+        /// Stop the networking service for this environement
+        /// </summary>
+        public void StopNetworkingService()
+        {
+            host.Close();
+        }
+
 
         /// <summary>
         /// Method invoked when a changes that involves the attributes occurs into the environement's statement 
@@ -165,5 +252,8 @@ namespace AgentLibrary
             */
             throw new System.NotImplementedException();
         }
+
+        #endregion
+
     }
 }

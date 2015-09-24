@@ -4,11 +4,22 @@ namespace AgentLibrary.Networking
 {
     public class MusaCommunicationService : IMusaCommunicationService
     {
-        public string GetData(int value)
+        private readonly AgentEnvironement environement;
+        private static MusaCommunicationService instance;
+
+        private MusaCommunicationService()
         {
-            return "hi " + value.ToString();
+
         }
 
+        public static MusaCommunicationService getInstance()
+        {
+            if (instance == null)
+                instance = new MusaCommunicationService();
+
+            return instance;
+        }
+        
         /// <summary>
         /// 
         /// </summary>

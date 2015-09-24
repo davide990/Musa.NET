@@ -1,8 +1,8 @@
 ﻿using System.Runtime.Serialization;
+using System.ServiceModel;
 
 namespace AgentLibrary.Networking
-{
-    
+{   
     [DataContract]
     public class AgentPassport
     {
@@ -10,7 +10,35 @@ namespace AgentLibrary.Networking
         private string agent_address_ip;
         private string agent_name;
         private string agent_role;
-        private string auth_token;
+        private string workgroup_name;
+        private string environement_name;
+        private object auth_token;
+
+        //[DataMember]
+        //public string AgentID
+        //{
+        //    get { return agent_address_ip + "/" + environement_name + ":" + agent_name; }
+        //}
+
+        /// <summary>
+        /// The name of the workgroup the sender agent belongs to
+        /// </summary>
+        [DataMember]
+        public string WorkgroupName
+        {
+            get { return workgroup_name; }
+            set { workgroup_name = value; }
+        }
+
+        /// <summary>
+        /// The name of the environement in which the sender agent is located
+        /// </summary>
+        [DataMember]
+        public string EnvironementName
+        {
+            get { return environement_name; }
+            set { environement_name = value; }
+        }
 
         /// <summary>
         /// The port through which agents communicate
@@ -56,7 +84,7 @@ namespace AgentLibrary.Networking
         /// An authorization token of the agent
         /// </summary>
         [DataMember]
-        public string AuthorizationToken
+        public object AuthorizationToken
         {
             get { return auth_token; }
             set { auth_token = value; }
