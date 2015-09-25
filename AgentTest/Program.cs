@@ -8,15 +8,10 @@
 
 */
 using AgentLibrary;
-using Antlr4.Runtime;
-using Antlr4.Runtime.Tree;
 using FormulaLibrary;
 using FormulaLibrary.ANTLR;
-using FormulaLibrary.ANTLR.visitor;
 using Quartz;
 using System;
-using System.IO;
-using System.Text;
 
 namespace AgentTest
 {
@@ -30,18 +25,15 @@ namespace AgentTest
                             FormulaParser.Parse("h(s,o,a<-string(\"ciao mondo\"))") as AtomicFormula,
                             FormulaParser.Parse("o(m,s<-char('d')") as AtomicFormula);*/
 
-            AgentEnvironement env = new AgentEnvironement("8080");
-            Agent a = new Agent("agent_1").start();
-            Agent b = new Agent("agent_2").start();
+            AgentEnvironement env = new AgentEnvironement("8080","127.0.0.1");
+            Agent a = new Agent("agent_1");
+            Agent b = new Agent("agent_2");
 
             env.RegisterAgent(a);
             env.RegisterAgent(b);
-
-
+            
             env.RegisterStatement(FormulaParser.Parse("f(x)") as AtomicFormula);
             
-
-
             Console.WriteLine(a.Workbench.ToString());
 
 

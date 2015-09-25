@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="MusaLogger.AgentLogger">
+    <Position X="1.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAFAgAAAAAAIAAAQCACAAAICBEAEEAAgAAAAAAIAA=</HashCode>
+      <FileName>AgentLogger.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MusaLogger.MusaLogger">
+    <Position X="2.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAABAAAAAAAAEAAAAABAAAAEAAAAFAEAA=</HashCode>
+      <FileName>MusaLogger.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MusaLogger.EnvironementLogger">
+    <Position X="3.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAABAgAAAAgAAQAAQAAAAAAAEAgAAAABgAAAAAAAAA=</HashCode>
+      <FileName>EnvironementLogger.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="MusaLogger.LoggingTarget" Collapsed="true">
+    <Position X="6.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAgAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAA=</HashCode>
+      <FileName>LoggingTarget.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

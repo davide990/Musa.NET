@@ -30,6 +30,16 @@ namespace AgentLibrary.Networking
         /// <param name="message">Message.</param>
         public bool sendAgentMessage(AgentPassport senderData, AgentPassport receiverData, AgentMessage message)
         {
+
+            //sender agent is trusted? if not return false
+            //otherwise forward the message to receiver agent
+
+            bool senderIsTrusted = true; //for now, sender is always trusted
+
+            if (!senderIsTrusted)
+                return false;
+            
+
             Console.WriteLine("### AGENT-AGENT MESSAGE ###");
             Console.WriteLine(senderData.ToString());
             Console.WriteLine(receiverData.ToString());

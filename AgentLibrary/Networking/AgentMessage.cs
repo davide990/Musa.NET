@@ -3,13 +3,51 @@ using System.Runtime.Serialization;
 
 namespace AgentLibrary.Networking
 {
+    /// <summary>
+    /// As stated on Jason .send internal action documentation: "the illocutionary force of the message (tell, achieve, ...)"
+    /// </summary>
+    [DataContract(Name = "InformationType")]
+    public enum InformationType
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        [EnumMember]
+        Tell    = 0,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [EnumMember]
+        Untell  = 1,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [EnumMember]
+        Achieve = 2,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [EnumMember]
+        AskOne  = 3,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [EnumMember]
+        AskAll  = 4
+    }
+
     [DataContract]
     public class AgentMessage
     {
         private object message;
         private DateTime validity;
         private byte messagePriority;
-
+        private InformationType infoType;
+        
         /// <summary>
         /// The content of this message
         /// </summary>
@@ -40,9 +78,18 @@ namespace AgentLibrary.Networking
             set { messagePriority = value; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public InformationType InfoType
+        {
+            get { return infoType; }
+            set { infoType = value; }
+        }
+
         public override string ToString()
         {
-            return string.Format("[AgentMessage: Message=[{0}],\n MessageValidity={1},\n MessagePriority={2}]", Message, MessageValidity, MessagePriority);
+            return string.Format("[AgentMessage: Message=[{0}], MessageValidity={1}, MessagePriority={2}, InfoType={3}]", Message, MessageValidity, MessagePriority, InfoType);
         }
     }
 }

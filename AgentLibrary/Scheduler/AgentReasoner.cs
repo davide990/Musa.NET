@@ -12,6 +12,9 @@ using Quartz;
 using System.Collections;
 using System.Threading;
 using System;
+using AgentLibrary.Networking;
+using FormulaLibrary.ANTLR;
+using FormulaLibrary;
 
 namespace AgentLibrary
 {
@@ -99,8 +102,16 @@ namespace AgentLibrary
 
                 Thread.Sleep(ReasoningUpdateTime);
 
+                lock (parentAgent.lock_mailBox)
+                {
+                    //Check the mail box
+                    checkMailBox();
+
+                    //Clear it
+                    parentAgent.mailBox.Clear();
+                }
                 
-                lock(parentAgent.lock_perceivedEnvironementChanges)
+                lock (parentAgent.lock_perceivedEnvironementChanges)
                 {
                     //Update the agent workbench
                     perceptEnvironement();
@@ -122,7 +133,36 @@ namespace AgentLibrary
                 
             }
         }
-        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void checkMailBox()
+        {
+            AtomicFormula formula;
+            
+            foreach (KeyValuePair<AgentPassport, AgentMessage> p in parentAgent.mailBox)
+            {
+                formula = (AtomicFormula)FormulaParser.Parse(p.Value.Message as string);
+                switch (p.Value.InfoType)
+                {
+                    case InformationType.Tell:
+                        parentAgent.Workbench.addStatement(formula);
+                        break;
+
+                    case InformationType.Untell:
+                        parentAgent.Workbench.removeStatement(formula);
+                        break;
+
+                    case InformationType.Achieve:
+
+                        //!!!
+
+                        break;
+                }
+            }
+        }
+
         /// <summary>
         /// Percept the environement changes and updates the workbench of the parent agent.
         /// </summary>

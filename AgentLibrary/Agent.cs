@@ -14,58 +14,48 @@ using System.Threading;
 using Quartz;
 using Quartz.Impl;
 using System.Collections;
+using AgentLibrary.Networking;
 
 namespace AgentLibrary
 {
     public class Agent
     {
+        #region Fields
+
         /// <summary>
         /// The scheduler entity of this agent
         /// </summary>
         private AgentReasoner reasoner;
+
         /// <summary>
         /// The roles this agent holds
         /// </summary>
         private List<AgentRole> roles;
+
         /// <summary>
         /// The workbench this agent use to do reasoning activities
         /// </summary>
-        public AgentWorkbench Workbench
-        {
-            get { return workbench; }
-        }
         private AgentWorkbench workbench;
+
         /// <summary>
         /// The list of jobs this agent is appointed to do
         /// </summary>
         private List<AgentJob> jobs;
+
         /// <summary>
         /// A unique identifier for this agent
         /// </summary>
         private readonly Guid ID;
-        /// <summary>
-        /// The name  of this agent
-        /// </summary>
-        public string Name
-        {
-            get { return name; }
-        }
-        private readonly string name;
+
         /// <summary>
         /// The date in which this agent started its life cycle.
         /// </summary>
         private readonly DateTime creationDate;
+
         /// <summary>
         /// 
         /// </summary>
         internal Thread agent_thread;
-        /// <summary>
-        /// Check if actually is working time for this agent.
-        /// </summary>
-        public bool isWorkingTime
-        {
-            get { DateTime now = DateTime.UtcNow;  return now >= workScheduleStart && now < workScheduleEnd; }
-        }
 
         /// <summary>
         /// This queue contains the changes to the environement that this agent have to perceive. Since an agent can be busy in doing other
@@ -75,82 +65,64 @@ namespace AgentLibrary
         internal Dictionary<IList, PerceptionType> perceivedEnvironementChanges;
         internal object lock_perceivedEnvironementChanges = new object();
 
-
+        /// <summary>
+        /// This dictionary represents the mailbox of the agent. In this dictionary are collected all the messages that the agent may receive
+        /// from other agents in the same, or different, environement. The messages are read during the agent's reasoning cycle.
+        /// </summary>
+        internal Dictionary<AgentPassport, AgentMessage> mailBox;
+        internal object lock_mailBox = new object();
 
         /// <summary>
         /// Event triggered when this agent receive a new job
         /// </summary>
         public event EventHandler jobReceived;
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// The workbench this agent use to do reasoning activities
+        /// </summary>
+        public AgentWorkbench Workbench
+        {
+            get { return workbench; }
+        }
+
+        /// <summary>
+        /// The name  of this agent
+        /// </summary>
+        public string Name
+        {
+            get { return name; }
+        }
+        private readonly string name;
         
         /// <summary>
-        /// Create a new agent
+        /// Check if actually is working time for this agent.
         /// </summary>
-        /// <param name="agent_name"></param>
-        public Agent(string agent_name)
+        public bool IsWorkingTime
         {
-            name   = agent_name;
-            ID     = Guid.NewGuid();
-            jobReceived += onJobReceived;
-            creationDate = DateTime.UtcNow;
-
-            jobs        = new List<AgentJob>();
-            roles       = new List<AgentRole>();
-            workbench   = new AgentWorkbench(this);
-            reasoner    = new AgentReasoner(this);
-            perceivedEnvironementChanges = new Dictionary<IList, PerceptionType>();
-            
-            CreateScheduler();
-        }
-        
-        /// <summary>
-        /// Notify to this agent a change occurred within the environement this agent is located.
-        /// </summary>
-        /// <param name="action">The type of change occurred</param>
-        /// <param name="changes">The data that involved in the environement change</param>
-        internal void notifyEnvironementChanges(PerceptionType action, IList changes)
-        {
-            Console.WriteLine("[Agent " + name + "] received " + action.ToString() + " -> " + changes.ToString());
-            perceivedEnvironementChanges.Add(changes, action);
+            get { DateTime now = DateTime.UtcNow; return now >= WorkScheduleStart && now < WorkScheduleEnd; }
         }
 
-
-
-        private void CreateScheduler()
-        {
-            // construct a scheduler factory
-            ISchedulerFactory schedFact = new StdSchedulerFactory();
-
-            // get a scheduler
-            //scheduler = schedFact.GetScheduler();
-        }
-
-        
-        ~Agent()
-        {
-            //TODO notify agent retirement
-            jobs.Clear();
-            roles.Clear();
-            
-            //scheduler.Shutdown();
-        }
-        
         /// <summary>
         /// Return the IP address of the machine in which this agent is located
         /// </summary>
-        public string ip_address
+        public string IP_address
         {
             get
             {
                 //return Dns.GetHostByName(hostName).AddressList[0].ToString(); DEPRECATED
                 return Dns.GetHostEntry(Dns.GetHostName()).AddressList[0].ToString();
             }
-            
+
         }
 
         /// <summary>
         /// Return the port this agent listen to.
         /// </summary>
-        public string port
+        public string Port
         {
             get
             {
@@ -166,20 +138,90 @@ namespace AgentLibrary
         /// The working end time of this agent
         /// </summary>
         private DateTime _workScheduleEnd;
-        public DateTime workScheduleEnd
+        public DateTime WorkScheduleEnd
         {
-            get {return _workScheduleEnd;}
-            private set {_workScheduleEnd = value;}
+            get { return _workScheduleEnd; }
+            private set { _workScheduleEnd = value; }
         }
 
         /// <summary>
         /// The working start time of this agent
         /// </summary>
         private DateTime _workScheduleStart;
-        public DateTime workScheduleStart
+        public DateTime WorkScheduleStart
         {
             get { return _workScheduleStart; }
             private set { _workScheduleStart = value; }
+        }
+
+        /// <summary>
+        /// Return all the messages received by this agent
+        /// </summary>
+        public List<AgentMessage> MailBox
+        {
+            get { return new List<AgentMessage>(mailBox.Values); }
+        }
+
+
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Create a new agent
+        /// </summary>
+        /// <param name="agent_name"></param>
+        public Agent(string agent_name)
+        {
+            name = agent_name;
+            ID = Guid.NewGuid();
+            jobReceived += onJobReceived;
+            creationDate = DateTime.UtcNow;
+
+            jobs = new List<AgentJob>();
+            roles = new List<AgentRole>();
+            workbench = new AgentWorkbench(this);
+            reasoner = new AgentReasoner(this);
+            perceivedEnvironementChanges = new Dictionary<IList, PerceptionType>();
+
+            CreateScheduler();
+        }
+
+        #endregion
+
+        #region Destructors
+
+        ~Agent()
+        {
+            //TODO notify agent retirement
+            jobs.Clear();
+            roles.Clear();
+
+            //scheduler.Shutdown();
+        }
+
+        #endregion
+        
+        #region Methods
+
+        /// <summary>
+        /// Notify to this agent a change occurred within the environement this agent is located.
+        /// </summary>
+        /// <param name="action">The type of change occurred</param>
+        /// <param name="changes">The data that involved in the environement change</param>
+        internal void notifyEnvironementChanges(PerceptionType action, IList changes)
+        {
+            Console.WriteLine("[Agent " + name + "] received " + action.ToString() + " -> " + changes.ToString());
+            perceivedEnvironementChanges.Add(changes, action);
+        }
+
+        private void CreateScheduler()
+        {
+            // construct a scheduler factory
+            ISchedulerFactory schedFact = new StdSchedulerFactory();
+
+            // get a scheduler
+            //scheduler = schedFact.GetScheduler();
         }
 
         public void manageDepartment()
@@ -228,7 +270,7 @@ namespace AgentLibrary
         /// <param name="end"></param>
         public void setWorkSchedule(DateTime start, DateTime end)
         {
-            
+
         }
 
         /// <summary>
@@ -250,6 +292,10 @@ namespace AgentLibrary
 
         }
 
-        
+        #endregion
+
+
+
+
     }
 }

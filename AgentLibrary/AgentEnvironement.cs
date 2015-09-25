@@ -9,7 +9,8 @@ using System.ServiceModel;
 
 namespace AgentLibrary
 {
-    public sealed class AgentEnvironement
+    // DEVE IMPLEMENTARE L'INTERFACCIA IMusaCommunicationService
+    public sealed class AgentEnvironement : IMusaCommunicationService
     {
         #region Fields
 
@@ -26,7 +27,7 @@ namespace AgentLibrary
         /// <summary>
         /// The agents registered to this environement
         /// </summary>
-        private HashSet<Agent> registeredAgents;
+        private List<Agent> registeredAgents;
 
         #endregion Fields
 
@@ -66,6 +67,10 @@ namespace AgentLibrary
 
         #region Events
 
+        /// <summary>
+        /// Event triggered when this environement starts to listen for external incoming messages, 
+        /// that is, when networking service is active.
+        /// </summary>
         public EventHandler onNetworkServiceStart = null;
 
         #endregion
@@ -79,7 +84,7 @@ namespace AgentLibrary
         {
             statements = new ObservableCollection<AtomicFormula>();
             attributes = new ObservableCollection<AssignmentType>();
-            registeredAgents = new HashSet<Agent>();
+            registeredAgents = new List<Agent>();
 
             statements.CollectionChanged += Statements_CollectionChanged;
             attributes.CollectionChanged += Attributes_CollectionChanged;
@@ -94,7 +99,7 @@ namespace AgentLibrary
         {
             statements = new ObservableCollection<AtomicFormula>();
             attributes = new ObservableCollection<AssignmentType>();
-            registeredAgents = new HashSet<Agent>();
+            registeredAgents = new List<Agent>();
 
             statements.CollectionChanged += Statements_CollectionChanged;
             attributes.CollectionChanged += Attributes_CollectionChanged;
@@ -113,12 +118,12 @@ namespace AgentLibrary
         /// <param name="port">the port used by this environement</param>
         public void StartNetworking(string port, string local_ip_address = "localhost")
         {
-            //var address = new Uri("http://localhost:8080");
             Uri address = new Uri("http://" + local_ip_address + ":" + port);
-            ServiceHost host = new ServiceHost(typeof(MusaCommunicationService));
+            ServiceHost host = new ServiceHost(typeof(AgentEnvironement));
             host.AddServiceEndpoint(typeof(IMusaCommunicationService), new BasicHttpBinding(), address);
             host.Open();
-
+            
+            // Once networking service is active, raise an event
             if (onNetworkServiceStart != null)
                 onNetworkServiceStart.Invoke(this, null);
         }
@@ -219,10 +224,7 @@ namespace AgentLibrary
             }
 
         }
-
-
-
-
+        
         /// <summary>
         /// Check if an agent is registered to this environement
         /// </summary>
@@ -252,6 +254,61 @@ namespace AgentLibrary
             */
             throw new System.NotImplementedException();
         }
+
+
+        #region IMusaCommunicationService method
+
+        /// <summary>
+        /// This function is invoked when an agent send a message to another agent.
+        /// </summary>
+        /// <param name="senderData">The informations about the sender agent</param>
+        /// <param name="receiverData">The informations about the receiver agent</param>
+        /// <param name="message">The sent message</param>
+        /// <returns></returns>
+        public bool sendAgentMessage(AgentPassport senderData, AgentPassport receiverData, AgentMessage message)
+        {
+            //sender agent is trusted? if not return false
+            //otherwise forward the message to receiver agent
+
+            bool senderIsTrusted = true; //for now, sender is always trusted
+
+            if (!senderIsTrusted)
+                return false;
+
+            //find the agent to which the message must be forwarded
+            Agent receiver = registeredAgents.Find(x => x.Name.Equals(receiverData.AgentName));
+            if (receiver == null)
+                return false;
+
+            ///lock the receiver agent mail box, and add to it the message
+            lock(receiver.lock_mailBox)
+            {
+                receiver.mailBox.Add(receiverData, message);
+            }
+
+            return true;
+        }
+
+        public bool sendBroadcastMessage(AgentPassport senderData, EnvironementData receiverData, AgentMessage message)
+        {
+
+
+            return true;
+        }
+
+
+        public bool AgentIsActive(AgentPassport senderData, EnvironementData receiverData)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool RequestAuthorizationKey(EnvironementData env)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
 
         #endregion
 

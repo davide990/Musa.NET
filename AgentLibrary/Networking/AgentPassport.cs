@@ -1,5 +1,4 @@
 ﻿using System.Runtime.Serialization;
-using System.ServiceModel;
 
 namespace AgentLibrary.Networking
 {   
@@ -13,12 +12,6 @@ namespace AgentLibrary.Networking
         private string workgroup_name;
         private string environement_name;
         private object auth_token;
-
-        //[DataMember]
-        //public string AgentID
-        //{
-        //    get { return agent_address_ip + "/" + environement_name + ":" + agent_name; }
-        //}
 
         /// <summary>
         /// The name of the workgroup the sender agent belongs to
