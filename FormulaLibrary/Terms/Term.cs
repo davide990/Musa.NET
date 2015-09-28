@@ -18,6 +18,7 @@ namespace FormulaLibrary
         public string Name
         {
             get { return name; }
+            private set { }
         }
 
         public Term(string name)

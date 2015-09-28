@@ -17,6 +17,7 @@ namespace FormulaLibrary
         public Formula Formula
         {
             get { return formula; }
+            private set { }
         }
         private readonly Formula formula;
 
@@ -33,7 +34,7 @@ namespace FormulaLibrary
         public override string ToString()
         {
             StringBuilder b = new StringBuilder();
-            b.Append("not(");
+            b.Append("!(");
             b.Append(formula.ToString());
             b.Append(")");
             return b.ToString();

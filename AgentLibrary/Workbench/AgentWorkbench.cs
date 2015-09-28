@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Collections.ObjectModel;
 using System.Collections;
 using System.Text;
+using System.Runtime.Serialization;
 /**
 __  __                                     _   
 |  \/  |                                   | |  
@@ -12,7 +13,6 @@ __  __                                     _
 | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
 | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
 |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
-
 */
 namespace AgentLibrary
 {
@@ -34,11 +34,15 @@ namespace AgentLibrary
         ThrowException
     }
 
-    
+
 
     /// <summary>
     /// 
     /// </summary>
+    [DataContract]
+    [KnownType(typeof(Formula))]
+    [KnownType(typeof(AtomicFormula))]
+    [KnownType(typeof(AssignmentType))]
     public class AgentWorkbench
     {
         WorkbenchAddFormulaPolicy add_policy        = WorkbenchAddFormulaPolicy.Default;
@@ -47,11 +51,23 @@ namespace AgentLibrary
         /// <summary>
         /// The set of formula
         /// </summary>
+        [DataMember]
+        public ObservableCollection<AtomicFormula> Statements
+        {
+            get { return statements; }
+            private set { statements = value; }
+        }
         private ObservableCollection<AtomicFormula> statements;
 
         /// <summary>
         /// The set of assignment
         /// </summary>
+        [DataMember]
+        public ObservableCollection<AssignmentType> AssignmentSet
+        {
+            get { return assignment_set; }
+            private set { assignment_set = value; }
+        }
         private ObservableCollection<AssignmentType> assignment_set;
 
         /// <summary>
@@ -69,7 +85,7 @@ namespace AgentLibrary
             assignment_set  = new ObservableCollection<AssignmentType>();
 
             assignment_set.CollectionChanged    += on_assignment_set_changed;
-            statements.CollectionChanged         += on_workbench_changed;
+            statements.CollectionChanged        += on_workbench_changed;
         }
 
         /// <summary>

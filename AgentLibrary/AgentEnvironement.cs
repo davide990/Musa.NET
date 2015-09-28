@@ -62,7 +62,13 @@ namespace AgentLibrary
 
         private static AgentEnvironement instance;
 
-        public static AgentEnvironement getInstance()
+        /// <summary>
+        /// Get the unique agent environement for this MUSA.NET process instance.
+        /// </summary>
+        /// <param name="port"></param>
+        /// <param name="ip_address"></param>
+        /// <returns></returns>
+        public static AgentEnvironement GetInstance(string port = "8080", string ip_address = "localhost")
         {
             if(instance == null)
             {
@@ -71,7 +77,12 @@ namespace AgentLibrary
 
                 //TODO QUESTE INFORMAZIONI DOVREBBERO POTER 
                 //ESSERE PASSATE DAL CODICE O DA FILE DI CONFIGURAZIONE
-                srv.StartNetworking("8080");
+
+                //if(configFile)
+                // port <- parseConfigFile(Port)
+                // ip_address <- parseConfigFile(IP)
+
+                srv.StartNetworking(port, ip_address);
             }
 
             return instance;

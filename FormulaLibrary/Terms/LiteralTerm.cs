@@ -1,5 +1,4 @@
-﻿using System;
-/**
+﻿/**
 __  __                                     _   
 |  \/  |                                   | |  
 | \  / | _   _  ___   __ _     _ __    ___ | |_ 
@@ -8,6 +7,7 @@ __  __                                     _
 |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 
 */
+using System;
 namespace FormulaLibrary
 {
     public class LiteralTerm : Term, IEquatable<LiteralTerm>

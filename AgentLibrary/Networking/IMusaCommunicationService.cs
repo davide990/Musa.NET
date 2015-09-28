@@ -1,4 +1,6 @@
-﻿using System.ServiceModel;
+﻿using FormulaLibrary;
+using System.Collections.Generic;
+using System.ServiceModel;
 using System.ServiceModel.Web;
 
 namespace AgentLibrary.Networking
@@ -57,6 +59,49 @@ namespace AgentLibrary.Networking
         [OperationContract]
         bool RequestAuthorizationKey(EnvironementData env);
 
+        /// <summary>
+        /// Return the list of agents within the environment
+        /// </summary>
+        /// <returns></returns>
+        [WebInvoke(Method = "POST",
+            ResponseFormat = WebMessageFormat.Json,
+            RequestFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        List<string> GetAgentList(AgentPassport sender);
+        
+        /// <summary>
+        /// Return the statements within the workbench of an agent
+        /// </summary>
+        /// <param name="agent"></param>
+        /// <returns></returns>
+        [WebInvoke(Method = "POST",
+            ResponseFormat = WebMessageFormat.Json,
+            RequestFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        List<string> GetAgentStatements(AgentPassport sender, AgentPassport receiver);
 
+        /// <summary>
+        /// Return the assignment within the workbench of an agent
+        /// </summary>
+        /// <param name="agent"></param>
+        /// <returns></returns>
+        [WebInvoke(Method = "POST",
+            ResponseFormat = WebMessageFormat.Json,
+            RequestFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        List<string> GetAgentAssignments(AgentPassport sender, AgentPassport receiver);
+
+        /// <summary>
+        /// Ask to an agent to verify in its workbench a given formula
+        /// </summary>
+        /// <param name="agent"></param>
+        /// <param name="f"></param>
+        /// <returns></returns>
+        [WebInvoke(Method = "POST",
+            ResponseFormat = WebMessageFormat.Json,
+            RequestFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        bool QueryAgent(AgentPassport sender, AgentPassport receiver, string formula);
+        
     }
 }

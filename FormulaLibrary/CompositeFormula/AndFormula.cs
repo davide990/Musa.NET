@@ -20,11 +20,13 @@ namespace FormulaLibrary
         public Formula Left
         {
             get { return left; }
+            private set { }
         }
-
+        
         public Formula Right
         {
             get { return right; }
+            private set { }
         }
 
         public AndFormula(Formula left, Formula right)
@@ -76,9 +78,9 @@ namespace FormulaLibrary
         public override string ToString()
         {
             StringBuilder b = new StringBuilder();
-            b.Append("and(");
+            b.Append("(");
             b.Append(left.ToString());
-            b.Append(",");
+            b.Append("&");
             b.Append(right.ToString());
             b.Append(")");
             return b.ToString();

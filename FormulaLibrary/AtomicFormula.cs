@@ -29,6 +29,7 @@ namespace FormulaLibrary
         public string Functor
         {
             get { return functor; }
+            private set { }
         }
         private readonly string functor;
 
@@ -38,15 +39,17 @@ namespace FormulaLibrary
         public List<Term> Terms
         {
             get { return terms; }
+            private set { }
         }
         private List<Term> terms;
-        
+
         /// <summary>
         /// Return the number of terms this formula has
         /// </summary>
         public int TermsCount
         {
             get { return Terms.Count; }
+            private set { }
         }
 
         public AtomicFormula(string functor, params Term[] terms)

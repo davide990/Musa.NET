@@ -19,8 +19,8 @@ namespace FormulaLibrary
         /// </summary>
         public T Value
         {
-            private set { this.value = value; }
             get { return value; }
+            private set { this.value = value; }
         }
         private T value;
 
@@ -66,8 +66,8 @@ namespace FormulaLibrary
         
         public override string ToString()
         {
-            return "["+base.ToString()+","+Value.ToString()+"]";
-            //return base.ToString() + "<-" + Value.GetType().Name + "(" + Value.ToString() + ")";
+            //return "["+base.ToString()+","+Value.ToString()+"]";
+            return base.ToString() + "<-" + Value.GetType().Name + "(" + Value.ToString() + ")";
         }
 
         public bool Equals(VariableTerm<T> other)
