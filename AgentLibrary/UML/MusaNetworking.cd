@@ -1,52 +1,52 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="AgentLibrary.Networking.MusaCommunicationService" BaseTypeListCollapsed="true">
-    <Position X="6" Y="0.75" Width="2.25" />
+  <Class Name="AgentLibrary.Networking.MusaCommunicationService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="2.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAQAAAECAAAAAAAAAAACAAAAAAAAAAgAAAAAAAAAA=</HashCode>
+      <HashCode>ABAAQAAAACAAAgAAAAAAACAAAABAAAQAgAAAAAAAAAA=</HashCode>
       <FileName>Networking\MusaCommunicationService.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" />
+    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
-  <Class Name="AgentLibrary.Networking.AgentMessage">
-    <Position X="0.75" Y="0.75" Width="2.25" />
+  <Class Name="AgentLibrary.Networking.AgentMessage" Collapsed="true">
+    <Position X="0.75" Y="0.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAQAAAAAEQAAAAEAAAAAAAAEAAAAIIAAAICA=</HashCode>
+      <HashCode>AAgAAAAIAQAAAAAEAAAAAAAAAAAAAAEAAAAIIAAAICA=</HashCode>
       <FileName>Networking\AgentMessage.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="AgentLibrary.Networking.AgentPassport">
-    <Position X="3.5" Y="0.75" Width="2.25" />
+  <Class Name="AgentLibrary.Networking.AgentPassport" Collapsed="true">
+    <Position X="2.5" Y="0.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAECAAAEAAAAAAGQAAAAIAAgAAEAAAAAAAgAAIAAAA=</HashCode>
+      <HashCode>AAAECEAAEAAAAAAGQAEAAIAAiAAEAAAAAAAgAAIAACA=</HashCode>
       <FileName>Networking\AgentPassport.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="AgentLibrary.Networking.EnvironementData">
-    <Position X="6" Y="4.75" Width="2.25" />
+  <Class Name="AgentLibrary.Networking.EnvironementData" Collapsed="true">
+    <Position X="0.75" Y="1.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>QAAAAAAAAAAAAAAEAEEAAAAAgAAAAgAAEAAAAAAAAAA=</HashCode>
+      <HashCode>QAAAAAAAAAAAAAAEAEAAAAAAgAAAAgAAEACAAAAAAAA=</HashCode>
       <FileName>Networking\BroadcastMessage.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="AgentLibrary.Networking.BroadcastMessage">
-    <Position X="0.75" Y="4" Width="2.25" />
+  <Class Name="AgentLibrary.Networking.BroadcastMessage" Collapsed="true">
+    <Position X="4.25" Y="0.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAACAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAIAAAACA=</HashCode>
       <FileName>Networking\BroadcastMessage.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Interface Name="AgentLibrary.Networking.IMusaCommunicationService">
-    <Position X="6" Y="2.75" Width="2.25" />
+  <Interface Name="AgentLibrary.Networking.IMusaCommunicationService" Collapsed="true">
+    <Position X="0.75" Y="3" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAQAAAECAAAAAAAAAAACAAAAAAAAAAgAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAQAAAACAAAAAAAAAAACAAAAAAAAAAgAAAAAAAAAA=</HashCode>
       <FileName>Networking\IMusaCommunicationService.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Enum Name="AgentLibrary.Networking.MessageScope">
-    <Position X="3.5" Y="4.75" Width="2.25" />
+  <Enum Name="AgentLibrary.Networking.MessageScope" Collapsed="true">
+    <Position X="0.75" Y="4" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAAAAEAAIAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAACAAAAAAAAAAAAAAAABAAAAAAAAIAAAAAAAAA=</HashCode>
       <FileName>Networking\BroadcastMessage.cs</FileName>
     </TypeIdentifier>
   </Enum>

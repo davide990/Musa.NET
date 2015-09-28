@@ -62,12 +62,13 @@
     <Compile Include="AgentJob\AgentJobResult.cs" />
     <Compile Include="AgentJob\AgentJobState.cs" />
     <Compile Include="AgentRole.cs" />
+    <Compile Include="EnvironmentFactory.cs" />
     <Compile Include="Networking\AgentMessage.cs" />
     <Compile Include="Networking\AgentPassport.cs" />
     <Compile Include="Networking\BroadcastMessage.cs" />
+    <Compile Include="Networking\EnvironementServer.cs" />
     <Compile Include="Networking\IMusaCommunicationService.cs" />
-    <Compile Include="Networking\MusaCommunicationService.cs" />
-    <Compile Include="Scheduler\AgentReasoner.cs" />
+    <Compile Include="Reasoner\AgentReasoner.cs" />
     <Compile Include="Workbench\AgentWorkbench.cs" />
     <Compile Include="Scheduler\SchedulingType.cs" />
     <Compile Include="Trigger\TriggerFactory.cs" />

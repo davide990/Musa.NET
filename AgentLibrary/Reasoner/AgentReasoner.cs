@@ -19,7 +19,7 @@ using FormulaLibrary;
 namespace AgentLibrary
 {
     /// <summary>
-    /// A convinient enum to mark the changes that can occur within the environement
+    /// A convinient enum to mark the changes that can occur within the environment
     /// </summary>
     public enum PerceptionType
     {
@@ -99,9 +99,7 @@ namespace AgentLibrary
             while(true)
             {
                 Console.WriteLine("reasoning cycle #"+ currentReasoningCycle++);
-
-                Thread.Sleep(ReasoningUpdateTime);
-
+                Console.WriteLine("Checking mail box...");
                 lock (parentAgent.lock_mailBox)
                 {
                     //Check the mail box
@@ -109,9 +107,12 @@ namespace AgentLibrary
 
                     //Clear it
                     parentAgent.mailBox.Clear();
+
+                    Thread.Sleep(1000);
                 }
-                
-                lock (parentAgent.lock_perceivedEnvironementChanges)
+
+                Console.WriteLine("Checking environment changes...");
+                lock (parentAgent.lock_perceivedEnvironmentChanges)
                 {
                     //Update the agent workbench
                     perceptEnvironement();
@@ -119,18 +120,19 @@ namespace AgentLibrary
                     //Trigger possible events caused by the update of agent's workbench
                     triggerEvents();
 
-                    //Clear the agent's queue of perceived environement changes
+                    //Clear the agent's queue of perceived environment changes
                     parentAgent.perceivedEnvironementChanges.Clear();
                 }
-                
-                
-                //#Environement percept
-                //-> percept belief changes in environement
+
+                Console.WriteLine("######### done reasoning...");
+                Thread.Sleep(ReasoningUpdateTime);
+                //#Environment percept
+                //-> percept belief changes in environment
                 //-> percept/trigger events
                 //#Jobs scheduling
                 //-> dequeue and execute
-                
-                
+
+
             }
         }
 
@@ -147,6 +149,7 @@ namespace AgentLibrary
                 switch (p.Value.InfoType)
                 {
                     case InformationType.Tell:
+                        Console.WriteLine("[" + parentAgent.Name + "] perceiving TELL: " + p.Value.ToString());
                         parentAgent.Workbench.addStatement(formula);
                         break;
 
@@ -164,7 +167,7 @@ namespace AgentLibrary
         }
 
         /// <summary>
-        /// Percept the environement changes and updates the workbench of the parent agent.
+        /// Percept the environment changes and updates the workbench of the parent agent.
         /// </summary>
         private void perceptEnvironement()
         {
@@ -200,7 +203,7 @@ namespace AgentLibrary
         }
 
         /// <summary>
-        /// Trigger events. Events triggers may be caused by the agent's perception of changes within the environement.
+        /// Trigger events. Events triggers may be caused by the agent's perception of changes within the environment.
         /// </summary>
         private void triggerEvents()
         {

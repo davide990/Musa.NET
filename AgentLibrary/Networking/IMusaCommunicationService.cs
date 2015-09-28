@@ -4,7 +4,7 @@ using System.ServiceModel.Web;
 namespace AgentLibrary.Networking
 {
     /// <summary>
-    /// Definisce il protocollo di comunicazione tra agenti e ambienti
+    /// An interface that define the communication protocol between agents and environements
     /// </summary>
     [ServiceContract]
     public interface IMusaCommunicationService
@@ -48,7 +48,7 @@ namespace AgentLibrary.Networking
         bool AgentIsActive(AgentPassport senderData, EnvironementData receiverData);
 
         /// <summary>
-        /// Requests an authorization key to access a specific environement.
+        /// Requests an authorization key to access a specific environment.
         /// </summary>
         /// <returns>The authorization key.</returns>
         [WebInvoke(Method = "POST",

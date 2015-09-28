@@ -6,15 +6,15 @@ namespace AgentLibrary.Networking
     public enum MessageScope
     {
         /// <summary>
-        /// The scope of a message is restricted to all the agents/environements in the machine hosting the sender agent
+        /// The scope of a message is restricted to all the agents/environments in the machine hosting the sender agent
         /// </summary>
         [EnumMember]
         All,
         /// <summary>
-        /// The scope of a message is restricted to a specific environement
+        /// The scope of a message is restricted to a specific environment
         /// </summary>
         [EnumMember]
-        Environement,
+        Environment,
         /// <summary>
         /// The scope of a message is restricted to a specific workgroup
         /// </summary>
@@ -44,7 +44,7 @@ namespace AgentLibrary.Networking
         }
 
         [DataMember]
-        public string EnvironementName
+        public string EnvironmentName
         {
             get { return env_name; }
             set { env_name = value; }
@@ -52,7 +52,7 @@ namespace AgentLibrary.Networking
 
         public override string ToString()
         {
-            return string.Format("[EnvironementData: AddressIP={0}, AddressPort={1}, EnvironementName={2}]", AddressIP, AddressPort, EnvironementName);
+            return string.Format("[EnvironementData: AddressIP={0}, AddressPort={1}, EnvironmentName={2}]", AddressIP, AddressPort, EnvironmentName);
         }
     }
 

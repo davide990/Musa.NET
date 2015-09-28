@@ -8,6 +8,7 @@
 
 */
 using AgentLibrary;
+using AgentLibrary.Networking;
 using FormulaLibrary;
 using FormulaLibrary.ANTLR;
 using Quartz;
@@ -25,16 +26,24 @@ namespace AgentTest
                             FormulaParser.Parse("h(s,o,a<-string(\"ciao mondo\"))") as AtomicFormula,
                             FormulaParser.Parse("o(m,s<-char('d')") as AtomicFormula);*/
 
-            AgentEnvironement env = new AgentEnvironement("8080","127.0.0.1");
-            Agent a = new Agent("agent_1");
-            Agent b = new Agent("agent_2");
+
+            AgentEnvironement env = AgentEnvironement.getInstance();
+            Agent a = new Agent("agent_1").start();
+            env.RegisterAgent(a);
+            /*AgentEnvironement env = new AgentEnvironement();
+            Agent a = new Agent("agent_1").start();
+            //Agent b = new Agent("agent_2");
 
             env.RegisterAgent(a);
-            env.RegisterAgent(b);
-            
-            env.RegisterStatement(FormulaParser.Parse("f(x)") as AtomicFormula);
-            
-            Console.WriteLine(a.Workbench.ToString());
+
+            EnvironmentServer srv = new EnvironmentServer(env);
+            srv.StartNetworking("8080");*/
+
+            //env.RegisterAgent(b);
+
+            //env.RegisterStatement(FormulaParser.Parse("f(x)") as AtomicFormula);
+
+            //Console.WriteLine(a.Workbench.ToString());
 
 
             Console.ReadKey();

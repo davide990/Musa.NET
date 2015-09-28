@@ -9,44 +9,37 @@ using System.ServiceModel;
 
 namespace AgentLibrary
 {
-    // DEVE IMPLEMENTARE L'INTERFACCIA IMusaCommunicationService
-    public sealed class AgentEnvironement : IMusaCommunicationService
+    public sealed class AgentEnvironement
     {
         #region Fields
 
         /// <summary>
-        /// The statements for this environement
+        /// The statements for this environment
         /// </summary>
         private ObservableCollection<AtomicFormula> statements;
 
         /// <summary>
-        /// The set of attributes for the statement contained in this environement
+        /// The set of attributes for the statement contained in this environment
         /// </summary>
         private ObservableCollection<AssignmentType> attributes;
 
         /// <summary>
-        /// The agents registered to this environement
+        /// The agents registered to this environment
         /// </summary>
-        private List<Agent> registeredAgents;
+        private ObservableCollection<Agent> registeredAgents;
+
+        public ObservableCollection<Agent> RegisteredAgents
+        {
+            get { return registeredAgents; }
+            set { if (value != null) registeredAgents = value; }
+        }
 
         #endregion Fields
 
         #region Properties
-
+        
         /// <summary>
-        /// The communication service interface used by this environement. This object act like
-        /// a bridge for communication between agents located in different (or within the same) 
-        /// environement. Every communication of agents is forwarded to an environement that will
-        /// forward to the receiver agent, agent group or environement (depending on the communication
-        /// type)
-        /// </summary>
-        private MusaCommunicationService CommunicationService
-        {
-            get { return MusaCommunicationService.getInstance(); }
-        }
-
-        /// <summary>
-        /// Return the IP address of the machine in which this environement is located
+        /// Return the IP address of the machine in which this environment is located
         /// </summary>
         public string IPAddress
         {
@@ -65,80 +58,62 @@ namespace AgentLibrary
 
         #endregion Properties
 
-        #region Events
 
-        /// <summary>
-        /// Event triggered when this environement starts to listen for external incoming messages, 
-        /// that is, when networking service is active.
-        /// </summary>
-        public EventHandler onNetworkServiceStart = null;
 
-        #endregion
+        private static AgentEnvironement instance;
+
+        public static AgentEnvironement getInstance()
+        {
+            if(instance == null)
+            {
+                instance = new AgentEnvironement();
+                EnvironmentServer srv = new EnvironmentServer(instance);
+
+                //TODO QUESTE INFORMAZIONI DOVREBBERO POTER 
+                //ESSERE PASSATE DAL CODICE O DA FILE DI CONFIGURAZIONE
+                srv.StartNetworking("8080");
+            }
+
+            return instance;
+        }
         
         #region Constructors
 
         /// <summary>
-        /// Create a new environement
+        /// Create a new environment
         /// </summary>
-        public AgentEnvironement()
+        private AgentEnvironement()
         {
             statements = new ObservableCollection<AtomicFormula>();
             attributes = new ObservableCollection<AssignmentType>();
-            registeredAgents = new List<Agent>();
+            registeredAgents = new ObservableCollection<Agent>();
 
+            registeredAgents.CollectionChanged += RegisteredAgents_CollectionChanged;
+            
             statements.CollectionChanged += Statements_CollectionChanged;
             attributes.CollectionChanged += Attributes_CollectionChanged;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="port"></param>
-        /// <param name="local_ip_address"></param>
-        public AgentEnvironement(string port, string local_ip_address = "localhost")
+        private void RegisteredAgents_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            statements = new ObservableCollection<AtomicFormula>();
-            attributes = new ObservableCollection<AssignmentType>();
-            registeredAgents = new List<Agent>();
+            switch(e.Action)
+            {
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                    Console.WriteLine("Added agent");
+                    break;
 
-            statements.CollectionChanged += Statements_CollectionChanged;
-            attributes.CollectionChanged += Attributes_CollectionChanged;
-
-            StartNetworking(port, local_ip_address);
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+                    Console.WriteLine("removed agent");
+                    break;
+            }
         }
-
+        
         #endregion
 
         #region Methods
-
+        
         /// <summary>
-        /// Setup and start the networking service for this environement
-        /// </summary>
-        /// <param name="address">the IP address of the machine in which this environement is located</param>
-        /// <param name="port">the port used by this environement</param>
-        public void StartNetworking(string port, string local_ip_address = "localhost")
-        {
-            Uri address = new Uri("http://" + local_ip_address + ":" + port);
-            ServiceHost host = new ServiceHost(typeof(AgentEnvironement));
-            host.AddServiceEndpoint(typeof(IMusaCommunicationService), new BasicHttpBinding(), address);
-            host.Open();
-            
-            // Once networking service is active, raise an event
-            if (onNetworkServiceStart != null)
-                onNetworkServiceStart.Invoke(this, null);
-        }
-
-        /// <summary>
-        /// Stop the networking service for this environement
-        /// </summary>
-        public void StopNetworkingService()
-        {
-            host.Close();
-        }
-
-
-        /// <summary>
-        /// Method invoked when a changes that involves the attributes occurs into the environement's statement 
+        /// Method invoked when a changes that involves the attributes occurs into the environment's statement 
         /// list. It is responsible for communicating the changes to the registered agents.
         /// </summary>
         /// <param name="sender"></param>
@@ -159,7 +134,7 @@ namespace AgentLibrary
         }
 
         /// <summary>
-        /// Method invoked when a changes that involves the statements occurs into the environement's statement 
+        /// Method invoked when a changes that involves the statements occurs into the environment's statement 
         /// list. It is responsible for communicating the changes to the registered agents.
         /// </summary>
         private void Statements_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -175,7 +150,7 @@ namespace AgentLibrary
         }
 
         /// <summary>
-        /// Register an agent to this environement
+        /// Register an agent to this environment
         /// </summary>
         public void RegisterAgent(Agent a)
         {
@@ -184,7 +159,7 @@ namespace AgentLibrary
         }
 
         /// <summary>
-        /// Register an agent to this environement
+        /// Register an agent to this environment
         /// </summary>
         public void RegisterAgent(string agent_ip_address)
         {
@@ -226,7 +201,7 @@ namespace AgentLibrary
         }
         
         /// <summary>
-        /// Check if an agent is registered to this environement
+        /// Check if an agent is registered to this environment
         /// </summary>
         public bool IsAgentRegistered(Agent a)
         {
@@ -241,7 +216,7 @@ namespace AgentLibrary
                 solo manager di progetto
                 solo se disposti di una chiave
             */
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public void SetExternalCommunicationPolicy()
@@ -252,64 +227,9 @@ namespace AgentLibrary
                 solo manager di progetto
                 solo se disposti di una chiave
             */
-            throw new System.NotImplementedException();
-        }
-
-
-        #region IMusaCommunicationService method
-
-        /// <summary>
-        /// This function is invoked when an agent send a message to another agent.
-        /// </summary>
-        /// <param name="senderData">The informations about the sender agent</param>
-        /// <param name="receiverData">The informations about the receiver agent</param>
-        /// <param name="message">The sent message</param>
-        /// <returns></returns>
-        public bool sendAgentMessage(AgentPassport senderData, AgentPassport receiverData, AgentMessage message)
-        {
-            //sender agent is trusted? if not return false
-            //otherwise forward the message to receiver agent
-
-            bool senderIsTrusted = true; //for now, sender is always trusted
-
-            if (!senderIsTrusted)
-                return false;
-
-            //find the agent to which the message must be forwarded
-            Agent receiver = registeredAgents.Find(x => x.Name.Equals(receiverData.AgentName));
-            if (receiver == null)
-                return false;
-
-            ///lock the receiver agent mail box, and add to it the message
-            lock(receiver.lock_mailBox)
-            {
-                receiver.mailBox.Add(receiverData, message);
-            }
-
-            return true;
-        }
-
-        public bool sendBroadcastMessage(AgentPassport senderData, EnvironementData receiverData, AgentMessage message)
-        {
-
-
-            return true;
-        }
-
-
-        public bool AgentIsActive(AgentPassport senderData, EnvironementData receiverData)
-        {
             throw new NotImplementedException();
         }
-
-        public bool RequestAuthorizationKey(EnvironementData env)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-
-
+        
         #endregion
 
     }

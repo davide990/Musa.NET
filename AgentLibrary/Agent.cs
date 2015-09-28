@@ -58,16 +58,16 @@ namespace AgentLibrary
         internal Thread agent_thread;
 
         /// <summary>
-        /// This queue contains the changes to the environement that this agent have to perceive. Since an agent can be busy in doing other
-        /// activities such event-handling or execution of plans, the perceived environement changes are accumulated temporarily in this
+        /// This queue contains the changes to the environment that this agent have to perceive. Since an agent can be busy in doing other
+        /// activities such event-handling or execution of plans, the perceived environment changes are accumulated temporarily in this
         /// queue until the agent start a perception activity.
         /// </summary>
         internal Dictionary<IList, PerceptionType> perceivedEnvironementChanges;
-        internal object lock_perceivedEnvironementChanges = new object();
+        internal object lock_perceivedEnvironmentChanges = new object();
 
         /// <summary>
         /// This dictionary represents the mailbox of the agent. In this dictionary are collected all the messages that the agent may receive
-        /// from other agents in the same, or different, environement. The messages are read during the agent's reasoning cycle.
+        /// from other agents in the same, or different, environment. The messages are read during the agent's reasoning cycle.
         /// </summary>
         internal Dictionary<AgentPassport, AgentMessage> mailBox;
         internal object lock_mailBox = new object();
@@ -183,6 +183,7 @@ namespace AgentLibrary
             workbench = new AgentWorkbench(this);
             reasoner = new AgentReasoner(this);
             perceivedEnvironementChanges = new Dictionary<IList, PerceptionType>();
+            mailBox = new Dictionary<AgentPassport, AgentMessage>();
 
             CreateScheduler();
         }
@@ -205,10 +206,10 @@ namespace AgentLibrary
         #region Methods
 
         /// <summary>
-        /// Notify to this agent a change occurred within the environement this agent is located.
+        /// Notify to this agent a change occurred within the environment this agent is located.
         /// </summary>
         /// <param name="action">The type of change occurred</param>
-        /// <param name="changes">The data that involved in the environement change</param>
+        /// <param name="changes">The data that involved in the environment change</param>
         internal void notifyEnvironementChanges(PerceptionType action, IList changes)
         {
             Console.WriteLine("[Agent " + name + "] received " + action.ToString() + " -> " + changes.ToString());

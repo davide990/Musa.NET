@@ -24,7 +24,7 @@ namespace AgentLibrary.Networking
         }
 
         /// <summary>
-        /// The name of the environement in which the sender agent is located
+        /// The name of the environment in which the sender agent is located
         /// </summary>
         [DataMember]
         public string EnvironementName
