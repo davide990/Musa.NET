@@ -37,7 +37,26 @@ namespace AgentLibrary
         #endregion Fields
 
         #region Properties
-        
+
+        /// <summary>
+        /// The moment in which this environment has been created.
+        /// </summary>
+        public DateTime CreationDate
+        {
+            get { return creationTime; }
+            private set { creationTime = value; }
+        }
+        private DateTime creationTime;
+
+        /// <summary>
+        /// Count how many much time elapsed between the moment in which this environment 
+        /// has been created and now.
+        /// </summary>
+        public TimeSpan UpTime
+        {
+            get { return DateTime.Now.Subtract(CreationDate); }
+        }
+
         /// <summary>
         /// Return the IP address of the machine in which this environment is located
         /// </summary>
@@ -45,17 +64,7 @@ namespace AgentLibrary
         {
             get { return Dns.GetHostEntry(Dns.GetHostName()).AddressList[0].ToString(); }
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public ServiceHost Host
-        {
-            get { return host; }
-            set { host = value; }
-        }
-        private ServiceHost host;
-
+        
         #endregion Properties
 
 
@@ -99,6 +108,8 @@ namespace AgentLibrary
             attributes = new ObservableCollection<AssignmentType>();
             registeredAgents = new ObservableCollection<Agent>();
 
+            CreationDate = DateTime.Now;
+
             registeredAgents.CollectionChanged += RegisteredAgents_CollectionChanged;
             
             statements.CollectionChanged += Statements_CollectionChanged;
@@ -118,10 +129,12 @@ namespace AgentLibrary
                     break;
             }
         }
-        
+
         #endregion
 
         #region Methods
+        
+        #region Collection delegates
         
         /// <summary>
         /// Method invoked when a changes that involves the attributes occurs into the environment's statement 
@@ -160,6 +173,8 @@ namespace AgentLibrary
             }
         }
 
+        #endregion
+
         /// <summary>
         /// Register an agent to this environment
         /// </summary>
@@ -168,16 +183,7 @@ namespace AgentLibrary
             if (!registeredAgents.Contains(a))
                 registeredAgents.Add(a);
         }
-
-        /// <summary>
-        /// Register an agent to this environment
-        /// </summary>
-        public void RegisterAgent(string agent_ip_address)
-        {
-            //!!!
-        }
-
-
+        
         /// <summary>
         /// Add a statement (as atomic formula) into this workbench.
         /// </summary>

@@ -101,7 +101,7 @@ namespace AgentLibrary
         /// <summary>
         /// Check if actually is working time for this agent.
         /// </summary>
-        public bool IsWorkingTime
+        public bool IsActive
         {
             get { DateTime now = DateTime.UtcNow; return now >= WorkScheduleStart && now < WorkScheduleEnd; }
         }
@@ -126,7 +126,7 @@ namespace AgentLibrary
         {
             get
             {
-                throw new NotImplementedException();
+                return "8080";
             }
 
             set
@@ -162,6 +162,15 @@ namespace AgentLibrary
             get { return new List<AgentMessage>(mailBox.Values); }
         }
 
+        /// <summary>
+        /// The role of this agent
+        /// </summary>
+        public string Role
+        {
+            get { return role; }
+            set { role = value; }
+        }
+        private string role;
 
         #endregion
 
@@ -204,6 +213,17 @@ namespace AgentLibrary
         #endregion
         
         #region Methods
+
+
+        public AgentPassport GetPassport()
+        {
+            AgentPassport ps = new AgentPassport();
+            ps.AgentName = Name;
+            ps.AgentRole = Role;
+            ps.AgentAddressIP = IP_address;
+            ps.AgentAddressPort = Port;
+            return ps;
+        }
 
         /// <summary>
         /// Notify to this agent a change occurred within the environment this agent is located.

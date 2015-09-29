@@ -58,6 +58,7 @@
     <Compile Include="Assignment.cs" />
     <Compile Include="AtomicFormula.cs" />
     <Compile Include="Formula.cs" />
+    <Compile Include="FormulaGenerator.cs" />
     <Compile Include="FormulaType.cs" />
     <Compile Include="CompositeFormula\NotFormula.cs" />
     <Compile Include="CompositeFormula\OrFormula.cs" />

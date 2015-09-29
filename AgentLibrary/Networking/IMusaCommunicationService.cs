@@ -1,5 +1,4 @@
-﻿using FormulaLibrary;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 
@@ -47,7 +46,7 @@ namespace AgentLibrary.Networking
             ResponseFormat = WebMessageFormat.Json,
             RequestFormat = WebMessageFormat.Json)]
         [OperationContract]
-        bool AgentIsActive(AgentPassport senderData, EnvironementData receiverData);
+        bool AgentIsActive(AgentPassport senderData, AgentPassport receiverData);
 
         /// <summary>
         /// Requests an authorization key to access a specific environment.
@@ -78,7 +77,7 @@ namespace AgentLibrary.Networking
             ResponseFormat = WebMessageFormat.Json,
             RequestFormat = WebMessageFormat.Json)]
         [OperationContract]
-        List<string> GetAgentStatements(AgentPassport sender, AgentPassport receiver);
+        List<string> GetAgentStatements(AgentPassport agent);
 
         /// <summary>
         /// Return the assignment within the workbench of an agent
@@ -89,7 +88,7 @@ namespace AgentLibrary.Networking
             ResponseFormat = WebMessageFormat.Json,
             RequestFormat = WebMessageFormat.Json)]
         [OperationContract]
-        List<string> GetAgentAssignments(AgentPassport sender, AgentPassport receiver);
+        List<string> GetAgentAssignments(AgentPassport agent);
 
         /// <summary>
         /// Ask to an agent to verify in its workbench a given formula
@@ -102,6 +101,16 @@ namespace AgentLibrary.Networking
             RequestFormat = WebMessageFormat.Json)]
         [OperationContract]
         bool QueryAgent(AgentPassport sender, AgentPassport receiver, string formula);
-        
+
+        /// <summary>
+        /// Register a new agent to the environment
+        /// </summary>
+        /// <returns></returns>
+        [WebInvoke(Method = "POST",
+            ResponseFormat = WebMessageFormat.Json,
+            RequestFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        bool RegisterAgent(AgentPassport newAgent);
+
     }
 }

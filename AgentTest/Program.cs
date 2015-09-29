@@ -27,9 +27,29 @@ namespace AgentTest
                             FormulaParser.Parse("o(m,s<-char('d')") as AtomicFormula);*/
 
 
-            AgentEnvironement env = AgentEnvironement.GetInstance();
-            Agent a = new Agent("agent_1").start();
-            env.RegisterAgent(a);
+            //AgentEnvironement env = AgentEnvironement.GetInstance();
+            //Agent a = new Agent("agent_1").start();
+            //env.RegisterAgent(a);
+
+
+
+            FormulaGenerator fg = new FormulaGenerator(0, 5, 2, 1, true);
+
+
+            Formula ff = fg.GetRandomFormula(0);
+            Console.WriteLine(ff.ToString());
+            //for (int i = 0; i < 50; i++)
+            //{
+            //    Console.WriteLine(fg.getRandomAtomicFormula().ToString());
+            //}
+            
+            
+
+
+
+
+
+
             /*AgentEnvironement env = new AgentEnvironement();
             Agent a = new Agent("agent_1").start();
             //Agent b = new Agent("agent_2");
