@@ -10,10 +10,11 @@ __  __                                     _
 
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
+using System;
 
 namespace FormulaLibrary.ANTLR.visitor
 {
-    public class FormulaVisitor : formula_grammarBaseVisitor<Formula>
+    public class FormulaVisitor : formula_grammarBaseVisitor<Formula>,IDisposable
     {
         public override Formula VisitFormula([NotNull] formula_grammarParser.FormulaContext context)
         {
@@ -49,13 +50,19 @@ namespace FormulaLibrary.ANTLR.visitor
 
             if ((tree = context.predicate()) != null)
             {
-                PredicateVisitor predicateVisitor = new PredicateVisitor();
-                predicateVisitor.Visit(tree);
-                
-                if (isNegated)
-                    return new NotFormula(predicateVisitor.ToAtomicFormula());
-                else
-                    return predicateVisitor.ToAtomicFormula();
+                Formula retFormula = null;
+
+                using (PredicateVisitor predicateVisitor = new PredicateVisitor())
+                {
+                    predicateVisitor.Visit(tree);
+                    
+                    if (isNegated)
+                        retFormula = new NotFormula(predicateVisitor.ToAtomicFormula());
+                    else
+                        retFormula = predicateVisitor.ToAtomicFormula();
+                }
+                    
+                return retFormula;
             }
             else if((tree = context.formula()) != null)
             {
@@ -67,6 +74,9 @@ namespace FormulaLibrary.ANTLR.visitor
             return null;
         }
 
-        
+        public void Dispose()
+        {
+            
+        }
     }
 }

@@ -15,7 +15,7 @@ using System.Reflection;
 
 namespace FormulaLibrary.ANTLR.visitor
 {
-    class PredicateVisitor : formula_grammarBaseVisitor<string>
+    class PredicateVisitor : formula_grammarBaseVisitor<string>, IDisposable
     {
         /// <summary>
         /// The terms of this predicate
@@ -81,7 +81,11 @@ namespace FormulaLibrary.ANTLR.visitor
             Type type = Type.GetType(Visit(context.varType().children[0]));
 
             //Get the term name and value
-            string str_value = context.value.expr;
+            //string str_value = context.value.expr;
+            string str_value = null;
+            if ((str_value = context.value.expr) == null)
+                throw new Exception("Something went wrong when parsing formula.\n");
+
             string name = context.name.expr;
 
             //Create a new VariableTerm object
@@ -154,5 +158,9 @@ namespace FormulaLibrary.ANTLR.visitor
             return context.expr;
         }
 
+        public void Dispose()
+        {
+            terms.Clear();
+        }
     }
 }

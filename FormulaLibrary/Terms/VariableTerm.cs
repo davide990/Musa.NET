@@ -7,8 +7,8 @@ __  __                                     _
 |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 
 */
-
 using System;
+using FormulaLibrary.ANTLR;
 
 namespace FormulaLibrary
 {
@@ -66,8 +66,13 @@ namespace FormulaLibrary
         
         public override string ToString()
         {
-            //return "["+base.ToString()+","+Value.ToString()+"]";
-            return base.ToString() + "<-" + Value.GetType().Name + "(" + Value.ToString() + ")";
+            string shortTypeName = TypesMapping.getShortTypeName(Value.GetType().FullName);
+            
+            if(!shortTypeName.Equals("string") && !shortTypeName.Equals("bool"))
+                return Name + "<-" + shortTypeName + "(" + Value.ToString() + ")";
+            else
+                return Name + "<-" + shortTypeName + "(\"" + Value.ToString().ToLower() + "\")";
+
         }
 
         public bool Equals(VariableTerm<T> other)

@@ -31,19 +31,20 @@ namespace AgentTest
             //Agent a = new Agent("agent_1").start();
             //env.RegisterAgent(a);
 
+            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+            customCulture.NumberFormat.NumberDecimalSeparator = ".";
 
+            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
 
-            FormulaGenerator fg = new FormulaGenerator(0, 5, 2, 1, true);
-
-
-            Formula ff = fg.GetRandomFormula(0);
-            Console.WriteLine(ff.ToString());
-            //for (int i = 0; i < 50; i++)
-            //{
-            //    Console.WriteLine(fg.getRandomAtomicFormula().ToString());
-            //}
+            FormulaGenerator fg = new FormulaGenerator(2, 2, 2, 1, true);
             
-            
+            for (int i = 0; i < 50; i++)
+            {
+                //Console.WriteLine(FormulaParser.Parse(fg.GetRandomFormula().ToString()).ToString());
+                Console.WriteLine(fg.GetRandomFormula().ToString());
+            }
+
+
 
 
 

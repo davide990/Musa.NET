@@ -2,7 +2,7 @@ grammar formula_grammar;
 
 options
 {
-    language=CSharp3;
+	language=CSharp3;
 }
 
 condition
@@ -51,42 +51,44 @@ variable_term
 	
 varValue returns [String expr]
 	:
-		INT {$expr = $INT.text;}
-	|	FLOAT {$expr = $FLOAT.text;}
-	|	String {$expr = $String.text;}
-	|	CHAR  {$expr = $CHAR.text;}
+		INT		{$expr = $INT.text;}
+	|	FLOAT	{$expr = $FLOAT.text;}
+	|	String	{$expr = $String.text;}
+	|	CHAR	{$expr = $CHAR.text;}
 	;
 
+
+	
 identifier returns [String expr]
 	:	
 		ID {$expr = $ID.text;}
 	;
 
 ID  :	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
-    ;
+	;
 
 INT :	'0'..'9'+
-    ;
+	;
 
 FLOAT
-    :   ('0'..'9')+ '.' ('0'..'9')* EXPONENT?
-    |   '.' ('0'..'9')+ EXPONENT?
-    |   ('0'..'9')+ EXPONENT
-    ;
+	:   ('0'..'9')+ '.' ('0'..'9')* EXPONENT?
+	|   '.' ('0'..'9')+ EXPONENT?
+	|   ('0'..'9')+ EXPONENT
+	;
 
 WS  :   ( ' '
-        | '\t'
-        | '\r'
-        | '\n'
-        ) -> channel(HIDDEN)
-    ;
+		| '\t'
+		| '\r'
+		| '\n'
+		) -> channel(HIDDEN)
+	;
 
 String : ('a'..'z'|'A'..'Z'|'0'..'9'|'_')+ | ('"' (~'"')* '"');
 
 
 
 CHAR:  '\'' ( ESC_SEQ | ~('\''|'\\') ) '\''
-    ;
+	;
 
 fragment
 EXPONENT : ('e'|'E') ('+'|'-')? ('0'..'9')+ ;
@@ -96,47 +98,47 @@ HEX_DIGIT : ('0'..'9'|'a'..'f'|'A'..'F') ;
 
 fragment
 ESC_SEQ
-    :   '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\')
-    |   UNICODE_ESC
-    |   OCTAL_ESC
-    ;
+	:   '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\')
+	|   UNICODE_ESC
+	|   OCTAL_ESC
+	;
 
 fragment
 OCTAL_ESC
-    :   '\\' ('0'..'3') ('0'..'7') ('0'..'7')
-    |   '\\' ('0'..'7') ('0'..'7')
-    |   '\\' ('0'..'7')
-    ;
+	:   '\\' ('0'..'3') ('0'..'7') ('0'..'7')
+	|   '\\' ('0'..'7') ('0'..'7')
+	|   '\\' ('0'..'7')
+	;
 
 fragment
 UNICODE_ESC
-    :   '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
-    ;
+	:   '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+	;
   
 LPAREN
-    : '('
-    ;
+	: '('
+	;
 
 RPAREN
-    : ')'
-    ;
-    
+	: ')'
+	;
+	
 ASSIGNMENT_OP
 	:
 	'<-'
 	;
 
 AND
-    : '&'
-    ;
+	: '&'
+	;
 
 OR
-    : '|'
-    ;
+	: '|'
+	;
 
 NOT
-    : '!'
-    ;
+	: '!'
+	;
   
 /** primitive types */  
 varType
@@ -178,4 +180,4 @@ string_type returns [String expr]
 	:
 		'string' {$expr = "System.String";}
 	;
-    
+	

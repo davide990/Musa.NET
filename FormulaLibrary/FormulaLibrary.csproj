@@ -52,6 +52,7 @@
     <Compile Include="ANTLR\formula_grammarParser.cs" />
     <Compile Include="ANTLR\formula_grammarVisitor.cs" />
     <Compile Include="ANTLR\parser\FormulaParser.cs" />
+    <Compile Include="ANTLR\TypesMapping.cs" />
     <Compile Include="ANTLR\visitor\FormulaVisitor.cs" />
     <Compile Include="ANTLR\visitor\PredicateVisitor.cs" />
     <Compile Include="CompositeFormula\AndFormula.cs" />

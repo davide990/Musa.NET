@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 
 namespace FormulaLibrary
@@ -58,7 +57,15 @@ namespace FormulaLibrary
         /// <summary>
         /// Generate a random generic formula that may contains and, or, not logic predicates
         /// </summary>
-        public Formula GetRandomFormula(int depth)
+        public Formula GetRandomFormula()
+        {
+            return GetRandomFormula(0);
+        }
+
+        /// <summary>
+        /// Generate a random generic formula that may contains and, or, not logic predicates
+        /// </summary>
+        private Formula GetRandomFormula(int depth)
         {
             if(depth > maxDepth)
                 return GetRandomAtomicFormula();
@@ -112,10 +119,10 @@ namespace FormulaLibrary
         {
             switch (SupportedDataTypes[rand.Next(0, SupportedDataTypesNum)])
             {
-                case "System.String":   return new VariableTerm<string>(RandomString(4), RandomString(rand.Next(1, maxTermLenght)));
-                case "System.Boolean":  return new VariableTerm<bool>(RandomString(4), GenerateRandomBool());
-                default: case "System.Int32":    return new VariableTerm<int>(RandomString(4), rand.Next());
-                case "System.Single":   return new VariableTerm<float>(RandomString(4), Convert.ToSingle(rand.NextDouble()));
+                case "System.String":               return new VariableTerm<string>(RandomString(4), RandomString(rand.Next(1, maxTermLenght)));
+                case "System.Boolean":              return new VariableTerm<bool>(RandomString(4), GenerateRandomBool());
+                default: case "System.Int32":       return new VariableTerm<int>(RandomString(4), rand.Next());
+                case "System.Single":               return new VariableTerm<float>(RandomString(4), Convert.ToSingle(rand.NextDouble()));
             }
         }
         

@@ -39,9 +39,13 @@ namespace FormulaLibrary.ANTLR
             parser.BuildParseTree = true;
             
             IParseTree tree = parser.disjunction();
-            FormulaVisitor vv = new FormulaVisitor();
-
-            return vv.Visit(tree);
+            Formula formulaObject;
+            using (FormulaVisitor vv = new FormulaVisitor())
+            {
+                formulaObject = vv.Visit(tree);
+            }
+            
+            return formulaObject;
         }
 
 

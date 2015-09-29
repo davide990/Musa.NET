@@ -161,5 +161,29 @@ namespace FormulaLibraryTest.ANTLRTest
             return generatedFormula.Equals(expectedFormula);
         }
 
+        [TestCase(Result = true)]
+        [Test]
+        public bool formula_test_12()
+        {
+            string formula = "f(k,x<-bool(\"true\"))";
+
+            Formula generatedFormula = FormulaParser.Parse(formula);
+            Formula expectedFormula = new AtomicFormula("f", new LiteralTerm("k"), new VariableTerm<bool>("x", true));
+
+            return generatedFormula.Equals(expectedFormula);
+        }
+
+        [TestCase(Result = true)]
+        [Test]
+        public bool formula_test_13()
+        {
+            string formula = "f(k,x<-bool(\"false\"),p)";
+
+            Formula generatedFormula = FormulaParser.Parse(formula);
+            Formula expectedFormula = new AtomicFormula("f", new LiteralTerm("k"), new VariableTerm<bool>("x", false), new LiteralTerm("p"));
+
+            return generatedFormula.Equals(expectedFormula);
+        }
+
     }
 }

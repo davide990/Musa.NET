@@ -21,7 +21,7 @@ namespace FormulaLibraryTest
         {
         }
 
-        [TestCase(false, Result = "f(x,[y,1])")]
+        [TestCase(false, Result = "f(x,y<-short(1))")]
         [TestCase(true, Result = "f(x,y)")]
         [Test]
         public string atomicFormulaToString(bool compactVisualization)
