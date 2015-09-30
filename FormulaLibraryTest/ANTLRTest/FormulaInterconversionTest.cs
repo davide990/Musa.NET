@@ -1,13 +1,16 @@
-﻿using FormulaLibrary;
-using FormulaLibrary.ANTLR;
+﻿using FormulaLibrary.ANTLR;
 using NUnit.Framework;
 
 namespace FormulaLibraryTest.ANTLRTest
 {
+    /// <summary>
+    /// The purpose of this test is to validate formulas by using random generated ones. More precisely, generate random
+    /// formulas, then re-parse their string representation using the dedicated parser. In this way, the interconversion
+    /// between from formula to string representation, and its reverse (from string to formula) is tested.
+    /// </summary>
     [TestFixture]
     class FormulaInterconversionTest
     {
-
         [TestCase("!(((f(w)&j(g))|(t(r)&m(w))))", Result = true)]
         [TestCase("(((l(e)|c(pghy<-float(0.7339609)))&(d(y)|g(v)))|!((d(uvrh<-bool(\"false\"))|g(gjes<-bool(\"false\")))))", Result = true)]
         [TestCase("(!(!(x(l)))|((r(g)&r(l))&(l(w)|v(xrov<-float(0.258401)))))", Result = true)]
@@ -111,8 +114,7 @@ namespace FormulaLibraryTest.ANTLRTest
         [Test]
         public bool interconversionTest(string formula)
         {
-            Formula ff = FormulaParser.Parse(formula);
-            return ff != null;
+            return FormulaParser.Parse(formula) != null;
         }
     }
 }

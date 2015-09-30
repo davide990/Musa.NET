@@ -46,12 +46,17 @@ namespace FormulaLibrary
 
         public FormulaGenerator(int MaxDepth, int MaxNumTerms, int MaxTermLength, int FunctorMaxLenght, bool Parametric)
         {
-            rand = new Random();
-            maxTerms = MaxNumTerms;
-            functorMaxLenght = FunctorMaxLenght;
-            parametric = Parametric;
-            maxTermLenght = MaxTermLength;
-            maxDepth = MaxDepth;
+            rand                = new Random();
+            maxTerms            = MaxNumTerms;
+            functorMaxLenght    = FunctorMaxLenght;
+            parametric          = Parametric;
+            maxTermLenght       = MaxTermLength;
+            maxDepth            = MaxDepth;
+
+            //Ensure that the decimal numbers separator is the dot instead of comma
+            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+            customCulture.NumberFormat.NumberDecimalSeparator = ".";
+            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
         }
 
         /// <summary>
@@ -72,8 +77,8 @@ namespace FormulaLibrary
 
             switch (rand.Next(0,3))
             {
-                case 0:     return new AndFormula(GetRandomFormula(depth+1), GetRandomFormula(depth + 1));
-                case 1:     return new OrFormula(GetRandomFormula(depth + 1), GetRandomFormula(depth + 1));
+                case 0:     return new AndFormula(GetRandomFormula(depth+1),    GetRandomFormula(depth + 1));
+                case 1:     return new OrFormula(GetRandomFormula(depth + 1),   GetRandomFormula(depth + 1));
                 case 2:     return new NotFormula(GetRandomFormula(depth + 1));
                 case 3:
                 default:    return GetRandomAtomicFormula();
@@ -90,7 +95,7 @@ namespace FormulaLibrary
 
             int numTerms = rand.Next(1, maxTerms);
 
-            for (int i=0;i< numTerms; i++)
+            for (int i=0;i < numTerms; i++)
             {
                 //If formula must no contains variable terms, just add a new literal term
                 if(!parametric)

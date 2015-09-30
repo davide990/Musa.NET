@@ -9,7 +9,6 @@
 */
 using FormulaLibrary;
 using NUnit.Framework;
-using System.Collections.Generic;
 
 namespace FormulaLibraryTest
 {

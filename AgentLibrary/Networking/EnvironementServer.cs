@@ -46,6 +46,7 @@ namespace AgentLibrary.Networking
         {
             Environment = env;
         }
+        
 
         /// <summary>
         /// sender agent is trusted? if not return false

@@ -13,52 +13,52 @@ using FormulaLibrary;
 using FormulaLibrary.ANTLR;
 using Quartz;
 using System;
+using System.Collections.Generic;
 
 namespace AgentTest
 {
     class Program
     {
+
+        private static void startMUSA()
+        {
+            AgentEnvironement env = AgentEnvironement.GetInstance();
+            Agent a = new Agent("agent_1").start();
+            env.RegisterAgent(a);
+        }
+
         static void Main(string[] args)
         {
-            //AgentWorkbench wb = new AgentWorkbench(a);
-            /*wb.addStatement(FormulaParser.Parse("y(x<-int(3))") as AtomicFormula,
-                            FormulaParser.Parse("f(x)") as AtomicFormula,
-                            FormulaParser.Parse("h(s,o,a<-string(\"ciao mondo\"))") as AtomicFormula,
-                            FormulaParser.Parse("o(m,s<-char('d')") as AtomicFormula);*/
+            //startMUSA();
+
+            List<AtomicFormula> ff = new List<AtomicFormula>();
+            AgentWorkbench wb = new AgentWorkbench(null);
+            Formula formula = FormulaParser.Parse("!f(x,u,a)&(y(l)|!(l(q,w,e,r,t,y)))");
+            ff = wb.UnrollFormula(formula);
 
 
-            //AgentEnvironement env = AgentEnvironement.GetInstance();
-            //Agent a = new Agent("agent_1").start();
-            //env.RegisterAgent(a);
-
-            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
-            customCulture.NumberFormat.NumberDecimalSeparator = ".";
-
-            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
-
-            FormulaGenerator fg = new FormulaGenerator(2, 2, 2, 1, true);
-            
-            for (int i = 0; i < 50; i++)
+            foreach (AtomicFormula item in ff)
             {
-                //Console.WriteLine(FormulaParser.Parse(fg.GetRandomFormula().ToString()).ToString());
-                Console.WriteLine(fg.GetRandomFormula().ToString());
+                Console.WriteLine(item.ToString());
             }
 
+            //FormulaGenerator fg = new FormulaGenerator(2, 2, 2, 1, true);
+
+            //for (int i = 0; i < 50; i++)
+            //{
+            //    Console.WriteLine(FormulaParser.Parse(fg.GetRandomFormula().ToString()).ToString());
+            //    //Console.WriteLine(fg.GetRandomFormula().ToString());
+            //}
 
 
+            //AgentEnvironement env = new AgentEnvironement();
+            //Agent a = new Agent("agent_1").start();
+            ////Agent b = new Agent("agent_2");
 
+            //env.RegisterAgent(a);
 
-
-
-
-            /*AgentEnvironement env = new AgentEnvironement();
-            Agent a = new Agent("agent_1").start();
-            //Agent b = new Agent("agent_2");
-
-            env.RegisterAgent(a);
-
-            EnvironmentServer srv = new EnvironmentServer(env);
-            srv.StartNetworking("8080");*/
+            //EnvironmentServer srv = new EnvironmentServer(env);
+            //srv.StartNetworking("8080");
 
             //env.RegisterAgent(b);
 

@@ -44,7 +44,10 @@ namespace FormulaLibrary.ANTLR
             {
                 formulaObject = vv.Visit(tree);
             }
-            
+
+            stream.Reset();
+            parser.Reset();
+
             return formulaObject;
         }
 

@@ -44,11 +44,6 @@ namespace FormulaLibrary.ANTLR.visitor
             terms = new List<Term>();
         }
         
-        ~PredicateVisitor()
-        {
-            Terms.Clear();
-        }
-        
         /// <summary>
         /// Return an AtomicFormula object that corresponds to the predicate this visitor parses.
         /// </summary>
