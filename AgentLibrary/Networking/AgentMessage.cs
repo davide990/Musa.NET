@@ -6,21 +6,19 @@ namespace AgentLibrary.Networking
     /// <summary>
     /// As stated on Jason .send internal action documentation: "the illocutionary force of the message (tell, achieve, ...)"
     /// </summary>
-    [DataContract(Name = "InformationType")]
+    [DataContract]
     public enum InformationType
     {
         /// <summary>
         /// 
         /// </summary>
         [EnumMember]
-        Tell    = 0,
-
+        Tell = 0,
         /// <summary>
         /// 
         /// </summary>
         [EnumMember]
-        Untell  = 1,
-
+        Untell = 1,
         /// <summary>
         /// 
         /// </summary>
@@ -31,13 +29,13 @@ namespace AgentLibrary.Networking
         /// 
         /// </summary>
         [EnumMember]
-        AskOne  = 3,
+        AskOne = 3,
 
         /// <summary>
         /// 
         /// </summary>
         [EnumMember]
-        AskAll  = 4
+        AskAll = 4
     }
 
     [DataContract]
@@ -81,6 +79,7 @@ namespace AgentLibrary.Networking
         /// <summary>
         /// 
         /// </summary>
+        [DataMember]
         public InformationType InfoType
         {
             get { return infoType; }

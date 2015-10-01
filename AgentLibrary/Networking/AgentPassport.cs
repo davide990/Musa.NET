@@ -1,20 +1,22 @@
 ﻿using System.Runtime.Serialization;
 
 namespace AgentLibrary.Networking
-{   
+{
+    /// <summary>
+    /// It is used for verifying agents identities when a communication between agents occurs.
+    /// </summary>
     [DataContract]
     public class AgentPassport
     {
-        private string agent_address_port;
-        private string agent_address_ip;
         private string agent_name;
         private string agent_role;
         private string workgroup_name;
         private string environement_name;
+        private string environement_ipaddress;
         private object auth_token;
-
+        
         /// <summary>
-        /// The name of the workgroup the sender agent belongs to
+        /// The name of the workgroup the agent belongs to
         /// </summary>
         [DataMember]
         public string WorkgroupName
@@ -24,7 +26,7 @@ namespace AgentLibrary.Networking
         }
 
         /// <summary>
-        /// The name of the environment in which the sender agent is located
+        /// The name of the environment in which the agent is located
         /// </summary>
         [DataMember]
         public string EnvironementName
@@ -34,23 +36,13 @@ namespace AgentLibrary.Networking
         }
 
         /// <summary>
-        /// The port through which agents communicate
+        /// The IP address of the environment in which the agent is located
         /// </summary>
         [DataMember]
-        public string AgentAddressPort
+        public string EnvironementAddress
         {
-            get { return agent_address_port; }
-            set { agent_address_port = value; }
-        }
-
-        /// <summary>
-        /// The address of the agent
-        /// </summary>
-        [DataMember]
-        public string AgentAddressIP
-        {
-            get { return agent_address_ip; }
-            set { agent_address_ip = value; }
+            get { return environement_ipaddress; }
+            set { environement_ipaddress = value; }
         }
 
         /// <summary>
@@ -85,7 +77,7 @@ namespace AgentLibrary.Networking
 
         public override string ToString()
         {
-            return string.Format("[AgentPassport: AgentAddressPort={0}, AgentAddressIP={1}, AgentName={2}, AgentRole={3}, AuthorizationToken={4}]", AgentAddressPort, AgentAddressIP, AgentName, AgentRole, AuthorizationToken);
+            return string.Format("[AgentPassport: AgentName={0}, AgentRole={1}, AuthorizationToken={2}]", AgentName, AgentRole, AuthorizationToken);
         }
     }
 }

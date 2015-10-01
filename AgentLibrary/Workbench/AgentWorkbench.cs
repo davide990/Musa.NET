@@ -21,7 +21,7 @@ namespace AgentLibrary
     /// </summary>
     public enum WorkbenchAddFormulaPolicy
     {
-        Default,
+        NoAction,
         ThrowException
     }
 
@@ -30,23 +30,18 @@ namespace AgentLibrary
     /// </summary>
     public enum WorkbenchRemoveFormulaPolicy
     {
-        Default,
+        NoAction,
         ThrowException
     }
-
-
-
+    
     /// <summary>
     /// 
     /// </summary>
     [DataContract]
-    [KnownType(typeof(Formula))]
-    [KnownType(typeof(AtomicFormula))]
-    [KnownType(typeof(AssignmentType))]
     public class AgentWorkbench
     {
-        WorkbenchAddFormulaPolicy add_policy        = WorkbenchAddFormulaPolicy.Default;
-        WorkbenchRemoveFormulaPolicy remove_policy  = WorkbenchRemoveFormulaPolicy.Default;
+        WorkbenchAddFormulaPolicy add_policy        = WorkbenchAddFormulaPolicy.NoAction;
+        WorkbenchRemoveFormulaPolicy remove_policy  = WorkbenchRemoveFormulaPolicy.NoAction;
         
         /// <summary>
         /// The set of formula
@@ -142,15 +137,6 @@ namespace AgentLibrary
         }
 
         /// <summary>
-        /// Add a statement (as atomic formula) into this workbench.
-        /// </summary>
-        public void addStatement(IList f)
-        {
-            foreach(AtomicFormula ff in f)
-                addStatement(ff);
-        }
-        
-        /// <summary>
         /// Given a generic formula, return its inner atomic formulas.
         /// </summary>
         private List<AtomicFormula> UnrollFormula(Formula f)
@@ -167,7 +153,7 @@ namespace AgentLibrary
                 ff.AddRange(UnrollFormula((f as OrFormula).Left));
                 ff.AddRange(UnrollFormula((f as OrFormula).Right));
             }
-            else if(f is NotFormula)
+            else if (f is NotFormula)
             {
                 ff.AddRange(UnrollFormula((f as NotFormula).Formula));
             }
@@ -177,16 +163,25 @@ namespace AgentLibrary
             return ff;
         }
 
-        public void addStatement(params Formula[] f)
+        /// <summary>
+        /// Add a statement (as atomic formula) into this workbench.
+        /// </summary>
+        public void AddStatement(IList f)
+        {
+            foreach(AtomicFormula ff in f)
+                AddStatement(ff);
+        }
+        
+        public void AddStatement(params Formula[] f)
         {
             foreach(Formula ff in f)
-                addStatement(UnrollFormula(ff));
+                AddStatement(UnrollFormula(ff));
         }
 
         /// <summary>
         /// Add a statement (as atomic formula) into this workbench.
         /// </summary>
-        public void addStatement(params AtomicFormula[] f)
+        public void AddStatement(params AtomicFormula[] f)
         {
             List<object> variableTerms = new List<object>();
             foreach (AtomicFormula ff in f)
@@ -214,22 +209,29 @@ namespace AgentLibrary
                 statements.Add(ff);
             }
         }
-
-
+        
         /// <summary>
         /// Add a statement (as atomic formula) into this workbench.
         /// </summary>
-        public void removeStatement(IList f)
+        public void RemoveStatement(IList f)
         {
             foreach (AtomicFormula ff in f)
-                removeStatement(ff);
+                RemoveStatement(ff);
         }
-
 
         /// <summary>
         /// Remove a statement from this workbench
         /// </summary>
-        public void removeStatement(params AtomicFormula[] f)
+        public void RemoveStatement(params Formula[] f)
+        {
+            foreach (Formula ff in f)
+                RemoveStatement(UnrollFormula(ff));
+        }
+
+        /// <summary>
+        /// Remove a statement from this workbench
+        /// </summary>
+        public void RemoveStatement(params AtomicFormula[] f)
         {
             foreach (AtomicFormula ff in f)
             {

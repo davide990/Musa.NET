@@ -72,6 +72,10 @@ namespace AgentLibrary
         internal Dictionary<AgentPassport, AgentMessage> mailBox;
         internal object lock_mailBox = new object();
 
+        #endregion
+
+        #region Events
+
         /// <summary>
         /// Event triggered when this agent receive a new job
         /// </summary>
@@ -80,6 +84,14 @@ namespace AgentLibrary
         #endregion
 
         #region Properties
+
+        /// <summary>
+        /// Return the IP address of the environment in which this agent is located
+        /// </summary>
+        public string EnvironementIPAddress
+        {
+            get { return AgentEnvironement.GetInstance().IPAddress; }
+        }
 
         /// <summary>
         /// The workbench this agent use to do reasoning activities
@@ -104,34 +116,6 @@ namespace AgentLibrary
         public bool IsActive
         {
             get { DateTime now = DateTime.UtcNow; return now >= WorkScheduleStart && now < WorkScheduleEnd; }
-        }
-
-        /// <summary>
-        /// Return the IP address of the machine in which this agent is located
-        /// </summary>
-        public string IP_address
-        {
-            get
-            {
-                //return Dns.GetHostByName(hostName).AddressList[0].ToString(); DEPRECATED
-                return Dns.GetHostEntry(Dns.GetHostName()).AddressList[0].ToString();
-            }
-
-        }
-
-        /// <summary>
-        /// Return the port this agent listen to.
-        /// </summary>
-        public string Port
-        {
-            get
-            {
-                return "8080";
-            }
-
-            set
-            {
-            }
         }
 
         /// <summary>
@@ -214,14 +198,16 @@ namespace AgentLibrary
         
         #region Methods
 
-
+        /// <summary>
+        /// Get the passport of this agent.
+        /// </summary>
+        /// <returns></returns>
         public AgentPassport GetPassport()
         {
             AgentPassport ps = new AgentPassport();
-            ps.AgentName = Name;
-            ps.AgentRole = Role;
-            ps.AgentAddressIP = IP_address;
-            ps.AgentAddressPort = Port;
+            ps.AgentName            = Name;
+            ps.AgentRole            = Role;
+            ps.EnvironementAddress  = EnvironementIPAddress;
             return ps;
         }
 

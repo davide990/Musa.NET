@@ -141,20 +141,18 @@ namespace AgentLibrary
         /// </summary>
         private void checkMailBox()
         {
-            AtomicFormula formula;
-            
             foreach (KeyValuePair<AgentPassport, AgentMessage> p in parentAgent.mailBox)
             {
-                formula = (AtomicFormula)FormulaParser.Parse(p.Value.Message as string);
                 switch (p.Value.InfoType)
                 {
                     case InformationType.Tell:
                         Console.WriteLine("[" + parentAgent.Name + "] perceiving TELL: " + p.Value.ToString());
-                        parentAgent.Workbench.addStatement(formula);
+                        parentAgent.Workbench.AddStatement(FormulaParser.Parse(p.Value.Message as string));
                         break;
 
                     case InformationType.Untell:
-                        parentAgent.Workbench.removeStatement(formula);
+                        Console.WriteLine("[" + parentAgent.Name + "] perceiving UNTELL: " + p.Value.ToString());
+                        parentAgent.Workbench.RemoveStatement(FormulaParser.Parse(p.Value.Message as string));
                         break;
 
                     case InformationType.Achieve:
@@ -180,11 +178,11 @@ namespace AgentLibrary
                 {
                     case PerceptionType.AddBelief:
                             Console.WriteLine("[" + parentAgent.Name + "] perceiving ADD: " + p.Value.ToString());
-                            parentAgent.Workbench.addStatement(p.Key);
+                            parentAgent.Workbench.AddStatement(p.Key);
                         break;
 
                     case PerceptionType.RemoveBelief:
-                            parentAgent.Workbench.addStatement(p.Key);
+                            parentAgent.Workbench.AddStatement(p.Key);
                         break;
 
                     case PerceptionType.SetBeliefValue:

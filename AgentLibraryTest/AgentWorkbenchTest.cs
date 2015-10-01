@@ -19,7 +19,7 @@ namespace AgentLibraryTest
         public bool test_simple(string formula)
         {
             AgentWorkbench wb = new AgentWorkbench(null);
-            wb.addStatement(FormulaParser.Parse("y(x<-int(3))") as AtomicFormula,
+            wb.AddStatement(FormulaParser.Parse("y(x<-int(3))") as AtomicFormula,
                             FormulaParser.Parse("f(x)") as AtomicFormula,
                             FormulaParser.Parse("h(s,o,a<-string(\"ciao mondo\"))") as AtomicFormula,
                             FormulaParser.Parse("o(m,s<-char('d')") as AtomicFormula);
@@ -39,7 +39,7 @@ namespace AgentLibraryTest
         public bool test_composite(string formula)
         {
             AgentWorkbench wb = new AgentWorkbench(null);
-            wb.addStatement(FormulaParser.Parse("y(x<-int(3))") as AtomicFormula,
+            wb.AddStatement(FormulaParser.Parse("y(x<-int(3))") as AtomicFormula,
                             FormulaParser.Parse("f(x)") as AtomicFormula,
                             FormulaParser.Parse("h(s,o,a<-string(\"ciao mondo\"))") as AtomicFormula,
                             FormulaParser.Parse("o(m,s<-char('d')") as AtomicFormula);
@@ -70,7 +70,7 @@ namespace AgentLibraryTest
         public int unroll_formula_test(string formula)
         {
             AgentWorkbench wb = new AgentWorkbench(null);
-            wb.addStatement(FormulaParser.Parse(formula));
+            wb.AddStatement(FormulaParser.Parse(formula));
             return wb.Statements.Count;
         }
     }

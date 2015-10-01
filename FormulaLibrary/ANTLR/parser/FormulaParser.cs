@@ -36,7 +36,7 @@ namespace FormulaLibrary.ANTLR
             ITokenSource lexer = new formula_grammarLexer(stream);
             ITokenStream tokens = new CommonTokenStream(lexer);
             formula_grammarParser parser = new formula_grammarParser(tokens);
-            parser.BuildParseTree = true;
+            //parser.BuildParseTree = true;
             
             IParseTree tree = parser.disjunction();
             Formula formulaObject;

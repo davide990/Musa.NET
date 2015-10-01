@@ -29,18 +29,8 @@ namespace AgentTest
 
         static void Main(string[] args)
         {
-            //startMUSA();
+            startMUSA();
 
-            List<AtomicFormula> ff = new List<AtomicFormula>();
-            AgentWorkbench wb = new AgentWorkbench(null);
-            Formula formula = FormulaParser.Parse("!f(x,u,a)&(y(l)|!(l(q,w,e,r,t,y)))");
-            ff = wb.UnrollFormula(formula);
-
-
-            foreach (AtomicFormula item in ff)
-            {
-                Console.WriteLine(item.ToString());
-            }
 
             //FormulaGenerator fg = new FormulaGenerator(2, 2, 2, 1, true);
 
@@ -79,6 +69,8 @@ namespace AgentTest
             IJobDetail jobDetail = JobBuilder.Create<testJob1>()
                                             .WithIdentity("myJob", "group1") // name "myJob", group "group1"
                                             .Build();
+
+            
 
             ITrigger trigger = TriggerBuilder.Create()
                                .WithIdentity("myTrigger", "group1")
