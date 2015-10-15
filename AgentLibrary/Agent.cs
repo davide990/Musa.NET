@@ -51,6 +51,10 @@ namespace AgentLibrary
         /// The date in which this agent started its life cycle.
         /// </summary>
         private readonly DateTime creationDate;
+		public TimeSpan Uptime
+		{
+			get{ return DateTime.Now.Subtract(creationDate); }
+		}
 
         /// <summary>
         /// 
@@ -71,6 +75,7 @@ namespace AgentLibrary
         /// </summary>
         internal Dictionary<AgentPassport, AgentMessage> mailBox;
         internal object lock_mailBox = new object();
+
 
         #endregion
 
@@ -177,7 +182,7 @@ namespace AgentLibrary
             reasoner = new AgentReasoner(this);
             perceivedEnvironementChanges = new Dictionary<IList, PerceptionType>();
             mailBox = new Dictionary<AgentPassport, AgentMessage>();
-
+			creationDate = DateTime.Now;
             CreateScheduler();
         }
 

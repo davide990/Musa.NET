@@ -112,5 +112,24 @@ namespace AgentLibrary.Networking
         [OperationContract]
         bool RegisterAgent(AgentPassport newAgent);
 
+		/// <summary>
+		/// Gets the informations of an agent.
+		/// </summary>
+		/// <returns>The agentinfo.</returns>
+		/// <param name="agent_name">Agent name.</param>
+		[WebInvoke(Method = "POST",
+			ResponseFormat = WebMessageFormat.Json,
+			RequestFormat = WebMessageFormat.Json)]
+		[OperationContract]
+		AgentPassport GetAgentinfo(string agent_name);
+
+		[WebInvoke(Method = "POST",
+			ResponseFormat = WebMessageFormat.Json,
+			RequestFormat = WebMessageFormat.Json)]
+		[OperationContract]
+		bool AddStatement(string agent_name, string statement);
+
+
+
     }
 }

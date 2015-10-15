@@ -155,7 +155,6 @@ namespace AgentLibrary.Networking
 
         public List<string> GetAgentStatements(AgentPassport agent)
         {
-
             List<string> outList = new List<string>();
 
             foreach (Formula f in Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(agent.AgentName)).Workbench.Statements)
@@ -190,11 +189,36 @@ namespace AgentLibrary.Networking
             
             Agent a = new Agent(newAgent.AgentName);
 
-            //set workgroup, role and other attributes here
+            //TODO set workgroup, role and other attributes here
 
             AgentEnvironement.GetInstance().RegisterAgent(a);
             return true;
         }
+
+		/// <summary>
+		/// Gets the informations of an agent.
+		/// </summary>
+		/// <returns>The agentinfo.</returns>
+		/// <param name="agent_name">Agent name.</param>
+		public AgentPassport GetAgentinfo (string agent_name)
+    	{
+			Agent ag = Environment.RegisteredAgents.FirstOrDefault (s => s.Name.Equals (agent_name));
+
+			AgentPassport ag_passport 	= new AgentPassport ();
+			ag_passport.AgentName 		= ag.Name;
+			ag_passport.AgentRole 		= ag.Role;
+			ag_passport.UpTime 			= ag.Uptime.ToString ();
+			//TODO set other agent informations here
+
+			return ag_passport;
+    	}
+
+		public bool AddStatement (string agent_name, string statement)
+    	{
+			Agent ag = Environment.RegisteredAgents.FirstOrDefault (s => s.Name.Equals (agent_name));
+			ag.Workbench.AddStatement (FormulaParser.Parse (statement));
+			return true;
+    	}
 
         #endregion
     }

@@ -32,6 +32,9 @@
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="Antlr4.Runtime">
+      <HintPath>..\Antlr4.Runtime.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Test.cs" />
@@ -45,5 +48,11 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FormulaLibrary\FormulaLibrary.csproj">
+      <Project>{2A2DD9B6-50F6-4D87-AF2E-B422E31A999C}</Project>
+      <Name>FormulaLibrary</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

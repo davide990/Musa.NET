@@ -13,6 +13,7 @@ namespace AgentLibrary.Networking
         private string workgroup_name;
         private string environement_name;
         private string environement_ipaddress;
+		private string uptime;
         private object auth_token;
         
         /// <summary>
@@ -65,15 +66,25 @@ namespace AgentLibrary.Networking
             set { agent_role = value; }
         }
 
-        /// <summary>
-        /// An authorization token of the agent
-        /// </summary>
-        [DataMember]
-        public object AuthorizationToken
-        {
-            get { return auth_token; }
-            set { auth_token = value; }
-        }
+		/// <summary>
+		/// An authorization token of the agent
+		/// </summary>
+		[DataMember]
+		public object AuthorizationToken
+		{
+			get { return auth_token; }
+			set { auth_token = value; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		[DataMember]
+		public string UpTime
+		{
+			get { return uptime; }
+			set { uptime = value; }
+		}
 
         public override string ToString()
         {
