@@ -23,8 +23,12 @@ namespace AgentTest
         private static void startMUSA()
         {
             AgentEnvironement env = AgentEnvironement.GetInstance();
-            Agent a = new Agent("agent_1").start();
-            env.RegisterAgent(a);
+			Agent a = new Agent("agent_1").start();
+			Agent b = new Agent("agent_2").start();
+			Agent c = new Agent("agent_3").start();
+			env.RegisterAgent(a);
+			env.RegisterAgent(b);
+			env.RegisterAgent(c);
         }
 
         static void Main(string[] args)

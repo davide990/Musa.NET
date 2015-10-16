@@ -50,11 +50,11 @@ namespace AgentLibrary
         /// <summary>
         /// The date in which this agent started its life cycle.
         /// </summary>
-        private readonly DateTime creationDate;
-		public TimeSpan Uptime
+		public DateTime CreatedAt
 		{
-			get{ return DateTime.Now.Subtract(creationDate); }
+			get { return createdAt; }
 		}
+		private readonly DateTime createdAt;
 
         /// <summary>
         /// 
@@ -174,7 +174,6 @@ namespace AgentLibrary
             name = agent_name;
             ID = Guid.NewGuid();
             jobReceived += onJobReceived;
-            creationDate = DateTime.UtcNow;
 
             jobs = new List<AgentJob>();
             roles = new List<AgentRole>();
@@ -182,7 +181,7 @@ namespace AgentLibrary
             reasoner = new AgentReasoner(this);
             perceivedEnvironementChanges = new Dictionary<IList, PerceptionType>();
             mailBox = new Dictionary<AgentPassport, AgentMessage>();
-			creationDate = DateTime.Now;
+			createdAt = DateTime.Now;
             CreateScheduler();
         }
 

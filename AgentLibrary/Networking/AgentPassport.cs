@@ -13,7 +13,7 @@ namespace AgentLibrary.Networking
         private string workgroup_name;
         private string environement_name;
         private string environement_ipaddress;
-		private string uptime;
+		private string createdAt;
         private object auth_token;
         
         /// <summary>
@@ -80,10 +80,10 @@ namespace AgentLibrary.Networking
 		/// 
 		/// </summary>
 		[DataMember]
-		public string UpTime
+		public string CreatedAt
 		{
-			get { return uptime; }
-			set { uptime = value; }
+			get { return createdAt; }
+			set { createdAt = value; }
 		}
 
         public override string ToString()

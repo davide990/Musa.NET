@@ -207,7 +207,7 @@ namespace AgentLibrary.Networking
 			AgentPassport ag_passport 	= new AgentPassport ();
 			ag_passport.AgentName 		= ag.Name;
 			ag_passport.AgentRole 		= ag.Role;
-			ag_passport.UpTime 			= ag.Uptime.ToString ();
+			ag_passport.CreatedAt 		= ag.CreatedAt.ToString(@"hh\:mm\:ss");
 			//TODO set other agent informations here
 
 			return ag_passport;
