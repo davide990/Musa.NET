@@ -2,6 +2,8 @@
 using Quartz;
 using System.Reflection;
 using System.Linq;
+using FormulaLibrary;
+using FormulaLibrary.ANTLR;
 
 namespace PlanLibrary
 {
@@ -46,12 +48,12 @@ namespace PlanLibrary
 		/// <summary>
 		/// The trigger condition necessary to activate this plan.
 		/// </summary>
-		public string TriggerCondition
+		public Formula TriggerCondition
 		{
 			get { return triggerCondition; }		//Type of TriggerCondition here must be Formula
 			private set { triggerCondition = value; }
 		}
-		private string triggerCondition;
+		private Formula triggerCondition;
 
 		#endregion Fields/Properties
 
@@ -62,12 +64,12 @@ namespace PlanLibrary
 		/// </summary>
 		public PlanInstance ()
 		{
+			//Generate a unique key for this plan instance
 			PlanKey = new JobKey (typeof(T).Name).ToString();
 
-			//TriggerCondition = (T as PlanModel).TriggerCondition;
-
-			//TODO Invoke formula parser to convert the plan's trigger condition to a concrete formula and store here,
-			//so it can be used to test if this plan instance can be executed
+			//Parse the trigger condition of the plan model
+			string trigger_condition = (Activator.CreateInstance (typeof(T)) as PlanModel).TriggerCondition;
+			TriggerCondition = FormulaParser.Parse (trigger_condition);
 
 			//Use reflection to create an instance of IJobDetail for a generic PlanModel
 			var create_method 		= typeof(JobBuilder).GetMethods().Where(x => x.Name == "Create").First(x => x.ContainsGenericParameters);
