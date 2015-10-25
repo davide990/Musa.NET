@@ -98,4 +98,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Folder Include="Nuova cartella\" />
+  </ItemGroup>
 </Project>

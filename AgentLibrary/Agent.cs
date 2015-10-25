@@ -79,87 +79,87 @@ namespace AgentLibrary
 
         #endregion
 
+		#region Properties
+
+		/// <summary>
+		/// Return the IP address of the environment in which this agent is located
+		/// </summary>
+		public string EnvironementIPAddress
+		{
+			get { return AgentEnvironement.GetInstance().IPAddress; }
+		}
+
+		/// <summary>
+		/// The workbench this agent use to do reasoning activities
+		/// </summary>
+		public AgentWorkbench Workbench
+		{
+			get { return workbench; }
+		}
+
+		/// <summary>
+		/// The name  of this agent
+		/// </summary>
+		public string Name
+		{
+			get { return name; }
+		}
+		private readonly string name;
+
+		/// <summary>
+		/// Check if actually is working time for this agent.
+		/// </summary>
+		public bool IsActive
+		{
+			get { DateTime now = DateTime.UtcNow; return now >= WorkScheduleStart && now < WorkScheduleEnd; }
+		}
+
+		/// <summary>
+		/// The working end time of this agent
+		/// </summary>
+		private DateTime _workScheduleEnd;
+		public DateTime WorkScheduleEnd
+		{
+			get { return _workScheduleEnd; }
+			private set { _workScheduleEnd = value; }
+		}
+
+		/// <summary>
+		/// The working start time of this agent
+		/// </summary>
+		private DateTime _workScheduleStart;
+		public DateTime WorkScheduleStart
+		{
+			get { return _workScheduleStart; }
+			private set { _workScheduleStart = value; }
+		}
+
+		/// <summary>
+		/// Return all the messages received by this agent
+		/// </summary>
+		public List<AgentMessage> MailBox
+		{
+			get { return new List<AgentMessage>(mailBox.Values); }
+		}
+
+		/// <summary>
+		/// The role of this agent
+		/// </summary>
+		public string Role
+		{
+			get { return role; }
+			set { role = value; }
+		}
+		private string role;
+
+		#endregion
+
         #region Events
 
         /// <summary>
         /// Event triggered when this agent receive a new job
         /// </summary>
         public event EventHandler jobReceived;
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Return the IP address of the environment in which this agent is located
-        /// </summary>
-        public string EnvironementIPAddress
-        {
-            get { return AgentEnvironement.GetInstance().IPAddress; }
-        }
-
-        /// <summary>
-        /// The workbench this agent use to do reasoning activities
-        /// </summary>
-        public AgentWorkbench Workbench
-        {
-            get { return workbench; }
-        }
-
-        /// <summary>
-        /// The name  of this agent
-        /// </summary>
-        public string Name
-        {
-            get { return name; }
-        }
-        private readonly string name;
-        
-        /// <summary>
-        /// Check if actually is working time for this agent.
-        /// </summary>
-        public bool IsActive
-        {
-            get { DateTime now = DateTime.UtcNow; return now >= WorkScheduleStart && now < WorkScheduleEnd; }
-        }
-
-        /// <summary>
-        /// The working end time of this agent
-        /// </summary>
-        private DateTime _workScheduleEnd;
-        public DateTime WorkScheduleEnd
-        {
-            get { return _workScheduleEnd; }
-            private set { _workScheduleEnd = value; }
-        }
-
-        /// <summary>
-        /// The working start time of this agent
-        /// </summary>
-        private DateTime _workScheduleStart;
-        public DateTime WorkScheduleStart
-        {
-            get { return _workScheduleStart; }
-            private set { _workScheduleStart = value; }
-        }
-
-        /// <summary>
-        /// Return all the messages received by this agent
-        /// </summary>
-        public List<AgentMessage> MailBox
-        {
-            get { return new List<AgentMessage>(mailBox.Values); }
-        }
-
-        /// <summary>
-        /// The role of this agent
-        /// </summary>
-        public string Role
-        {
-            get { return role; }
-            set { role = value; }
-        }
-        private string role;
 
         #endregion
 
