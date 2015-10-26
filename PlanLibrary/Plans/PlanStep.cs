@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace PlanLibrary
 {
@@ -15,7 +16,6 @@ namespace PlanLibrary
 			private set { parent = value; }
 		}
 		private PlanModel parent;
-
 
 		/// <summary>
 		/// Gets the trigger condition.
@@ -34,16 +34,23 @@ namespace PlanLibrary
 		/// <value>The name.</value>
 		public string Name
 		{
-			get { return name; }
-			private set { name = value; }
+			get { return the_method.Name; }
 		}
-		private string name;
+		private MethodInfo the_method;
 
-		internal PlanStep (PlanModel parent, string name, string trigger_condition = "")
+		internal PlanStep (PlanModel parent, MethodInfo method, string trigger_condition = "")
 		{
 			Parent = parent;
-			Name = name;
+			the_method = method;
 			TriggerCondition = trigger_condition;
+		}
+
+		internal void Execute(/*object[] args = null*/)
+		{
+			if (the_method == null)
+				throw new Exception ("In plan " + Parent.Name + ": invalid plan step.");
+
+			the_method.Invoke (this, null);
 		}
 	}
 }

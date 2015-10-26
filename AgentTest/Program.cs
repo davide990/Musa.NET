@@ -50,7 +50,16 @@ namespace AgentTest
 		{
 			string a = args [0].ToString ();
 
-			Console.WriteLine ("Hello from " + GetType ().Name + " to " + a);
+			Console.WriteLine ("Hello from " + Name + " to " + a);
+
+			ExecuteStep ("wella");
+		}
+
+
+		[PlanStep]
+		void wella()
+		{
+			Console.WriteLine ("Hello");
 		}
 
 	}

@@ -55,7 +55,7 @@ namespace PlanLibrary
 		private List<PlanStep> steps;
 
 		/// <summary>
-		/// Gets the plan name.
+		/// Gets this plan's name.
 		/// </summary>
 		public string Name
 		{
@@ -125,13 +125,13 @@ namespace PlanLibrary
 		private void setPlanSteps()
 		{
 			//Retrieve the methods of this plan decorated with PlanStep attribute
-			var plan_steps = from mm in GetType ().GetMethods (BindingFlags.Instance | BindingFlags.Public)
-				let attribute = mm.GetCustomAttribute (typeof(PlanStepAttribute)) as PlanStepAttribute
-					where attribute != null
-				select new {MethodName = mm.Name, TriggerCondition = attribute.TriggerCondition};
+			var plan_steps = from mm in GetType ().GetMethods (BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+			                 let attribute = mm.GetCustomAttribute (typeof(PlanStepAttribute)) as PlanStepAttribute
+			                 where attribute != null
+			                 select new {Method = mm, TriggerCondition = attribute.TriggerCondition};
 
 			foreach (var vv in plan_steps)
-				Steps.Add (new PlanStep (this, vv.MethodName, vv.TriggerCondition));
+				Steps.Add (new PlanStep (this, vv.Method, vv.TriggerCondition));
 		}
 
 		/// <summary>
@@ -170,10 +170,34 @@ namespace PlanLibrary
 		internal void Execute(Object[] args)
 		{
 			if (planEntryPointMethod == null)
-				throw new Exception ("In plan " + GetType ().Name + ": invalid entry point method.");
+				throw new Exception ("In plan " + Name + ": invalid entry point method.");
 			
 			planEntryPointMethod.Invoke (this, new object[]{ args });
 		}
+
+
+		protected void ExecuteStep(string step_name, object[] args = null)
+		{
+			bool plan_found = false;
+
+			foreach (PlanStep step in Steps) 
+			{
+				if (!step.Name.Equals (step_name))
+					continue;
+
+				plan_found = true;
+				step.Execute ();
+			}
+
+			if (!plan_found) 
+				throw new Exception ("In plan " + Name + ": cannot find plan step '"+step_name+"'");
+		}
+
+		protected void ExecuteExternalPlan()
+		{
+
+		}
+
 	}
 }
 

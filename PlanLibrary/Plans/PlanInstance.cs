@@ -60,8 +60,6 @@ namespace PlanLibrary
 			string trigger_condition = plan_model.TriggerCondition;
 
 			//TriggerCondition = FormulaParser.Parse (trigger_condition);
-
-
 		}
 
 		#endregion Constructor
@@ -76,68 +74,15 @@ namespace PlanLibrary
 			plan_model.Execute (plan_model.Args);
 		}
 
+		/// <summary>
+		/// Sets the arguments for this plan instance.
+		/// </summary>
 		public void SetArgs(object[] args)
 		{
 			plan_model.Args = args;
 		}
 
 
-		/// <summary>
-		/// Executes this plan
-		/// </summary>
-		public void SetStartNow()
-		{
-			/*if (!schedule_set)
-				throw new Exception ("Schedule for this plan has not been set.");*/
-		}
-
-
-		//TODO
-		/*
-		public void SetSchedule(Schedule schedule)
-		{
-			if (schedule is CronSchedule)
-				setCronSchedule (schedule as CronSchedule);
-			else if (schedule is SimpleSchedule)
-				setSimpleSchedule (schedule as SimpleSchedule);
-
-		}
-
-		//TODO
-		/// <summary>
-		/// Set the cron schedule for this plan
-		/// </summary>
-		/// <param name="schedule">Schedule.</param>
-		private void setCronSchedule(CronSchedule schedule)
-		{
-			switch(schedule.ScheduleType)
-			{
-			case CronScheduleType.AtHourAndMinuteOnGivenDaysOfWeek:
-				break;
-
-			case CronScheduleType.DailyAtHourAndMinute:
-				break;
-
-			case CronScheduleType.MonthlyOnDayAndHourAndMinute:
-				break;
-
-			case CronScheduleType.WeeklyOnDayAndHourAndMinute:
-				break;
-			}
-		}
-
-		private void setSimpleSchedule(SimpleSchedule schedule)
-		{
-			//...
-
-		}
-		*/
-
-
-		public void SchedulePlan()
-		{
-			//...
-		}
 		#endregion Methods
 	}
 }
