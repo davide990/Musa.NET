@@ -18,24 +18,6 @@ namespace PlanLibrary
 		#region Fields/Properties
 
 		/// <summary>
-		/// The Quartz.net's IJobDetail related to this plan instance
-		/// </summary>
-		internal IJobDetail Job
-		{
-			get { return job; }
-		}
-		private IJobDetail job;
-
-		/// <summary>
-		/// The Quartz.net's ITrigger related to this plan instance
-		/// </summary>
-		internal ITrigger Trigger
-		{
-			get { return trigger; }
-		}
-		private ITrigger trigger;
-
-		/// <summary>
 		/// The unique key for this plan instance
 		/// </summary>
 		public string PlanKey
@@ -55,6 +37,11 @@ namespace PlanLibrary
 		}
 		private Formula triggerCondition;
 
+		/// <summary>
+		/// The plan model this instance references to.
+		/// </summary>
+		private PlanModel plan_model;
+
 		#endregion Fields/Properties
 
 		#region Constructor
@@ -67,30 +54,33 @@ namespace PlanLibrary
 			//Generate a unique key for this plan instance
 			PlanKey = new JobKey (typeof(T).Name).ToString();
 
+			plan_model = Activator.CreateInstance (typeof(T)) as PlanModel;
+
 			//Parse the trigger condition of the plan model
-			string trigger_condition = (Activator.CreateInstance (typeof(T)) as PlanModel).TriggerCondition;
-			TriggerCondition = FormulaParser.Parse (trigger_condition);
+			string trigger_condition = plan_model.TriggerCondition;
 
-			//Use reflection to create an instance of IJobDetail for a generic PlanModel
-			var create_method 					= typeof(JobBuilder).GetMethods().Where(x => x.Name == "Create").First(x => x.ContainsGenericParameters);
-			MethodInfo Job_Create_method 		= create_method.MakeGenericMethod(typeof(T));
-			MethodInfo Job_withIdentity_method 	= typeof(JobBuilder).GetMethod ("WithIdentity", new Type[] { typeof(string) });
-			MethodInfo Job_Build_method 		= typeof(JobBuilder).GetMethod ("Build");
+			//TriggerCondition = FormulaParser.Parse (trigger_condition);
 
-			JobBuilder builder = Job_Create_method.Invoke(null, null) as JobBuilder;
-			builder = Job_withIdentity_method.Invoke (builder, new object[]{ typeof(T).Name }) as JobBuilder;
-			job 	= Job_Build_method.Invoke (builder, null) as IJobDetail;
 
-			//Create a new trigger for the plan
-			trigger = TriggerBuilder.Create()
-				.WithIdentity(typeof(T).Name + "_trigger", "trigger_group")
-				.StartNow()       
-				.Build();
 		}
 
 		#endregion Constructor
 
 		#region Methods
+
+		/// <summary>
+		/// Execute this plan.
+		/// </summary>
+		public void Execute()
+		{
+			plan_model.Execute (plan_model.Args);
+		}
+
+		public void SetArgs(object[] args)
+		{
+			plan_model.Args = args;
+		}
+
 
 		/// <summary>
 		/// Executes this plan
@@ -123,19 +113,15 @@ namespace PlanLibrary
 			switch(schedule.ScheduleType)
 			{
 			case CronScheduleType.AtHourAndMinuteOnGivenDaysOfWeek:
-				builder = builder.WithSchedule (CronScheduleBuilder.AtHourAndMinuteOnGivenDaysOfWeek (schedule.Hour, schedule.Minute, schedule.DaysOfWeek));
 				break;
 
 			case CronScheduleType.DailyAtHourAndMinute:
-				builder = builder.WithSchedule (CronScheduleBuilder.DailyAtHourAndMinute (schedule.Hour, schedule.Minute));
 				break;
 
 			case CronScheduleType.MonthlyOnDayAndHourAndMinute:
-				builder = builder.WithSchedule (CronScheduleBuilder.MonthlyOnDayAndHourAndMinute (schedule.DayOfMonth, schedule.Hour, schedule.Minute));
 				break;
 
 			case CronScheduleType.WeeklyOnDayAndHourAndMinute:
-				builder = builder.WithSchedule (CronScheduleBuilder.WeeklyOnDayAndHourAndMinute (schedule.DayOfWeek, schedule.Hour, schedule.Minute));
 				break;
 			}
 		}

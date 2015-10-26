@@ -6,7 +6,7 @@ using Quartz;
 
 namespace PlanLibrary
 {
-	public abstract class PlanModel : IJob
+	public abstract class PlanModel
 	{
 		#region Fields/Properties
 
@@ -63,18 +63,48 @@ namespace PlanLibrary
 		}
 		#endregion Fields/Properties
 
+		/// <summary>
+		/// Gets the plan entry point method's name.
+		/// </summary>
+		public string PlanEntryPointMethod
+		{
+			get { return planEntryPointMethod.Name; }
+		}
+		private MethodInfo planEntryPointMethod;
+
+		public object[] Args
+		{
+			get { return args; }
+			internal set { args = value; }
+		}
+		private object[] args;
+
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PlanLibrary.PlanModel"/> class.
+		/// </summary>
 		protected PlanModel ()
 		{
 			AllowedRoles = new HashSet<string> ();
 			Steps = new List<PlanStep> ();
 
+			setPlanAttributes ();
+			setPlanSteps ();
+			setEntryPointMethod ();
+		}
+
+		/// <summary>
+		/// Sets the plan attributes.
+		/// </summary>
+		private void setPlanAttributes()
+		{
 			//Retrieve the plan attribute (if any)
 			var plan_attribute = from t in GetType ().GetCustomAttributes (typeof(PlanAttribute), true)
-			                     let attributes = t as PlanAttribute
-			                     where t != null
-			                     select new { 	AllowedRoles = attributes.AllowedRoles, 
-												TriggerCondition = attributes.TriggerCondition,
-												ExpectedResult = attributes.ExpectedResult};
+				let attributes = t as PlanAttribute
+					where t != null
+				select new { 	AllowedRoles = attributes.AllowedRoles, 
+				TriggerCondition = attributes.TriggerCondition,
+				ExpectedResult = attributes.ExpectedResult};
 
 			if (plan_attribute.ToList ().Count <= 0)
 				throw new Exception ("Class " + GetType ().Name + " is not decorated with [Plan] attribute.");
@@ -87,31 +117,63 @@ namespace PlanLibrary
 				foreach (string role in v.AllowedRoles)
 					AllowedRoles.Add (role);
 			}
+		}
 
+		/// <summary>
+		/// Sets the plan steps.
+		/// </summary>
+		private void setPlanSteps()
+		{
 			//Retrieve the methods of this plan decorated with PlanStep attribute
 			var plan_steps = from mm in GetType ().GetMethods (BindingFlags.Instance | BindingFlags.Public)
-			                 let attribute = mm.GetCustomAttribute (typeof(PlanStepAttribute)) as PlanStepAttribute
-			                 where attribute != null
-			                 select new {MethodName = mm.Name, TriggerCondition = attribute.TriggerCondition};
-			
+				let attribute = mm.GetCustomAttribute (typeof(PlanStepAttribute)) as PlanStepAttribute
+					where attribute != null
+				select new {MethodName = mm.Name, TriggerCondition = attribute.TriggerCondition};
+
 			foreach (var vv in plan_steps)
 				Steps.Add (new PlanStep (this, vv.MethodName, vv.TriggerCondition));
 		}
 
 		/// <summary>
-		/// Execute this plan.
+		/// Sets the entry point method for this plan.
 		/// </summary>
-		public abstract void Execute (object[] args);
-
-		/// <summary>
-		/// IJob's interface method. It is hidden, and when this plan is triggered, it calls the Execute method.
-		/// </summary>
-		/// <param name="context">Context.</param>
-		void IJob.Execute (IJobExecutionContext context)
+		private void setEntryPointMethod()
 		{
-			//Execute ();
+			//Search for the plan entry point method
+			var entry_point = from mm in GetType ().GetMethods (BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+				let attribute = mm.GetCustomAttribute (typeof(PlanEntryPoint)) as PlanEntryPoint
+					where attribute != null
+				select mm;
+
+			//Check for entry point method count
+			int entry_point_methods_count = entry_point.ToList ().Count;
+			if (entry_point_methods_count < 1)
+				throw new Exception ("In plan " + GetType ().Name + ": no plan entry point specified.");
+			if (entry_point_methods_count > 1)
+				throw new Exception ("In plan " + GetType ().Name + ": only one entry point method can be specified within a plan.");
+
+			//Set the plan entry point method
+			planEntryPointMethod = (entry_point.ToList () [0]) as MethodInfo;
+
+			//Check for entry point method parameter
+			if(planEntryPointMethod.GetParameters ().Length < 1)
+				throw new Exception ("In plan " + GetType ().Name + ": entry point method must include an object[] parameter.");
+			if(planEntryPointMethod.GetParameters ().Length > 1)
+				throw new Exception ("In plan " + GetType ().Name + ": entry point method must include only one parameter of type object[].");
+			if (!planEntryPointMethod.GetParameters () [0].ParameterType.IsEquivalentTo (typeof(object[])))
+				throw new Exception ("In plan " + GetType ().Name + ": entry point method's parameter must be of type object[].");
+
+			//set the entry point method parameter's
+			//Args = planEntryPointMethod.GetParameters () [0] as object[];
 		}
 
+		internal void Execute(Object[] args)
+		{
+			if (planEntryPointMethod == null)
+				throw new Exception ("In plan " + GetType ().Name + ": invalid entry point method.");
+			
+			planEntryPointMethod.Invoke (this, new object[]{ args });
+		}
 	}
 }
 
