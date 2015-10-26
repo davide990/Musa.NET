@@ -89,6 +89,10 @@
       <Project>{2A2DD9B6-50F6-4D87-AF2E-B422E31A999C}</Project>
       <Name>FormulaLibrary</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PlanLibrary\PlanLibrary.csproj">
+      <Project>{5EB4BE6E-6C14-43D5-9F98-86E635F74C78}</Project>
+      <Name>PlanLibrary</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -98,7 +102,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup>
-    <Folder Include="Nuova cartella\" />
-  </ItemGroup>
 </Project>

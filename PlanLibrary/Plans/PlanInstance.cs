@@ -72,9 +72,9 @@ namespace PlanLibrary
 			TriggerCondition = FormulaParser.Parse (trigger_condition);
 
 			//Use reflection to create an instance of IJobDetail for a generic PlanModel
-			var create_method 		= typeof(JobBuilder).GetMethods().Where(x => x.Name == "Create").First(x => x.ContainsGenericParameters);
+			var create_method 					= typeof(JobBuilder).GetMethods().Where(x => x.Name == "Create").First(x => x.ContainsGenericParameters);
 			MethodInfo Job_Create_method 		= create_method.MakeGenericMethod(typeof(T));
-			MethodInfo Job_withIdentity_method = typeof(JobBuilder).GetMethod ("WithIdentity", new Type[] { typeof(string) });
+			MethodInfo Job_withIdentity_method 	= typeof(JobBuilder).GetMethod ("WithIdentity", new Type[] { typeof(string) });
 			MethodInfo Job_Build_method 		= typeof(JobBuilder).GetMethod ("Build");
 
 			JobBuilder builder = Job_Create_method.Invoke(null, null) as JobBuilder;

@@ -59,4 +59,10 @@
     <None Include="packages.config" />
     <None Include="job_scheduling_data_2_0.xsd" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FormulaLibrary\FormulaLibrary.csproj">
+      <Project>{2A2DD9B6-50F6-4D87-AF2E-B422E31A999C}</Project>
+      <Name>FormulaLibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

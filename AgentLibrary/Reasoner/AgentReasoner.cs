@@ -105,8 +105,15 @@ namespace AgentLibrary
                     //Check the mail box
                     checkMailBox();
 
+					//check events
+
                     //Clear it
                     parentAgent.mailBox.Clear();
+
+
+					//check intentions (plans)
+
+
 
                     Thread.Sleep(1000);
                 }
@@ -131,8 +138,6 @@ namespace AgentLibrary
                 //-> percept/trigger events
                 //#Jobs scheduling
                 //-> dequeue and execute
-
-
             }
         }
 

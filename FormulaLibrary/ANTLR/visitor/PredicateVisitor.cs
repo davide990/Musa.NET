@@ -79,7 +79,7 @@ namespace FormulaLibrary.ANTLR.visitor
             //string str_value = context.value.expr;
             string str_value = null;
             if ((str_value = context.value.expr) == null)
-                throw new Exception("Something went wrong when parsing formula.\n");
+                throw new Exception("Something went wrong in parsing formula.\n");
 
             string name = context.name.expr;
 

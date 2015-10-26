@@ -101,7 +101,7 @@ namespace PlanLibrary
 		/// <summary>
 		/// Execute this plan.
 		/// </summary>
-		public abstract void Execute ();
+		public abstract void Execute (object[] args);
 
 		/// <summary>
 		/// IJob's interface method. It is hidden, and when this plan is triggered, it calls the Execute method.
@@ -109,7 +109,7 @@ namespace PlanLibrary
 		/// <param name="context">Context.</param>
 		void IJob.Execute (IJobExecutionContext context)
 		{
-			Execute ();
+			//Execute ();
 		}
 
 	}
