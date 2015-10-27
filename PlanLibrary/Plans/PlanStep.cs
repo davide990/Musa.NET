@@ -45,13 +45,41 @@ namespace PlanLibrary
 			TriggerCondition = trigger_condition;
 		}
 
-		internal void Execute(/*object[] args = null*/)
+		/// <summary>
+		/// Execute this plan step
+		/// </summary>
+		internal void Execute(Dictionary<string, object> args = null)
 		{
 			if (the_method == null)
 				throw new Exception ("In plan " + Parent.Name + ": invalid plan step.");
 
-			the_method.Invoke (Parent, null);
+			//If the plan step method has parameters
+			if (the_method.GetParameters ().Length > 0) 
+			{
+				//If passed args are not null
+				if (args != null) 
+				{
+					//Check if the parameter is of type Dictionary<string,object>
+					if (!the_method.GetParameters () [0].ParameterType.IsEquivalentTo (typeof(Dictionary<string,object>)))
+						throw new Exception ("In plan step" + Name + ": plan steps supports only a maximum of 1 parameter of type Dictionary<string,object>.");
+
+					//Invoke the method
+					the_method.Invoke (Parent, new object[]{ args });
+				} 
+				else 
+				{
+					//If the passed args are null, invoke the method with an empty dictionary
+					the_method.Invoke (Parent, new object[]{ new Dictionary<string, object> () });
+				}
+			} 
+			else 
+			{
+				//no args are passed neither provided by plan step method. Invoke the method without parameters.
+				the_method.Invoke (Parent, null);
+			}
 		}
+
+
 	}
 }
 

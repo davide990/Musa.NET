@@ -58,7 +58,7 @@ namespace AgentTest
 
 
 		[PlanStep]
-		void wella()
+		void wella(Dictionary<string,object> args)
 		{
 			Console.WriteLine ("Hello");
 		}

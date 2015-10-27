@@ -182,7 +182,7 @@ namespace PlanLibrary
 		/// </summary>
 		/// <param name="step_name">The step name.</param>
 		/// <param name="args">The step arguments.</param>
-		protected void ExecuteStep(string step_name/*, Dictionary<string,object> args*/)
+		protected void ExecuteStep(string step_name, Dictionary<string,object> args = null)
 		{
 			bool plan_found = false;
 
@@ -192,7 +192,7 @@ namespace PlanLibrary
 					continue;
 
 				plan_found = true;
-				step.Execute (/*args*/);
+				step.Execute (args);
 			}
 
 			//Throw an exception if no plan step named [plan_step] has been found
