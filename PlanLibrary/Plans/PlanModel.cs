@@ -72,12 +72,17 @@ namespace PlanLibrary
 		}
 		private MethodInfo planEntryPointMethod;
 
-		public object[] Args
+		/// <summary>
+		/// Gets or sets the arguments for this plan. These arguments are passed to the plan from the entry point 
+		/// method.
+		/// </summary>
+		/// <value>The arguments.</value>
+		public Dictionary<string,object> Args
 		{
 			get { return args; }
 			internal set { args = value; }
 		}
-		private object[] args;
+		private Dictionary<string,object> args;
 
 
 		/// <summary>
@@ -157,17 +162,14 @@ namespace PlanLibrary
 
 			//Check for entry point method parameter
 			if(planEntryPointMethod.GetParameters ().Length < 1)
-				throw new Exception ("In plan " + GetType ().Name + ": entry point method must include an object[] parameter.");
+				throw new Exception ("In plan " + GetType ().Name + ": entry point method must include a Dictionary<string,object> parameter.");
 			if(planEntryPointMethod.GetParameters ().Length > 1)
-				throw new Exception ("In plan " + GetType ().Name + ": entry point method must include only one parameter of type object[].");
-			if (!planEntryPointMethod.GetParameters () [0].ParameterType.IsEquivalentTo (typeof(object[])))
-				throw new Exception ("In plan " + GetType ().Name + ": entry point method's parameter must be of type object[].");
-
-			//set the entry point method parameter's
-			//Args = planEntryPointMethod.GetParameters () [0] as object[];
+				throw new Exception ("In plan " + GetType ().Name + ": entry point method must include only one parameter of type Dictionary<string,object>.");
+			if (!planEntryPointMethod.GetParameters () [0].ParameterType.IsEquivalentTo (typeof(Dictionary<string,object>)))
+				throw new Exception ("In plan " + GetType ().Name + ": entry point method's parameter must be of type Dictionary<string,object>.");
 		}
 
-		internal void Execute(Object[] args)
+		internal void Execute(Dictionary<string,object> args)
 		{
 			if (planEntryPointMethod == null)
 				throw new Exception ("In plan " + Name + ": invalid entry point method.");
@@ -175,8 +177,12 @@ namespace PlanLibrary
 			planEntryPointMethod.Invoke (this, new object[]{ args });
 		}
 
-
-		protected void ExecuteStep(string step_name, object[] args = null)
+		/// <summary>
+		/// Executes a plan step.
+		/// </summary>
+		/// <param name="step_name">The step name.</param>
+		/// <param name="args">The step arguments.</param>
+		protected void ExecuteStep(string step_name/*, Dictionary<string,object> args*/)
 		{
 			bool plan_found = false;
 
@@ -186,9 +192,10 @@ namespace PlanLibrary
 					continue;
 
 				plan_found = true;
-				step.Execute ();
+				step.Execute (/*args*/);
 			}
 
+			//Throw an exception if no plan step named [plan_step] has been found
 			if (!plan_found) 
 				throw new Exception ("In plan " + Name + ": cannot find plan step '"+step_name+"'");
 		}

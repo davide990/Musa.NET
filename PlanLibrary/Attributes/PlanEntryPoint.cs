@@ -6,7 +6,9 @@ namespace PlanLibrary
 	public class PlanEntryPoint : Attribute
 	{
 		public PlanEntryPoint ()
-		{}
+		{
+			
+		}
 	}
 }
 

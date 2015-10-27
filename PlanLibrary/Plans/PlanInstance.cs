@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Linq;
 using FormulaLibrary;
 using FormulaLibrary.ANTLR;
+using System.Collections.Generic;
 
 namespace PlanLibrary
 {
@@ -77,7 +78,7 @@ namespace PlanLibrary
 		/// <summary>
 		/// Sets the arguments for this plan instance.
 		/// </summary>
-		public void SetArgs(object[] args)
+		public void SetArgs(Dictionary<string, object> args)
 		{
 			plan_model.Args = args;
 		}

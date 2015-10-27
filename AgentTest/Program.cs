@@ -35,7 +35,7 @@ namespace AgentTest
             //startMUSA();
 
 			PlanInstance<PlanExample> a = new PlanInstance<PlanExample> ();
-			a.SetArgs (new object[]{ "davide" });
+			a.SetArgs (new Dictionary<string, object> (){ { "nome", "davide" } });
 
 			a.Execute ();
             Console.ReadKey();
@@ -46,11 +46,12 @@ namespace AgentTest
 	class PlanExample : PlanModel
 	{
 		[PlanEntryPoint]
-		void a(object[] args)
+		void a(Dictionary<string,object> args)
 		{
-			string a = args [0].ToString ();
+			object a;
+			args.TryGetValue ("nome",out a);
 
-			Console.WriteLine ("Hello from " + Name + " to " + a);
+			Console.WriteLine ("Hello from " + Name + " to " + a.ToString());
 
 			ExecuteStep ("wella");
 		}

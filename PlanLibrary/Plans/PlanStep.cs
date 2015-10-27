@@ -50,7 +50,7 @@ namespace PlanLibrary
 			if (the_method == null)
 				throw new Exception ("In plan " + Parent.Name + ": invalid plan step.");
 
-			the_method.Invoke (this, null);
+			the_method.Invoke (Parent, null);
 		}
 	}
 }
