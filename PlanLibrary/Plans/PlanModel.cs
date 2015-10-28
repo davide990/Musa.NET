@@ -70,7 +70,7 @@ namespace PlanLibrary
 		{
 			get { return planEntryPointMethod.Name; }
 		}
-		private MethodInfo planEntryPointMethod;
+		internal MethodInfo planEntryPointMethod;
 
 		/// <summary>
 		/// Gets or sets the arguments for this plan. These arguments are passed to the plan from the entry point 
@@ -169,14 +169,17 @@ namespace PlanLibrary
 				throw new Exception ("In plan " + GetType ().Name + ": entry point method's parameter must be of type Dictionary<string,object>.");
 		}
 
-		internal void Execute(Dictionary<string,object> args)
+		//remove
+		/*internal void Execute(Dictionary<string,object> args)
 		{
 			if (planEntryPointMethod == null)
 				throw new Exception ("In plan " + Name + ": invalid entry point method.");
 			
 			planEntryPointMethod.Invoke (this, new object[]{ args });
-		}
+		}*/
 
+
+		//MOVE TO PLAN INSTANCE
 		/// <summary>
 		/// Executes a plan step.
 		/// </summary>

@@ -62,7 +62,7 @@ namespace PlanLibrary
 					//Check if the parameter is of type Dictionary<string,object>
 					if (!the_method.GetParameters () [0].ParameterType.IsEquivalentTo (typeof(Dictionary<string,object>)))
 						throw new Exception ("In plan step" + Name + ": plan steps supports only a maximum of 1 parameter of type Dictionary<string,object>.");
-
+					
 					//Invoke the method
 					the_method.Invoke (Parent, new object[]{ args });
 				} 

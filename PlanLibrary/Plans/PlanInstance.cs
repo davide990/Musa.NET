@@ -5,6 +5,7 @@ using System.Linq;
 using FormulaLibrary;
 using FormulaLibrary.ANTLR;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace PlanLibrary
 {
@@ -43,6 +44,19 @@ namespace PlanLibrary
 		/// </summary>
 		private PlanModel plan_model;
 
+		/// <summary>
+		/// Gets the entry point method for this plan.
+		/// </summary>
+		private MethodInfo EntryPointMethod
+		{
+			get { return plan_model.planEntryPointMethod; }
+		}
+
+		/// <summary>
+		/// The background worker that handles the execution of this plan.
+		/// </summary>
+		private BackgroundWorker background_worker;
+
 		#endregion Fields/Properties
 
 		#region Constructor
@@ -70,19 +84,54 @@ namespace PlanLibrary
 		/// <summary>
 		/// Execute this plan.
 		/// </summary>
-		public void Execute()
+		public void Execute(Dictionary<string,object> args = null)
 		{
-			plan_model.Execute (plan_model.Args);
+			if(plan_model == null)
+				throw new Exception ("Error: plan model is null");
+
+			if (EntryPointMethod == null)
+				throw new Exception ("In plan " + plan_model.Name + ": invalid entry point method.");
+			
+			//If the plan step method has parameters
+			if (EntryPointMethod.GetParameters ().Length > 0) 
+			{
+				//If passed args are not null
+				if (args != null) 
+				{
+					//Check if the parameter is of type Dictionary<string,object>
+					if (!EntryPointMethod.GetParameters () [0].ParameterType.IsEquivalentTo (typeof(Dictionary<string,object>)))
+						throw new Exception ("In plan step" + plan_model.Name + ": plan steps supports only a maximum of 1 parameter of type Dictionary<string,object>.");
+
+					//Invoke the method
+					InvokePlan (new object[]{ args });
+				} 
+				else 
+				{
+					//If the passed args are null, invoke the method with an empty dictionary
+					InvokePlan (new object[]{ new Dictionary<string, object> () });
+				}
+			} 
+			else 
+			{
+				//no args are passed neither provided by plan step method. Invoke the method without parameters.
+				InvokePlan (null);
+			}
 		}
 
 		/// <summary>
-		/// Sets the arguments for this plan instance.
+		/// Invokes this plan's entry point.
 		/// </summary>
-		public void SetArgs(Dictionary<string, object> args)
+		private void InvokePlan(object[] args)
 		{
-			plan_model.Args = args;
+			try
+			{
+				EntryPointMethod.Invoke (plan_model, args);
+			}
+			catch(TargetInvocationException e)
+			{
+				Console.WriteLine ("An exception has been throwed by the invoked plan '"+plan_model.Name+"'.\nMessage: "+e.InnerException.ToString());
+			}
 		}
-
 
 		#endregion Methods
 	}
