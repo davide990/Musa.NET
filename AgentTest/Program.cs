@@ -52,7 +52,7 @@ namespace AgentTest
 
 			Console.WriteLine ("Hello from " + Name + " to " + a.ToString());
 
-			//ExecuteStep ("wella", new Dictionary<string, object> (){ { "nome", "davide" } });
+			ExecuteStep ("wella", new Dictionary<string, object> (){ { "nome", "davide" } });
 		}
 
 

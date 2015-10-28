@@ -64,18 +64,37 @@ namespace PlanLibrary
 						throw new Exception ("In plan step" + Name + ": plan steps supports only a maximum of 1 parameter of type Dictionary<string,object>.");
 					
 					//Invoke the method
-					the_method.Invoke (Parent, new object[]{ args });
+					//the_method.Invoke (Parent, new object[]{ args });
+					InvokePlanStep (new object[]{ args });
 				} 
 				else 
 				{
 					//If the passed args are null, invoke the method with an empty dictionary
-					the_method.Invoke (Parent, new object[]{ new Dictionary<string, object> () });
+					//the_method.Invoke (Parent, new object[]{ new Dictionary<string, object> () });
+					InvokePlanStep (new object[]{ new Dictionary<string, object> () });
 				}
 			} 
 			else 
 			{
 				//no args are passed neither provided by plan step method. Invoke the method without parameters.
-				the_method.Invoke (Parent, null);
+				//the_method.Invoke (Parent, null);
+				InvokePlanStep (null);
+			}
+		}
+
+		/// <summary>
+		/// Invokes this plan step.
+		/// </summary>
+		/// <param name="args">Arguments.</param>
+		private void InvokePlanStep(object[] args)
+		{
+			try
+			{
+				the_method.Invoke (Parent, args);
+			}
+			catch(TargetInvocationException e)
+			{
+				Console.WriteLine ("An exception has been throwed by the invoked plan step '"+Name+"'.\nMessage: "+e.InnerException.ToString());
 			}
 		}
 
