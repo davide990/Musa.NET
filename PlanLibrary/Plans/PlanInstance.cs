@@ -6,6 +6,7 @@ using FormulaLibrary;
 using FormulaLibrary.ANTLR;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading;
 
 namespace PlanLibrary
 {
@@ -53,9 +54,31 @@ namespace PlanLibrary
 		}
 
 		/// <summary>
+		/// Gets the plan steps.
+		/// </summary>
+		private List<PlanStep> PlanSteps
+		{
+			get { return plan_model.Steps; }
+		}
+
+		/// <summary>
+		/// Gets the name of this plan.
+		/// </summary>
+		public string Name 
+		{
+			get { return typeof(T).Name; }
+		}
+
+		/// <summary>
 		/// The background worker that handles the execution of this plan.
 		/// </summary>
 		private BackgroundWorker background_worker;
+
+		/// <summary>
+		/// An object used to handle pause/resume of this plan
+		/// </summary>
+		ManualResetEvent _busy;
+
 
 		#endregion Fields/Properties
 
@@ -71,10 +94,30 @@ namespace PlanLibrary
 
 			plan_model = Activator.CreateInstance (typeof(T)) as PlanModel;
 
+			//add an event handler for step's execution
+			foreach(PlanStep step in plan_model.Steps)
+				step.ExecuteStep += onExecuteStep;
+
 			//Parse the trigger condition of the plan model
 			string trigger_condition = plan_model.TriggerCondition;
 
 			//TriggerCondition = FormulaParser.Parse (trigger_condition);
+
+			_busy = new ManualResetEvent (true);
+		}
+
+		/// <summary>
+		/// This is invoked when a plan step [step_name] is invoked from within the plan
+		/// </summary>
+		/// <param name="step_name">Step name.</param>
+		/// <param name="args">Arguments.</param>
+		private void onExecuteStep (PlanStep the_step, Dictionary<string, object> args)
+		{
+			//If in pause, do nothing
+			_busy.WaitOne ();
+
+			//Execute the step
+			the_step.InvokePlanStep(args);
 		}
 
 		#endregion Constructor
@@ -90,17 +133,17 @@ namespace PlanLibrary
 				throw new Exception ("Error: plan model is null");
 
 			if (EntryPointMethod == null)
-				throw new Exception ("In plan " + plan_model.Name + ": invalid entry point method.");
+				throw new Exception ("In plan " + Name + ": invalid entry point method.");
 			
 			//If the plan step method has parameters
-			if (EntryPointMethod.GetParameters ().Length > 0) 
+			if (EntryPointMethod.GetParameters ().Length > 0)
 			{
 				//If passed args are not null
 				if (args != null) 
 				{
 					//Check if the parameter is of type Dictionary<string,object>
 					if (!EntryPointMethod.GetParameters () [0].ParameterType.IsEquivalentTo (typeof(Dictionary<string,object>)))
-						throw new Exception ("In plan step" + plan_model.Name + ": plan steps supports only a maximum of 1 parameter of type Dictionary<string,object>.");
+						throw new Exception ("In plan step" + Name + ": plan steps supports only a maximum of 1 parameter of type Dictionary<string,object>.");
 
 					//Invoke the method
 					InvokePlan (new object[]{ args });
@@ -129,7 +172,7 @@ namespace PlanLibrary
 			}
 			catch(TargetInvocationException e)
 			{
-				Console.WriteLine ("An exception has been throwed by the invoked plan '"+plan_model.Name+"'.\nMessage: "+e.InnerException.ToString());
+				Console.WriteLine ("An exception has been throwed by the invoked plan '"+Name+"'.\nMessage: "+e.InnerException.ToString());
 			}
 		}
 

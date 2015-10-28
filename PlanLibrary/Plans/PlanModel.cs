@@ -61,7 +61,6 @@ namespace PlanLibrary
 		{
 			get { return GetType().Name; }
 		}
-		#endregion Fields/Properties
 
 		/// <summary>
 		/// Gets the plan entry point method's name.
@@ -84,6 +83,22 @@ namespace PlanLibrary
 		}
 		private Dictionary<string,object> args;
 
+		/// <summary>
+		/// Gets the name of the plan step from within this property is accessed.
+		/// </summary>
+		public string PlanStepName
+		{
+			get 
+			{ 
+				MethodBase calling_method = new System.Diagnostics.StackTrace (1, false).GetFrame (0).GetMethod ();
+				if (calling_method.GetCustomAttributes().OfType<PlanStepAttribute>().FirstOrDefault() == null)
+					throw new Exception ("Method '" + calling_method.Name + "' is not a plan step.\n");
+				
+				return calling_method.Name; 
+			}
+		}
+
+		#endregion Fields/Properties
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PlanLibrary.PlanModel"/> class.
@@ -93,7 +108,7 @@ namespace PlanLibrary
 			AllowedRoles = new HashSet<string> ();
 			Steps = new List<PlanStep> ();
 
-			setPlanAttributes ();
+			parsePlanAttributes ();
 			setPlanSteps ();
 			setEntryPointMethod ();
 		}
@@ -101,15 +116,15 @@ namespace PlanLibrary
 		/// <summary>
 		/// Sets the plan attributes.
 		/// </summary>
-		private void setPlanAttributes()
+		private void parsePlanAttributes()
 		{
 			//Retrieve the plan attribute (if any)
 			var plan_attribute = from t in GetType ().GetCustomAttributes (typeof(PlanAttribute), true)
-				let attributes = t as PlanAttribute
-					where t != null
-				select new { 	AllowedRoles = attributes.AllowedRoles, 
-				TriggerCondition = attributes.TriggerCondition,
-				ExpectedResult = attributes.ExpectedResult};
+			                     let attributes = t as PlanAttribute
+			                     where t != null
+			                     select new { 	AllowedRoles 		= attributes.AllowedRoles, 
+												TriggerCondition 	= attributes.TriggerCondition,
+												ExpectedResult 		= attributes.ExpectedResult};
 
 			if (plan_attribute.ToList ().Count <= 0)
 				throw new Exception ("Class " + GetType ().Name + " is not decorated with [Plan] attribute.");
@@ -169,17 +184,6 @@ namespace PlanLibrary
 				throw new Exception ("In plan " + GetType ().Name + ": entry point method's parameter must be of type Dictionary<string,object>.");
 		}
 
-		//remove
-		/*internal void Execute(Dictionary<string,object> args)
-		{
-			if (planEntryPointMethod == null)
-				throw new Exception ("In plan " + Name + ": invalid entry point method.");
-			
-			planEntryPointMethod.Invoke (this, new object[]{ args });
-		}*/
-
-
-		//MOVE TO PLAN INSTANCE
 		/// <summary>
 		/// Executes a plan step.
 		/// </summary>
@@ -205,7 +209,8 @@ namespace PlanLibrary
 
 		protected void ExecuteExternalPlan()
 		{
-
+			
+			// TODO implementare invocazione piani esterni
 		}
 
 	}

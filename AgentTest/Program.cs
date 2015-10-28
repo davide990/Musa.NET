@@ -61,7 +61,7 @@ namespace AgentTest
 		{
 			object a;
 			args.TryGetValue ("nome",out a);
-			Console.WriteLine ("Hello "+a.ToString());
+			Console.WriteLine ("Hello "+a.ToString() + " from plan step "+PlanStepName);
 		}
 
 	}
