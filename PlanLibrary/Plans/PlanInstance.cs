@@ -1,5 +1,4 @@
 ﻿using System;
-using Quartz;
 using System.Reflection;
 using System.Linq;
 using FormulaLibrary;
@@ -84,7 +83,7 @@ namespace PlanLibrary
 		/// </summary>
 		public bool HasFinished
 		{
-			get { return !background_worker.IsBusy; }
+			get { return background_worker == null ? true : !background_worker.IsBusy; }
 		}
 			
 		#endregion Fields/Properties
@@ -97,7 +96,7 @@ namespace PlanLibrary
 		public PlanInstance ()
 		{
 			//Generate a unique key for this plan instance
-			PlanKey = new JobKey (typeof(T).Name).ToString();
+			//PlanKey = new JobKey (typeof(T).Name).ToString();
 
 			plan_model = Activator.CreateInstance (typeof(T)) as PlanModel;
 
@@ -142,6 +141,7 @@ namespace PlanLibrary
 		void onBackgroundWorker_WorkCompleted (object sender, RunWorkerCompletedEventArgs e)
 		{
 			//TODO log plan execution complete
+			Abort ();
 		}
 
 		/// <summary>
@@ -212,22 +212,23 @@ namespace PlanLibrary
 		/// </summary>
 		public void Execute(Dictionary<string,object> args = null)
 		{
-			if(!background_worker.IsBusy)
+			if (!background_worker.IsBusy) 
+			{
+				initializeBackgroundWorker ();
 				background_worker.RunWorkerAsync (args);
+			}
 			else
 			{
 				throw new Exception("Plan '"+Name+"' already running.");
 			}
 		}
 
-
-
-
 		/// <summary>
 		/// Pause this plan's execution.
 		/// </summary>
 		public void Pause()
 		{
+			Console.WriteLine (Name + " paused");
 			_busy.Reset ();
 		}
 
@@ -236,12 +237,23 @@ namespace PlanLibrary
 		/// </summary>
 		public void Resume()
 		{
+			Console.WriteLine (Name + " resumed");
 			_busy.Set();
 		}
 
+		/// <summary>
+		/// Abort this plan's execution.
+		/// </summary>
 		public void Abort()
 		{
-			//TODO abort this plan's execution
+			if (background_worker.IsBusy) 
+			{
+				_busy.Close ();
+				background_worker.CancelAsync ();
+				background_worker.Dispose ();
+				background_worker = null;
+				GC.Collect ();
+			}
 		}
 
 		/// <summary>
@@ -255,7 +267,7 @@ namespace PlanLibrary
 			}
 			catch(TargetInvocationException e)
 			{
-				Console.WriteLine ("An exception has been throwed by the invoked plan '"+Name+"'.\nMessage: "+e.InnerException.ToString());
+				Console.WriteLine ("An exception has been throwed by the invoked plan '" + Name + "'.\nMessage: " + e.InnerException.ToString ());
 			}
 		}
 

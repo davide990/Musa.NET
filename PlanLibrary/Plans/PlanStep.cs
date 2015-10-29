@@ -71,7 +71,7 @@ namespace PlanLibrary
 		internal void InvokePlanStep(Dictionary<string, object> args = null)
 		{
 			if (the_method == null)
-				throw new Exception ("In plan " + Parent.Name + ": invalid plan step.");
+				throw new Exception ("In plan " + Parent.Name + ": invalid plan step. May be the method is not decorated with the attribute [PlanStep]?");
 
 			//If the plan step method has parameters
 			if (the_method.GetParameters ().Length > 0) 

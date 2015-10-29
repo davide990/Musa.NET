@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Quartz;
 
 namespace PlanLibrary
 {
@@ -65,7 +64,7 @@ namespace PlanLibrary
 		/// <summary>
 		/// Gets the plan entry point method's name.
 		/// </summary>
-		public string PlanEntryPointMethod
+		public string EntryPointName
 		{
 			get { return planEntryPointMethod.Name; }
 		}
