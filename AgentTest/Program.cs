@@ -38,32 +38,35 @@ namespace AgentTest
 
 			BackgroundWorker bg_test = new BackgroundWorker();
 			PlanInstance<PlanExample> a = new PlanInstance<PlanExample> ();
-
-
+			a.RegisterResult += A_RegisterResult;
 			bg_test.DoWork += delegate(object sender, DoWorkEventArgs e) 
 			{
-				Console.WriteLine("Pausing plan...");
+				/*Console.WriteLine("Pausing plan...");
 				a.Pause();
-				Thread.Sleep(10000);
+				//Thread.Sleep(10000);
 				Console.WriteLine("Resuming plan...");
 
-				a.Abort();
-				//a.Resume();
+				//a.Abort();
+				a.Resume();*/
 			};
 
 			a.Execute (new Dictionary<string, object> (){ { "nome", "davide" } });
 
-			Thread.Sleep (4000);
+			Thread.Sleep (1000);
 			bg_test.RunWorkerAsync ();
-
-
-
-
 			while (!a.HasFinished);
-            
 			Console.ReadKey();
         }
+
+		static void A_RegisterResult (string result)
+		{
+			Console.WriteLine ("PRODUCED RESULT: " + result);
+		}
+
     }
+
+
+
 
 	[Plan]
 	class PlanExample : PlanModel
@@ -89,6 +92,7 @@ namespace AgentTest
 			Console.WriteLine ("working...");
 			Thread.Sleep (2000);
 			Console.WriteLine ("Hello "+a.ToString() + " from plan step "+PlanStepName);
+			RegisterResult ("hi 1");
 			ExecuteStep ("intensive_task1");
 		}
 
@@ -105,7 +109,9 @@ namespace AgentTest
 		{
 			Thread.Sleep (2000);
 			Console.WriteLine (PlanStepName + " completed!");
+			RegisterResult ("hi 3");
 			ExecuteStep ("intensive_task3");
+
 		}
 
 		[PlanStep]
@@ -137,7 +143,9 @@ namespace AgentTest
 		{
 			Thread.Sleep (2000);
 			Console.WriteLine (PlanStepName + " completed!");
+			RegisterResult ("hi 7");
 			ExecuteStep ("intensive_task7");
+
 		}
 
 		[PlanStep]
@@ -172,4 +180,6 @@ namespace AgentTest
 		}
 
 	}
+
+        
 }

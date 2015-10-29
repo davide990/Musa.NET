@@ -6,6 +6,7 @@ using FormulaLibrary.ANTLR;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace PlanLibrary
 {
@@ -88,7 +89,15 @@ namespace PlanLibrary
 			
 		#endregion Fields/Properties
 
-		#region Constructor
+
+		public delegate void onRegisterResult(string result);
+		/// <summary>
+		/// Used to register results into agent's workbenches
+		/// </summary>
+		public event onRegisterResult RegisterResult;
+
+
+		#region Constructor and initialization methods
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PlanInstance"/>class.
@@ -96,10 +105,11 @@ namespace PlanLibrary
 		public PlanInstance ()
 		{
 			//Generate a unique key for this plan instance
-			//PlanKey = new JobKey (typeof(T).Name).ToString();
+			//TODO PlanKey = new JobKey (typeof(T).Name).ToString();
 
 			plan_model = Activator.CreateInstance (typeof(T)) as PlanModel;
-
+			plan_model.RegisterResultEvent += OnRegisterResult;
+				
 			//add an event handler for step's execution
 			foreach(PlanStep step in plan_model.Steps)
 				step.ExecuteStep += onExecuteStep;
@@ -111,10 +121,20 @@ namespace PlanLibrary
 			//TriggerCondition = FormulaParser.Parse (trigger_condition);
 
 			_busy = new ManualResetEvent (true);
-
-			//Initialize the background worker
-			initializeBackgroundWorker ();
 		}
+
+		private void OnRegisterResult (string result)
+		{
+			if(RegisterResult != null) 
+			{
+				//TODO log result to logger
+				//background_worker.ReportProgress(0,result);
+				RegisterResult (result);
+			}
+			else
+				throw new Exception("No agent is registered to catch this plan's results.");
+		}
+
 
 		/// <summary>
 		/// Initializes the background worker for this plan.
@@ -123,13 +143,14 @@ namespace PlanLibrary
 		{
 			background_worker = new BackgroundWorker ();
 
-			background_worker.DoWork += onBackgroundWorker_DoWork;
-			background_worker.RunWorkerCompleted += onBackgroundWorker_WorkCompleted;
-			background_worker.ProgressChanged += onBackgroundWorker_ProgressChanged;
+			background_worker.DoWork 				+= onBackgroundWorker_DoWork;
+			background_worker.RunWorkerCompleted 	+= onBackgroundWorker_WorkCompleted;
+			background_worker.ProgressChanged 		+= onBackgroundWorker_ProgressChanged;
 
 			background_worker.WorkerReportsProgress = true;
 			background_worker.WorkerSupportsCancellation = true;
 		}
+		#endregion Constructor and initialization methods
 
 		#region Background worker methods
 
@@ -141,7 +162,6 @@ namespace PlanLibrary
 		void onBackgroundWorker_WorkCompleted (object sender, RunWorkerCompletedEventArgs e)
 		{
 			//TODO log plan execution complete
-			Abort ();
 		}
 
 		/// <summary>
@@ -156,7 +176,8 @@ namespace PlanLibrary
 
 			if (EntryPointMethod == null)
 				throw new Exception ("In plan " + Name + ": invalid entry point method.");
-			
+
+			//Takes the plan's arguments
 			Dictionary<string, object> args = e.Argument as Dictionary<string, object>;
 
 			//If the plan step method has parameters
@@ -183,9 +204,12 @@ namespace PlanLibrary
 				//no args are passed neither provided by plan step method. Invoke the method without parameters.
 				InvokePlan (null);
 			}
+
 		}
 
 		#endregion Background worker methods
+
+		#region Methods
 
 		/// <summary>
 		/// This is invoked when a plan step [step_name] is invoked from within the plan. This method checks if this
@@ -196,25 +220,23 @@ namespace PlanLibrary
 		/// <param name="args">The arguments passed to the plan step (optional).</param>
 		private void onExecuteStep (PlanStep the_step, Dictionary<string, object> args = null)
 		{
-			//If in pause, do nothing
+			//If the plan is in pause, wait until it is resumed
 			_busy.WaitOne ();
 
-			//Execute the step
+			//If it is not in pause, execute the requested plan step
 			the_step.InvokePlanStep(args);
 		}
-
-		#endregion Constructor
-
-		#region Methods
 
 		/// <summary>
 		/// Execute this plan.
 		/// </summary>
 		public void Execute(Dictionary<string,object> args = null)
 		{
+			if(background_worker == null)
+				initializeBackgroundWorker ();
+			
 			if (!background_worker.IsBusy) 
 			{
-				initializeBackgroundWorker ();
 				background_worker.RunWorkerAsync (args);
 			}
 			else

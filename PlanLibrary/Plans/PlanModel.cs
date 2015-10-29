@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace PlanLibrary
 {
@@ -98,6 +99,14 @@ namespace PlanLibrary
 		}
 
 		#endregion Fields/Properties
+
+		internal delegate void onRegisterResult(string result);
+		/// <summary>
+		/// Used to register results into agent's workbenches
+		/// </summary>
+		internal event onRegisterResult RegisterResultEvent;
+
+
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PlanLibrary.PlanModel"/> class.
@@ -210,6 +219,14 @@ namespace PlanLibrary
 		{
 			
 			// TODO implementare invocazione piani esterni
+		}
+
+
+
+
+		protected void RegisterResult(string result)
+		{
+			RegisterResultEvent (result);
 		}
 
 	}
