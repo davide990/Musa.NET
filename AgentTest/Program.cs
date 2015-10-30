@@ -24,9 +24,9 @@ namespace AgentTest
         private static void startMUSA()
         {
             AgentEnvironement env = AgentEnvironement.GetInstance();
-			Agent a = new Agent("agent_1").start();
-			Agent b = new Agent("agent_2").start();
-			Agent c = new Agent("agent_3").start();
+			Agent a = new Agent("agent_1").Start();
+			Agent b = new Agent("agent_2").Start();
+			Agent c = new Agent("agent_3").Start();
 			env.RegisterAgent(a);
 			env.RegisterAgent(b);
 			env.RegisterAgent(c);
@@ -36,6 +36,12 @@ namespace AgentTest
         {
             //startMUSA();
 
+			Agent a = new Agent ("agent_1");
+
+			a.AddPlan (typeof(PlanExample2));
+			a.ExecutePlan (typeof(PlanExample2));
+			Thread.Sleep(10000);
+			/*
 			BackgroundWorker bg_test = new BackgroundWorker();
 			PlanInstance<PlanExample> a = new PlanInstance<PlanExample> ();
 			a.RegisterResult += A_RegisterResult;
@@ -47,14 +53,14 @@ namespace AgentTest
 				Console.WriteLine("Resuming plan...");
 
 				//a.Abort();
-				a.Resume();*/
+				a.Resume();  ----
 			};
 
 			a.Execute (new Dictionary<string, object> (){ { "nome", "davide" } });
 
 			Thread.Sleep (1000);
 			bg_test.RunWorkerAsync ();
-			while (!a.HasFinished);
+			while (!a.HasFinished);*/
 			Console.ReadKey();
         }
 
@@ -65,7 +71,16 @@ namespace AgentTest
 
     }
 
-
+	[Plan]
+	class PlanExample2 : PlanModel
+	{
+		[PlanEntryPoint]
+		void wella(Dictionary<string,object> args)
+		{
+			Console.WriteLine ("Ciao!");
+			Thread.Sleep (5000);
+		}
+	}
 
 
 	[Plan]

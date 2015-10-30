@@ -123,6 +123,10 @@ namespace PlanLibrary
 			_busy = new ManualResetEvent (true);
 		}
 
+		/// <summary>
+		/// Raised when a result has be be registered after the invocation of RegisterResult(...) within a plan step.
+		/// </summary>
+		/// <param name="result">Result.</param>
 		private void OnRegisterResult (string result)
 		{
 			if(RegisterResult != null) 
@@ -234,13 +238,16 @@ namespace PlanLibrary
 		{
 			if(background_worker == null)
 				initializeBackgroundWorker ();
-			
+
+			//If the plan is not already in execution, execute it
 			if (!background_worker.IsBusy) 
 			{
 				background_worker.RunWorkerAsync (args);
 			}
 			else
 			{
+				//TODO decidere se generare una eccezione o non fare nulla
+				//Else, ...
 				throw new Exception("Plan '"+Name+"' already running.");
 			}
 		}
@@ -268,14 +275,14 @@ namespace PlanLibrary
 		/// </summary>
 		public void Abort()
 		{
-			if (background_worker.IsBusy) 
-			{
-				_busy.Close ();
-				background_worker.CancelAsync ();
-				background_worker.Dispose ();
-				background_worker = null;
-				GC.Collect ();
-			}
+			if (!background_worker.IsBusy)
+				return;
+			
+			_busy.Close ();
+			background_worker.CancelAsync ();
+			background_worker.Dispose ();
+			background_worker = null;
+			GC.Collect ();
 		}
 
 		/// <summary>
@@ -287,9 +294,12 @@ namespace PlanLibrary
 			{
 				EntryPointMethod.Invoke (plan_model, args);
 			}
-			catch(TargetInvocationException e)
+			catch(Exception e)
 			{
-				Console.WriteLine ("An exception has been throwed by the invoked plan '" + Name + "'.\nMessage: " + e.InnerException.ToString ());
+				if (e is TargetInvocationException)
+					Console.WriteLine ("An exception has been throwed by the invoked plan '" + Name + "'.\nMessage: " + e.InnerException.ToString ());
+				else
+					Console.WriteLine (e.ToString ());
 			}
 		}
 

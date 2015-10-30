@@ -11,10 +11,10 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
-using Quartz;
-using Quartz.Impl;
 using System.Collections;
 using AgentLibrary.Networking;
+using PlanLibrary;
+using System.Reflection;
 
 namespace AgentLibrary
 {
@@ -56,10 +56,15 @@ namespace AgentLibrary
 		}
 		private readonly DateTime createdAt;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        internal Thread agent_thread;
+		/// <summary>
+		/// The agent thread.
+		/// </summary>
+		internal Thread Thread
+		{
+			get { return agent_thread; }
+			set { agent_thread = value; }
+		}
+        private Thread agent_thread;
 
         /// <summary>
         /// This queue contains the changes to the environment that this agent have to perceive. Since an agent can be busy in doing other
@@ -75,6 +80,20 @@ namespace AgentLibrary
         /// </summary>
         internal Dictionary<AgentPassport, AgentMessage> mailBox;
         internal object lock_mailBox = new object();
+
+		/// <summary>
+		/// Gets the plans of this agent.
+		/// </summary>
+		/// <value>The plans.</value>
+		public List<Type> Plans
+		{
+			get { return new List<Type>(PlansCollection.Keys); }
+		}
+
+		/// <summary>
+		/// The plans collection.
+		/// </summary>
+		private Dictionary<Type, IPlanInstance> PlansCollection;
 
 
         #endregion
@@ -182,7 +201,8 @@ namespace AgentLibrary
             perceivedEnvironementChanges = new Dictionary<IList, PerceptionType>();
             mailBox = new Dictionary<AgentPassport, AgentMessage>();
 			createdAt = DateTime.Now;
-            CreateScheduler();
+
+			PlansCollection = new Dictionary<Type, IPlanInstance> ();
         }
 
         #endregion
@@ -222,46 +242,9 @@ namespace AgentLibrary
         /// <param name="changes">The data that involved in the environment change</param>
         internal void notifyEnvironementChanges(PerceptionType action, IList changes)
         {
+			//TODO log environment change
             Console.WriteLine("[Agent " + name + "] received " + action.ToString() + " -> " + changes.ToString());
             perceivedEnvironementChanges.Add(changes, action);
-        }
-
-        private void CreateScheduler()
-        {
-            // construct a scheduler factory
-            ISchedulerFactory schedFact = new StdSchedulerFactory();
-
-            // get a scheduler
-            //scheduler = schedFact.GetScheduler();
-        }
-
-        public void manageDepartment()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Schedule a job to an employee agent
-        /// </summary>
-        public void scheduleJobToWorker()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Schedule a job to this agent
-        /// </summary>
-        public void scheduleJob(ITrigger jobTrigger, IJobDetail jobDetail)
-        {
-            //scheduler.ScheduleJob(jobDetail, jobTrigger);
-        }
-
-        /// <summary>
-        /// Schedule a job to this agent
-        /// </summary>
-        public void addJob(IJobDetail jobDetail)
-        {
-            //scheduler.AddJob(jobDetail, false);
         }
 
         /// <summary>
@@ -275,19 +258,9 @@ namespace AgentLibrary
         }
 
         /// <summary>
-        /// Set the working schedule for this agent.
-        /// </summary>
-        /// <param name="start"></param>
-        /// <param name="end"></param>
-        public void setWorkSchedule(DateTime start, DateTime end)
-        {
-
-        }
-
-        /// <summary>
         /// Start the agent activity
         /// </summary>
-        public Agent start()
+        public Agent Start()
         {
             //begin the agent reasoning activity
             reasoner.startReasoning();
@@ -298,15 +271,59 @@ namespace AgentLibrary
             return this;
         }
 
-        private void doPerception()
-        {
+		/// <summary>
+		/// Adds a plan to this agent.
+		/// </summary>
+		/// <returns><c>true</c>, if plan was added, <c>false</c> otherwise.</returns>
+		/// <param name="plan">The plan model to be added. An instance of this plan is instantiated</param>
+		public void AddPlan(Type Plan)
+		{
+			if (Plan.IsEquivalentTo (typeof(PlanModel)))
+				throw new Exception ("Argument #1 in ExecutePlan(...) is not of type PlanModel.");
+			
+			//Create a new plan instance
+			Type planInstanceType = typeof(PlanInstance<>).MakeGenericType (Plan);
+			var plan_instance = Activator.CreateInstance (planInstanceType);
 
-        }
+			//Register the event handler
+			EventInfo register_result_event = planInstanceType.GetEvent ("RegisterResult");
+			MethodInfo delegate_method = GetType ().GetMethod ("onPlanInstanceRegisterResult", BindingFlags.NonPublic|BindingFlags.Instance);
+
+
+			Delegate register_plan_results_delegate = Delegate.CreateDelegate (register_result_event.EventHandlerType, this, delegate_method);
+			register_result_event.AddEventHandler (plan_instance, register_plan_results_delegate);
+
+			//Add the plan to the agent's plan collection
+			PlansCollection.Add (Plan, plan_instance as IPlanInstance);
+		}
+
+		private void onPlanInstanceRegisterResult(string result)
+		{
+			//TODO convert result to formula, then add it to agent's workbench
+		}
+
+		/// <summary>
+		/// Executes a plan.
+		/// </summary>
+		/// <param name="Plan">Plan.</param>
+		/// <param name="args">Arguments.</param>
+		public void ExecutePlan(Type Plan, Dictionary<string, object> args = null)
+		{
+			if (Plan.IsEquivalentTo (typeof(PlanModel)))
+				throw new Exception ("Argument #1 in ExecutePlan(...) is not of type PlanModel.");
+			
+			Type planInstanceType = typeof(PlanInstance<>).MakeGenericType (Plan);
+			IPlanInstance the_plan = null;
+
+			PlansCollection.TryGetValue(Plan, out the_plan );
+
+			if (the_plan == null)
+				throw new Exception ("Plan '" + Plan.Name + "' not found in agent [" + Name + "] plans collection.");
+
+			MethodInfo execute_method = planInstanceType.GetMethod ("Execute", BindingFlags.Public | BindingFlags.Instance);
+			execute_method.Invoke (the_plan, new object[]{ args });
+		}
 
         #endregion
-
-
-
-
     }
 }

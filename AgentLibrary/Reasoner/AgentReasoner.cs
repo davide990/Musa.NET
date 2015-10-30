@@ -34,66 +34,61 @@ namespace AgentLibrary
     public sealed class AgentReasoner
     {
         private int currentReasoningCycle = 0;
+		private readonly int ReasoningUpdateTime = 5000;
 
-        private readonly int ReasoningUpdateTime = 5000;
-
-        /// <summary>
-        /// The quartz.net scheduler class
-        /// </summary>
-        private IScheduler job_scheduler;
-        
-        /// <summary>
-        /// The job schedules
-        /// </summary>
-        private List<Schedule> schedules;
-        
         /// <summary>
         /// The agent this reasoner belongs to
         /// </summary>
         private readonly Agent parentAgent;
 
         /// <summary>
-        /// 
+        /// Gets or sets the agent thread.
         /// </summary>
-        private Thread thread
+        private Thread AgentThread
         {
-            get { return parentAgent.agent_thread; }
-            set { parentAgent.agent_thread = value; }
+			get { return parentAgent.Thread; }
+			set { parentAgent.Thread = value; }
         }
 
         public AgentReasoner(Agent agent)
         {
             parentAgent = agent;
-            thread      = new Thread(new ThreadStart(agentReasoningMain));
-            thread.Name = parentAgent.Name;
-
+            AgentThread      = new Thread(new ThreadStart(agentReasoningMain));
+            AgentThread.Name = parentAgent.Name;
         }
 
         internal void startReasoning()
         {
+			//TODO log this
             //TODO segna un timestamp in cui inizia il reasoning
             Console.WriteLine("Starting agent [" + parentAgent.Name + "] reasoning...");
-            thread.Start();
+            AgentThread.Start();
         }
 
         public void stopReasoning()
         {
+			//TODO log this
             //TODO segna un timestamp in cui ferma il reasoning
 
         }
 
         public void pauseReasoning()
         {
+			//TODO log this
             //TODO segna un timestamp in cui pausa il reasoning
             
         }
 
         public void resumeReasoning()
         {
+			//TODO log this
             //TODO segna un timestamp in cui ripristina il reasoning
             
         }
 
+		/// <summary>
+		/// This is the main agent's reasoning method. It is executed on an agent-related unique thread.
+		/// </summary>
         private void agentReasoningMain()
         {
             while(true)

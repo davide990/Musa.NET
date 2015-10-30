@@ -116,9 +116,16 @@ namespace PlanLibrary
 			AllowedRoles = new HashSet<string> ();
 			Steps = new List<PlanStep> ();
 
-			parsePlanAttributes ();
-			setPlanSteps ();
-			setEntryPointMethod ();
+			try
+			{
+				parsePlanAttributes ();
+				setPlanSteps ();
+				setEntryPointMethod ();
+			}
+			catch(Exception e)
+			{
+				Console.WriteLine (e.Message);
+			}
 		}
 
 		/// <summary>
@@ -185,9 +192,9 @@ namespace PlanLibrary
 
 			//Check for entry point method parameter
 			if(planEntryPointMethod.GetParameters ().Length < 1)
-				throw new Exception ("In plan " + GetType ().Name + ": entry point method must include a Dictionary<string,object> parameter.");
+				throw new Exception ("In plan " + GetType ().Name + ": entry point method '"+planEntryPointMethod.Name+"' must include a Dictionary<string,object> parameter.");
 			if(planEntryPointMethod.GetParameters ().Length > 1)
-				throw new Exception ("In plan " + GetType ().Name + ": entry point method must include only one parameter of type Dictionary<string,object>.");
+				throw new Exception ("In plan " + GetType ().Name + ": entry point method '"+planEntryPointMethod.Name+"' must include only one parameter of type Dictionary<string,object>.");
 			if (!planEntryPointMethod.GetParameters () [0].ParameterType.IsEquivalentTo (typeof(Dictionary<string,object>)))
 				throw new Exception ("In plan " + GetType ().Name + ": entry point method's parameter must be of type Dictionary<string,object>.");
 		}
