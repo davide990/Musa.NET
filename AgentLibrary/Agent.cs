@@ -15,6 +15,8 @@ using System.Collections;
 using AgentLibrary.Networking;
 using PlanLibrary;
 using System.Reflection;
+using FormulaLibrary;
+using FormulaLibrary.ANTLR;
 
 namespace AgentLibrary
 {
@@ -95,6 +97,21 @@ namespace AgentLibrary
 		/// </summary>
 		private Dictionary<Type, IPlanInstance> PlansCollection;
 
+
+		/// <summary>
+		/// The set of plans that this agent is executing.
+		/// </summary>
+		private HashSet<string> ExecutingPlans;
+
+		/// <summary>
+		/// Gets a value indicating whether this agent is busy (executing a plan).
+		/// </summary>
+		public bool Busy
+		{
+			get { return agent_is_busy; }
+			private set {agent_is_busy = value; }
+		}
+		private bool agent_is_busy;
 
         #endregion
 
@@ -203,6 +220,8 @@ namespace AgentLibrary
 			createdAt = DateTime.Now;
 
 			PlansCollection = new Dictionary<Type, IPlanInstance> ();
+
+			Busy = false;
         }
 
         #endregion
@@ -265,9 +284,6 @@ namespace AgentLibrary
             //begin the agent reasoning activity
             reasoner.startReasoning();
 
-            //start the scheduler
-            //scheduler.Start();
-
             return this;
         }
 
@@ -278,27 +294,61 @@ namespace AgentLibrary
 		/// <param name="plan">The plan model to be added. An instance of this plan is instantiated</param>
 		public void AddPlan(Type Plan)
 		{
-			if (Plan.IsEquivalentTo (typeof(PlanModel)))
+			if (!Plan.BaseType.IsEquivalentTo (typeof(PlanModel)))
 				throw new Exception ("Argument #1 in ExecutePlan(...) is not of type PlanModel.");
 			
 			//Create a new plan instance
 			Type planInstanceType = typeof(PlanInstance<>).MakeGenericType (Plan);
 			var plan_instance = Activator.CreateInstance (planInstanceType);
 
-			//Register the event handler
+			//Register the handler for the event 'RegisterResult'
 			EventInfo register_result_event = planInstanceType.GetEvent ("RegisterResult");
 			MethodInfo delegate_method = GetType ().GetMethod ("onPlanInstanceRegisterResult", BindingFlags.NonPublic|BindingFlags.Instance);
-
-
 			Delegate register_plan_results_delegate = Delegate.CreateDelegate (register_result_event.EventHandlerType, this, delegate_method);
 			register_result_event.AddEventHandler (plan_instance, register_plan_results_delegate);
+
+			//Register the handler for the event 'Finished'
+			EventInfo plan_finished_event = planInstanceType.GetEvent ("Finished");
+			MethodInfo plan_finished_delegate_method = GetType ().GetMethod ("onPlanInstanceFinished", BindingFlags.NonPublic|BindingFlags.Instance);
+			Delegate plan_finished_delegate = Delegate.CreateDelegate (plan_finished_event.EventHandlerType, this, plan_finished_delegate_method);
+			plan_finished_event.AddEventHandler (plan_instance, plan_finished_delegate);
 
 			//Add the plan to the agent's plan collection
 			PlansCollection.Add (Plan, plan_instance as IPlanInstance);
 		}
 
+		/// <summary>
+		/// Invoked when a plan terminates its execution.
+		/// </summary>
+		/// <param name="sender">The executed plan.</param>
+		/// <param name="args">Arguments.</param>
+		private void onPlanInstanceFinished(object sender, EventArgs args)
+		{
+			//TODO log [agent + plan + event->finished]
+			Console.WriteLine ("[Agent " + Name + "] plan " + (sender as IPlanInstance).GetName() + " finished its execution.");
+
+			//Set the agent busy state to false
+			Busy = false;
+		}
+
+		/// <summary>
+		/// Invoked when a plan requests to register a result.
+		/// </summary>
+		/// <param name="result">Result.</param>
 		private void onPlanInstanceRegisterResult(string result)
 		{
+			Formula resultFormula = null;
+
+			try
+			{
+				resultFormula = FormulaParser.Parse(result);
+				Workbench.AddStatement(resultFormula);
+			}
+			catch(Exception e)
+			{
+				Console.WriteLine ("Unable to parse formula '" + result + "'.\n" + e.Message);
+			}
+
 			//TODO convert result to formula, then add it to agent's workbench
 		}
 
@@ -309,18 +359,27 @@ namespace AgentLibrary
 		/// <param name="args">Arguments.</param>
 		public void ExecutePlan(Type Plan, Dictionary<string, object> args = null)
 		{
-			if (Plan.IsEquivalentTo (typeof(PlanModel)))
+			//If Plan is not of type PlanModel, then throw an exception
+			if (!Plan.BaseType.IsEquivalentTo (typeof(PlanModel)))
 				throw new Exception ("Argument #1 in ExecutePlan(...) is not of type PlanModel.");
 			
 			Type planInstanceType = typeof(PlanInstance<>).MakeGenericType (Plan);
 			IPlanInstance the_plan = null;
 
+			//Search for the input plan
 			PlansCollection.TryGetValue(Plan, out the_plan );
 
+			//If the input plan has not been found within the agent's plans collection, throw an exception
 			if (the_plan == null)
 				throw new Exception ("Plan '" + Plan.Name + "' not found in agent [" + Name + "] plans collection.");
 
+			//Get the plan's Execute() method
 			MethodInfo execute_method = planInstanceType.GetMethod ("Execute", BindingFlags.Public | BindingFlags.Instance);
+
+			//Set the agent to busy
+			Busy = true;
+
+			//Execute the plan
 			execute_method.Invoke (the_plan, new object[]{ args });
 		}
 

@@ -10,7 +10,6 @@ using AgentLibrary;
 using AgentLibrary.Networking;
 using FormulaLibrary;
 using FormulaLibrary.ANTLR;
-using Quartz;
 using System;
 using System.Collections.Generic;
 using PlanLibrary;
@@ -40,27 +39,13 @@ namespace AgentTest
 
 			a.AddPlan (typeof(PlanExample2));
 			a.ExecutePlan (typeof(PlanExample2));
-			Thread.Sleep(10000);
-			/*
-			BackgroundWorker bg_test = new BackgroundWorker();
-			PlanInstance<PlanExample> a = new PlanInstance<PlanExample> ();
-			a.RegisterResult += A_RegisterResult;
-			bg_test.DoWork += delegate(object sender, DoWorkEventArgs e) 
-			{
-				/*Console.WriteLine("Pausing plan...");
-				a.Pause();
-				//Thread.Sleep(10000);
-				Console.WriteLine("Resuming plan...");
 
-				//a.Abort();
-				a.Resume();  ----
-			};
 
-			a.Execute (new Dictionary<string, object> (){ { "nome", "davide" } });
+			while (a.Busy);
 
-			Thread.Sleep (1000);
-			bg_test.RunWorkerAsync ();
-			while (!a.HasFinished);*/
+			//TODO implementare un meccanismo di attesa per gli agenti
+			//Thread.Sleep(10000);
+
 			Console.ReadKey();
         }
 

@@ -88,9 +88,10 @@ namespace AgentLibrary
         /// </summary>
         private void on_assignment_set_changed(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+			/*
             object assignment = e.NewItems[0];
             Type assignmentType = typeof(VariableTerm<>).MakeGenericType(assignment.GetType().GetGenericArguments()[0]);
-            
+            */
 
             switch (e.Action)
             {
@@ -164,7 +165,7 @@ namespace AgentLibrary
         }
 
         /// <summary>
-        /// Add a statement (as atomic formula) into this workbench.
+        /// Add a statement to this workbench.
         /// </summary>
         public void AddStatement(IList f)
         {
@@ -195,8 +196,7 @@ namespace AgentLibrary
                 {
                     //get the type info for the current term
                     Type variableTermType = typeof(VariableTerm<>).MakeGenericType(varTerm.GetType().GetGenericArguments()[0]);
-                    ConstructorInfo cinfo = variableTermType.GetConstructor(new[] { typeof(string), varTerm.GetType().GetGenericArguments()[0] });
-
+                    
                     //get the value of the current term
                     object name = Convert.ChangeType(variableTermType.GetProperty("Name").GetValue(varTerm), typeof(string));
                     object value = variableTermType.GetProperty("Value").GetValue(varTerm);
@@ -293,7 +293,6 @@ namespace AgentLibrary
             {
                 List<AssignmentType> l;
                 return testCondition(formula as AtomicFormula, out l);
-                l.Clear();
             }
         }
 

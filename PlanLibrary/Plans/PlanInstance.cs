@@ -11,7 +11,12 @@ using System.Threading.Tasks;
 namespace PlanLibrary
 {
 	public interface IPlanInstance
-	{}
+	{
+		/// <summary>
+		/// Gets the name of this plan.
+		/// </summary>
+		string GetName();
+	}
 
 	/// <summary>
 	/// Plan instance.
@@ -86,7 +91,12 @@ namespace PlanLibrary
 		{
 			get { return background_worker == null ? true : !background_worker.IsBusy; }
 		}
-			
+
+		/// <summary>
+		/// An event that occurs when this plan's execution terminates.
+		/// </summary>
+		public event EventHandler Finished;
+
 		#endregion Fields/Properties
 
 
@@ -166,6 +176,9 @@ namespace PlanLibrary
 		void onBackgroundWorker_WorkCompleted (object sender, RunWorkerCompletedEventArgs e)
 		{
 			//TODO log plan execution complete
+
+			if (Finished != null)
+				Finished (this, null);
 		}
 
 		/// <summary>
@@ -302,6 +315,15 @@ namespace PlanLibrary
 					Console.WriteLine (e.ToString ());
 			}
 		}
+
+		#region IPlanInstance inherithed methods
+
+		public string GetName()
+		{
+			return Name;
+		}
+
+		#endregion IPlanInstance inherithed methods
 
 		#endregion Methods
 	}
