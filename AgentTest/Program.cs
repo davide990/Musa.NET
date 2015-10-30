@@ -40,7 +40,7 @@ namespace AgentTest
 			a.AddPlan (typeof(PlanExample2));
 			a.ExecutePlan (typeof(PlanExample2));
 
-
+			Console.WriteLine ("Executing plan " + a.CurrentExecutingPlan);
 			while (a.Busy);
 
 			//TODO implementare un meccanismo di attesa per gli agenti
@@ -63,7 +63,16 @@ namespace AgentTest
 		void wella(Dictionary<string,object> args)
 		{
 			Console.WriteLine ("Ciao!");
-			Thread.Sleep (5000);
+			//Thread.Sleep (5000);
+
+			ExecuteStep ("other_step1");
+		}
+
+
+		[PlanStep]
+		void other_step1()
+		{
+			RegisterResult ("f(x)");
 		}
 	}
 

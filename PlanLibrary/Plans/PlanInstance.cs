@@ -127,16 +127,17 @@ namespace PlanLibrary
 			//Parse the trigger condition of the plan model
 			string trigger_condition = plan_model.TriggerCondition;
 
-			//TODO parse trigger condition formula here
-			//TriggerCondition = FormulaParser.Parse (trigger_condition);
+			if (!string.IsNullOrEmpty (trigger_condition))
+				TriggerCondition = FormulaParser.Parse (trigger_condition);
 
+			//Initialize the ManualResetEvent object
 			_busy = new ManualResetEvent (true);
 		}
 
 		/// <summary>
 		/// Raised when a result has be be registered after the invocation of RegisterResult(...) within a plan step.
 		/// </summary>
-		/// <param name="result">Result.</param>
+		/// <param name="result">The result to be registered. It is a formula.</param>
 		private void OnRegisterResult (string result)
 		{
 			if(RegisterResult != null) 
@@ -175,7 +176,7 @@ namespace PlanLibrary
 
 		void onBackgroundWorker_WorkCompleted (object sender, RunWorkerCompletedEventArgs e)
 		{
-			//TODO log plan execution complete
+			//TODO log plan execution completed
 
 			if (Finished != null)
 				Finished (this, null);

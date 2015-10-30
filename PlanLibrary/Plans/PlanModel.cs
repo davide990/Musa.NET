@@ -202,7 +202,8 @@ namespace PlanLibrary
 		/// <summary>
 		/// Executes a plan step.
 		/// </summary>
-		/// <param name="step_name">The step name.</param>
+		/// <param name="step_name">The step name to be executed. It is the name of a method decorated with
+		/// [PlanStep] atttribute.</param>
 		/// <param name="args">The step arguments.</param>
 		protected void ExecuteStep(string step_name, Dictionary<string,object> args = null)
 		{
@@ -230,7 +231,10 @@ namespace PlanLibrary
 
 
 
-
+		/// <summary>
+		/// Registers a result to the workbench of the agent that executes this plan.
+		/// </summary>
+		/// <param name="result">The result to be registered. It is a formula.</param>
 		protected void RegisterResult(string result)
 		{
 			RegisterResultEvent (result);

@@ -113,6 +113,23 @@ namespace AgentLibrary
 		}
 		private bool agent_is_busy;
 
+		/// <summary>
+		/// Gets the plan's name that this agent is currently executing.
+		/// </summary>
+		public string CurrentExecutingPlan
+		{
+			get
+			{
+				if (Busy)
+					return current_executing_plan;
+				else
+					return null;
+			}
+
+			private set { current_executing_plan = value; }
+		}
+		private string current_executing_plan;
+
         #endregion
 
 		#region Properties
@@ -295,7 +312,7 @@ namespace AgentLibrary
 		public void AddPlan(Type Plan)
 		{
 			if (!Plan.BaseType.IsEquivalentTo (typeof(PlanModel)))
-				throw new Exception ("Argument #1 in ExecutePlan(...) is not of type PlanModel.");
+				throw new Exception ("Argument #1 in AddPlan(Type) must be of type PlanModel.");
 			
 			//Create a new plan instance
 			Type planInstanceType = typeof(PlanInstance<>).MakeGenericType (Plan);
@@ -327,6 +344,9 @@ namespace AgentLibrary
 			//TODO log [agent + plan + event->finished]
 			Console.WriteLine ("[Agent " + Name + "] plan " + (sender as IPlanInstance).GetName() + " finished its execution.");
 
+			//Set the value of CurrentExecutingPlan to null
+			CurrentExecutingPlan = null;
+
 			//Set the agent busy state to false
 			Busy = false;
 		}
@@ -343,13 +363,13 @@ namespace AgentLibrary
 			{
 				resultFormula = FormulaParser.Parse(result);
 				Workbench.AddStatement(resultFormula);
+
+				Console.Write("[Agent "+Name+"] registered result: "+result);
 			}
 			catch(Exception e)
 			{
 				Console.WriteLine ("Unable to parse formula '" + result + "'.\n" + e.Message);
 			}
-
-			//TODO convert result to formula, then add it to agent's workbench
 		}
 
 		/// <summary>
@@ -359,9 +379,12 @@ namespace AgentLibrary
 		/// <param name="args">Arguments.</param>
 		public void ExecutePlan(Type Plan, Dictionary<string, object> args = null)
 		{
+			if (Busy)
+				throw new Exception ("Agent [" + Name + "] is currently executing plan " + CurrentExecutingPlan);
+			
 			//If Plan is not of type PlanModel, then throw an exception
 			if (!Plan.BaseType.IsEquivalentTo (typeof(PlanModel)))
-				throw new Exception ("Argument #1 in ExecutePlan(...) is not of type PlanModel.");
+				throw new Exception ("Argument #1 in ExecutePlan(Type) must be of type PlanModel.");
 			
 			Type planInstanceType = typeof(PlanInstance<>).MakeGenericType (Plan);
 			IPlanInstance the_plan = null;
@@ -378,6 +401,9 @@ namespace AgentLibrary
 
 			//Set the agent to busy
 			Busy = true;
+
+			//Set the value for CurrentExecutingPlan 
+			CurrentExecutingPlan = Plan.Name;
 
 			//Execute the plan
 			execute_method.Invoke (the_plan, new object[]{ args });
