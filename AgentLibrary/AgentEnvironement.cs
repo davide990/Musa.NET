@@ -67,8 +67,6 @@ namespace AgentLibrary
         
         #endregion Properties
 
-
-
         private static AgentEnvironement instance;
 
         /// <summary>
@@ -86,7 +84,6 @@ namespace AgentLibrary
 
                 //TODO QUESTE INFORMAZIONI DOVREBBERO POTER 
                 //ESSERE PASSATE DAL CODICE O DA FILE DI CONFIGURAZIONE
-
                 //if(configFile)
                 // port <- parseConfigFile(Port)
                 // ip_address <- parseConfigFile(IP)
@@ -185,7 +182,8 @@ namespace AgentLibrary
         }
         
         /// <summary>
-        /// Add a statement (as atomic formula) into this workbench.
+		/// Add a statement (as atomic formula) into this environment. The addition of the formula(s) is notified to 
+		/// every registered agent (to this environment).
         /// </summary>
         public void RegisterStatement(params AtomicFormula[] f)
         {
@@ -201,7 +199,6 @@ namespace AgentLibrary
                 {
                     //get the type info for the current term
                     Type variableTermType = typeof(VariableTerm<>).MakeGenericType(varTerm.GetType().GetGenericArguments()[0]);
-                    ConstructorInfo cinfo = variableTermType.GetConstructor(new[] { typeof(string), varTerm.GetType().GetGenericArguments()[0] });
 
                     //get the value of the current term
                     object name = Convert.ChangeType(variableTermType.GetProperty("Name").GetValue(varTerm), typeof(string));
@@ -211,7 +208,7 @@ namespace AgentLibrary
                     attributes.Add(AssignmentType.CreateAssignmentForTerm((string)name, value, varTerm.GetType().GetGenericArguments()[0]));
                 }
 
-                //Add the formula to this workbench
+                //Add the formula to this environment
                 statements.Add(ff);
             }
 

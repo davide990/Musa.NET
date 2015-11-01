@@ -26,16 +26,6 @@ namespace PlanLibrary
 		#region Fields/Properties
 
 		/// <summary>
-		/// The unique key for this plan instance
-		/// </summary>
-		public string PlanKey
-		{
-			get { return plan_key; }
-			private set { plan_key = value; }
-		}
-		private string plan_key;
-
-		/// <summary>
 		/// The trigger condition necessary to activate this plan.
 		/// </summary>
 		public Formula TriggerCondition
@@ -114,9 +104,6 @@ namespace PlanLibrary
 		/// </summary>
 		public PlanInstance ()
 		{
-			//Generate a unique key for this plan instance
-			//TODO PlanKey = new JobKey (typeof(T).Name).ToString();
-
 			plan_model = Activator.CreateInstance (typeof(T)) as PlanModel;
 			plan_model.RegisterResultEvent += OnRegisterResult;
 				
@@ -128,8 +115,11 @@ namespace PlanLibrary
 			string trigger_condition = plan_model.TriggerCondition;
 
 			if (!string.IsNullOrEmpty (trigger_condition))
-				TriggerCondition = FormulaParser.Parse (trigger_condition);
-
+			{
+				try 				{ TriggerCondition = FormulaParser.Parse (trigger_condition); }
+				catch(Exception e) 	{ Console.WriteLine ("Unable to parse plan's trigger condition '" + trigger_condition + "'.\n" + e.Message); }
+			}
+				
 			//Initialize the ManualResetEvent object
 			_busy = new ManualResetEvent (true);
 		}
@@ -222,7 +212,6 @@ namespace PlanLibrary
 				//no args are passed neither provided by plan step method. Invoke the method without parameters.
 				InvokePlan (null);
 			}
-
 		}
 
 		#endregion Background worker methods

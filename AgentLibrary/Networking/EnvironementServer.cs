@@ -122,7 +122,7 @@ namespace AgentLibrary.Networking
             //lock the receiver agent mail box, and add to it the message
             lock(receiver.lock_mailBox)
             {
-                receiver.mailBox.Add(senderData, message);
+				receiver.MailBox.Push (new Tuple<AgentPassport, AgentMessage> (senderData, message));
             }
             
             return true;
@@ -138,7 +138,7 @@ namespace AgentLibrary.Networking
                 //lock the receiver agent mail box, and add to it the message
                 lock (a.lock_mailBox)
                 {
-                    a.mailBox.Add(senderData, message);
+					a.MailBox.Push (new Tuple<AgentPassport, AgentMessage> (senderData, message));
                 }
             }
             

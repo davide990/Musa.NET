@@ -34,17 +34,21 @@ namespace AgentTest
         static void Main(string[] args)
         {
             //startMUSA();
-
-			Agent a = new Agent ("agent_1");
-
+			AgentEnvironement env = AgentEnvironement.GetInstance();
+			Agent a = new Agent ("agent_1").Start();
 			a.AddPlan (typeof(PlanExample2));
-			a.ExecutePlan (typeof(PlanExample2));
+			a.AddEvent ("f(x)", PerceptionType.AddBelief, typeof(PlanExample2));
 
-			Console.WriteLine ("Executing plan " + a.CurrentExecutingPlan);
+			env.RegisterAgent (a);
+
+			env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
+
+
+
+			//a.ExecutePlan (typeof(PlanExample2));
+
+			//Console.WriteLine ("Executing plan " + a.CurrentExecutingPlan);
 			while (a.Busy);
-
-			//TODO implementare un meccanismo di attesa per gli agenti
-			//Thread.Sleep(10000);
 
 			Console.ReadKey();
         }

@@ -15,6 +15,7 @@ using System;
 using AgentLibrary.Networking;
 using FormulaLibrary.ANTLR;
 using FormulaLibrary;
+using PlanLibrary;
 
 namespace AgentLibrary
 {
@@ -50,9 +51,53 @@ namespace AgentLibrary
 			set { parentAgent.Thread = value; }
         }
 
+		/// <summary>
+		/// Gets the the set of intentions of the agent, that is, the set of plans that the agent is intended to 
+		/// execute.
+		/// </summary>
+		public Queue<Type> AgentIntentions
+		{
+			get { return intentions; }
+			set 
+			{ 
+				lock(intentions_lock)
+				{
+					intentions = value;	
+				}
+			}
+		}
+		private Queue<Type> intentions;
+		private object intentions_lock;
+
+		/// <summary>
+		/// The events this agent reacts to. The key is a couple Formula-Perception type, while the value is a PlanModel
+		///  that indicates the plan to execute.
+		/// </summary>
+		public Dictionary<Tuple<string,PerceptionType>, Type> Events
+		{
+			get { return events; }
+			private set 
+			{
+				lock(events_lock)
+				{
+					events = value; 
+				}
+			}
+		}
+		private Dictionary<Tuple<string,PerceptionType>, Type> events;
+		private object events_lock;
+
+
         public AgentReasoner(Agent agent)
         {
-            parentAgent = agent;
+			intentions_lock = new object ();
+			events_lock 	= new object ();
+
+			Events = new Dictionary<Tuple<string, PerceptionType>, Type> ();
+
+			AgentIntentions = new Queue<Type> ();
+
+            parentAgent 	= agent;
             AgentThread      = new Thread(new ThreadStart(agentReasoningMain));
             AgentThread.Name = parentAgent.Name;
         }
@@ -87,12 +132,13 @@ namespace AgentLibrary
         }
 
 		/// <summary>
-		/// This is the main agent's reasoning method. It is executed on an agent-related unique thread.
+		/// This is the main agent's reasoning method. It is executed on a unique thread.
 		/// </summary>
         private void agentReasoningMain()
         {
             while(true)
             {
+				//TODO log here
                 Console.WriteLine("reasoning cycle #"+ currentReasoningCycle++);
                 Console.WriteLine("Checking mail box...");
                 lock (parentAgent.lock_mailBox)
@@ -101,14 +147,13 @@ namespace AgentLibrary
                     checkMailBox();
 
 					//check events
+					checkEvents ();
 
                     //Clear it
                     parentAgent.mailBox.Clear();
 
 
 					//check intentions (plans)
-
-
 
                     Thread.Sleep(1000);
                 }
@@ -136,68 +181,103 @@ namespace AgentLibrary
             }
         }
 
+		/// <summary>
+		/// Checks the events.
+		/// </summary>
+		private void checkEvents()
+		{
+			/**
+				per ogni messaggio MSG ricevuto
+				{
+					Se MSG è contenuto in events e il tipo di messaggio è uguale al tipo di percezione dell'evento,
+					  aggiungi il piano corrispondente alle intenzioni
+				}
+
+			*/
+
+		}
+
         /// <summary>
-        /// 
+        /// Checks the mail box.
         /// </summary>
         private void checkMailBox()
         {
-            foreach (KeyValuePair<AgentPassport, AgentMessage> p in parentAgent.mailBox)
-            {
-                switch (p.Value.InfoType)
-                {
-                    case InformationType.Tell:
-                        Console.WriteLine("[" + parentAgent.Name + "] perceiving TELL: " + p.Value.ToString());
-                        parentAgent.Workbench.AddStatement(FormulaParser.Parse(p.Value.Message as string));
-                        break;
+			//TODO solo un messaggio alla volta viene processato
+            //foreach (KeyValuePair<AgentPassport, AgentMessage> p in parentAgent.mailBox)
+			AgentPassport passport;
+			AgentMessage msg;
+			foreach (Tuple<AgentPassport, AgentMessage> p in parentAgent.MailBox) 
+			{
+				msg = p.Item2 as AgentMessage;
+				passport = p.Item1 as AgentPassport;
 
-                    case InformationType.Untell:
-                        Console.WriteLine("[" + parentAgent.Name + "] perceiving UNTELL: " + p.Value.ToString());
-                        parentAgent.Workbench.RemoveStatement(FormulaParser.Parse(p.Value.Message as string));
-                        break;
+				switch (msg.InfoType) 
+				{
+				case InformationType.Tell:
+					Console.WriteLine ("[" + parentAgent.Name + "] perceiving TELL: " + msg.ToString ());
+					parentAgent.Workbench.AddStatement (FormulaParser.Parse (msg.Message as string));
+					break;
 
-                    case InformationType.Achieve:
+				case InformationType.Untell:
+					Console.WriteLine ("[" + parentAgent.Name + "] perceiving UNTELL: " + msg.ToString ());
+					parentAgent.Workbench.RemoveStatement (FormulaParser.Parse (msg.Message as string));
+					break;
+
+				case InformationType.Achieve:
 
                         //!!!
 
-                        break;
-                }
+					break;
+				
+				}
             }
         }
 
         /// <summary>
-        /// Percept the environment changes and updates the workbench of the parent agent.
+        /// Percept the environment changes and updates the workbench of the parent agent and trigger events.
         /// </summary>
         private void perceptEnvironement()
         {
             if (parentAgent.perceivedEnvironementChanges.Count <= 0)
                 return;
 
-            foreach(KeyValuePair<IList, PerceptionType> p in parentAgent.perceivedEnvironementChanges)
-            {
-                switch (p.Value)
-                {
-                    case PerceptionType.AddBelief:
-                            Console.WriteLine("[" + parentAgent.Name + "] perceiving ADD: " + p.Value.ToString());
-                            parentAgent.Workbench.AddStatement(p.Key);
-                        break;
+			foreach (KeyValuePair<IList, PerceptionType> p in parentAgent.perceivedEnvironementChanges) 
+			{
+				switch (p.Value) 
+				{
+				case PerceptionType.AddBelief:
+					//Add the statement to the agent's workbench
+					parentAgent.Workbench.AddStatement (p.Key);
 
-                    case PerceptionType.RemoveBelief:
-                            parentAgent.Workbench.AddStatement(p.Key);
-                        break;
+					//Check for event 
+					foreach (AtomicFormula formula in p.Key)
+					{
+						Console.WriteLine ("[" + parentAgent.Name + "] perceiving " + p.Value.ToString () + ": " + formula.ToString());
 
-                    case PerceptionType.SetBeliefValue:
-                        break;
+						Type plan_to_execute = null;
+						Events.TryGetValue (new Tuple<string, PerceptionType> (formula.ToString (), p.Value), out plan_to_execute);
+						if (plan_to_execute != null) 
+							AgentIntentions.Enqueue (plan_to_execute);
+					}
+					break;
 
-                    case PerceptionType.UnSetBeliefValue:
-                        break;
+				case PerceptionType.RemoveBelief:
+					parentAgent.Workbench.AddStatement (p.Key);
+					break;
 
-                    case PerceptionType.UpdateBeliefValue:
-                        break;
+				case PerceptionType.SetBeliefValue:
+					break;
 
-                    case PerceptionType.Null:
-                        break;
-                }
-            }
+				case PerceptionType.UnSetBeliefValue:
+					break;
+
+				case PerceptionType.UpdateBeliefValue:
+					break;
+
+				case PerceptionType.Null:
+					break;
+				}
+			}
         }
 
         /// <summary>
@@ -237,5 +317,22 @@ namespace AgentLibrary
                 }
             }
         }
+
+
+		/// <summary>
+		/// Adds an event.
+		/// </summary>
+		/// <param name="formula">The formula to reason on.</param>
+		/// <param name="perception">The perception this event reacts to.</param>
+		/// <param name="Plan">The plan to execute.</param>
+		public void AddEvent(string formula, PerceptionType perception, Type Plan)
+		{
+			//If Plan is not of type PlanModel, then throw an exception
+			if (!Plan.BaseType.IsEquivalentTo (typeof(PlanModel)))
+				throw new Exception ("Argument #3 in AddEvent(...) must be of type PlanModel.");
+
+			//Add the event
+			Events.Add (new Tuple<string, PerceptionType> (formula, perception), Plan);
+		}
     }
 }

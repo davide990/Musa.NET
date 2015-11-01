@@ -72,15 +72,24 @@ namespace AgentLibrary
         /// This queue contains the changes to the environment that this agent have to perceive. Since an agent can be busy in doing other
         /// activities such event-handling or execution of plans, the perceived environment changes are accumulated temporarily in this
         /// queue until the agent start a perception activity.
+		/// The key contains the formula(s) to be perceived (AtomicFormula type)
         /// </summary>
         internal Dictionary<IList, PerceptionType> perceivedEnvironementChanges;
         internal object lock_perceivedEnvironmentChanges = new object();
 
         /// <summary>
-        /// This dictionary represents the mailbox of the agent. In this dictionary are collected all the messages that the agent may receive
-        /// from other agents in the same, or different, environment. The messages are read during the agent's reasoning cycle.
+		/// TODO cambiare la descrizione
+		/// 
+        /// This stack is the mailbox of the agent. In this structure are collected all the messages that the agent
+		/// may receive from other agents in the same, or different, environment. The messages are processed, one by 
+		/// one, during the agent's reasoning cycles.
         /// </summary>
-        internal Dictionary<AgentPassport, AgentMessage> mailBox;
+		public Stack<Tuple<AgentPassport, AgentMessage>> MailBox
+		{
+			get { return mailBox; }
+			internal set { mailBox = value; }
+		}
+		internal Stack<Tuple<AgentPassport, AgentMessage>> mailBox;
         internal object lock_mailBox = new object();
 
 		/// <summary>
@@ -96,12 +105,6 @@ namespace AgentLibrary
 		/// The plans collection.
 		/// </summary>
 		private Dictionary<Type, IPlanInstance> PlansCollection;
-
-
-		/// <summary>
-		/// The set of plans that this agent is executing.
-		/// </summary>
-		private HashSet<string> ExecutingPlans;
 
 		/// <summary>
 		/// Gets a value indicating whether this agent is busy (executing a plan).
@@ -187,13 +190,7 @@ namespace AgentLibrary
 			private set { _workScheduleStart = value; }
 		}
 
-		/// <summary>
-		/// Return all the messages received by this agent
-		/// </summary>
-		public List<AgentMessage> MailBox
-		{
-			get { return new List<AgentMessage>(mailBox.Values); }
-		}
+
 
 		/// <summary>
 		/// The role of this agent
@@ -205,16 +202,13 @@ namespace AgentLibrary
 		}
 		private string role;
 
+		public Queue<Type> AgentIntentions
+		{
+			get { return reasoner.AgentIntentions; }
+			private set { reasoner.AgentIntentions = value; }
+		}
+
 		#endregion
-
-        #region Events
-
-        /// <summary>
-        /// Event triggered when this agent receive a new job
-        /// </summary>
-        public event EventHandler jobReceived;
-
-        #endregion
 
         #region Constructors
 
@@ -226,14 +220,12 @@ namespace AgentLibrary
         {
             name = agent_name;
             ID = Guid.NewGuid();
-            jobReceived += onJobReceived;
-
             jobs = new List<AgentJob>();
             roles = new List<AgentRole>();
             workbench = new AgentWorkbench(this);
             reasoner = new AgentReasoner(this);
             perceivedEnvironementChanges = new Dictionary<IList, PerceptionType>();
-            mailBox = new Dictionary<AgentPassport, AgentMessage>();
+			mailBox = new Stack<Tuple<AgentPassport, AgentMessage>> ();// new Dictionary<AgentPassport, AgentMessage>();
 			createdAt = DateTime.Now;
 
 			PlansCollection = new Dictionary<Type, IPlanInstance> ();
@@ -275,22 +267,15 @@ namespace AgentLibrary
         /// Notify to this agent a change occurred within the environment this agent is located.
         /// </summary>
         /// <param name="action">The type of change occurred</param>
-        /// <param name="changes">The data that involved in the environment change</param>
+        /// <param name="changes">The data that involved in the environment change. Each element of [changes] is a 
+		/// formula to be added to this agent's workbench</param>
         internal void notifyEnvironementChanges(PerceptionType action, IList changes)
         {
 			//TODO log environment change
-            Console.WriteLine("[Agent " + name + "] received " + action.ToString() + " -> " + changes.ToString());
+			foreach(var v in changes)
+				Console.WriteLine("[Agent " + name + "] received " + action.ToString() + " -> " + v.ToString());	
+            
             perceivedEnvironementChanges.Add(changes, action);
-        }
-
-        /// <summary>
-        /// Method triggered when this agent schedule a new job.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void onJobReceived(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -364,7 +349,8 @@ namespace AgentLibrary
 				resultFormula = FormulaParser.Parse(result);
 				Workbench.AddStatement(resultFormula);
 
-				Console.Write("[Agent "+Name+"] registered result: "+result);
+				//TODO log register result
+				Console.WriteLine("[Agent "+Name+"] registered result: "+result);
 			}
 			catch(Exception e)
 			{
@@ -408,6 +394,27 @@ namespace AgentLibrary
 			//Execute the plan
 			execute_method.Invoke (the_plan, new object[]{ args });
 		}
+
+		/// <summary>
+		/// Tell this agent to execute the specified plan
+		/// </summary>
+		/// <param name="Plan">Plan.</param>
+		public void Intend(Type Plan)
+		{
+			//TODO implementare
+		}
+
+		/// <summary>
+		/// Adds an event.
+		/// </summary>
+		/// <param name="formula">The formula to reason on.</param>
+		/// <param name="perception">The perception this event reacts to.</param>
+		/// <param name="Plan">The plan to execute.</param>
+		public void AddEvent(string formula, PerceptionType perception, Type Plan)
+		{
+			reasoner.AddEvent (formula, perception, Plan);
+		}
+
 
         #endregion
     }
