@@ -69,13 +69,24 @@ namespace AgentLibrary
         private Thread agent_thread;
 
         /// <summary>
-        /// This queue contains the changes to the environment that this agent have to perceive. Since an agent can be busy in doing other
-        /// activities such event-handling or execution of plans, the perceived environment changes are accumulated temporarily in this
-        /// queue until the agent start a perception activity.
+        /// This queue contains the changes to the environment that this agent have to perceive. Since an agent can be 
+		/// busy in doing other activities such event-handling or execution of plans, the perceived environment changes 
+		/// are accumulated temporarily in this queue until the agent start a perception activity.
 		/// The key contains the formula(s) to be perceived (AtomicFormula type)
         /// </summary>
-        internal Dictionary<IList, PerceptionType> perceivedEnvironementChanges;
-        internal object lock_perceivedEnvironmentChanges = new object();
+		public Stack<Tuple<IList, PerceptionType>> PerceivedEnvironementChanges
+		{
+			get { return perceivedEnvironementChanges; }
+			private set 
+			{
+				lock (lock_perceivedEnvironmentChanges)
+				{
+					perceivedEnvironementChanges = value;
+				}
+			}
+		}
+		private Stack<Tuple<IList, PerceptionType>> perceivedEnvironementChanges;
+        private object lock_perceivedEnvironmentChanges = new object();
 
         /// <summary>
 		/// TODO cambiare la descrizione
@@ -87,10 +98,16 @@ namespace AgentLibrary
 		public Stack<Tuple<AgentPassport, AgentMessage>> MailBox
 		{
 			get { return mailBox; }
-			internal set { mailBox = value; }
+			internal set 
+			{
+				lock(lock_mailBox)
+				{
+					mailBox = value;
+				}
+			}
 		}
-		internal Stack<Tuple<AgentPassport, AgentMessage>> mailBox;
-        internal object lock_mailBox = new object();
+		private Stack<Tuple<AgentPassport, AgentMessage>> mailBox;
+        private object lock_mailBox = new object();
 
 		/// <summary>
 		/// Gets the plans of this agent.
@@ -190,8 +207,6 @@ namespace AgentLibrary
 			private set { _workScheduleStart = value; }
 		}
 
-
-
 		/// <summary>
 		/// The role of this agent
 		/// </summary>
@@ -224,7 +239,7 @@ namespace AgentLibrary
             roles = new List<AgentRole>();
             workbench = new AgentWorkbench(this);
             reasoner = new AgentReasoner(this);
-            perceivedEnvironementChanges = new Dictionary<IList, PerceptionType>();
+			PerceivedEnvironementChanges = new Stack<Tuple<IList, PerceptionType>>();
 			mailBox = new Stack<Tuple<AgentPassport, AgentMessage>> ();// new Dictionary<AgentPassport, AgentMessage>();
 			createdAt = DateTime.Now;
 
@@ -272,10 +287,10 @@ namespace AgentLibrary
         internal void notifyEnvironementChanges(PerceptionType action, IList changes)
         {
 			//TODO log environment change
-			foreach(var v in changes)
-				Console.WriteLine("[Agent " + name + "] received " + action.ToString() + " -> " + v.ToString());	
+			foreach (var v in changes)
+				Console.WriteLine ("[Agent " + name + "] received " + action.ToString () + " -> " + v.ToString ());
             
-            perceivedEnvironementChanges.Add(changes, action);
+			PerceivedEnvironementChanges.Push (new Tuple<IList, PerceptionType> (changes, action));
         }
 
         /// <summary>

@@ -118,12 +118,8 @@ namespace AgentLibrary.Networking
 
             if (receiver == null)
                 return false;
-
-            //lock the receiver agent mail box, and add to it the message
-            lock(receiver.lock_mailBox)
-            {
-				receiver.MailBox.Push (new Tuple<AgentPassport, AgentMessage> (senderData, message));
-            }
+			
+			receiver.MailBox.Push (new Tuple<AgentPassport, AgentMessage> (senderData, message));
             
             return true;
         }
@@ -135,11 +131,7 @@ namespace AgentLibrary.Networking
 
             foreach (Agent a in Environment.RegisteredAgents)
             {
-                //lock the receiver agent mail box, and add to it the message
-                lock (a.lock_mailBox)
-                {
-					a.MailBox.Push (new Tuple<AgentPassport, AgentMessage> (senderData, message));
-                }
+				a.MailBox.Push (new Tuple<AgentPassport, AgentMessage> (senderData, message));
             }
             
             return true;

@@ -141,35 +141,28 @@ namespace AgentLibrary
 				//TODO log here
                 Console.WriteLine("reasoning cycle #"+ currentReasoningCycle++);
                 Console.WriteLine("Checking mail box...");
-                lock (parentAgent.lock_mailBox)
-                {
-                    //Check the mail box
-                    checkMailBox();
-
-					//check events
-					checkEvents ();
-
-                    //Clear it
-                    parentAgent.mailBox.Clear();
-
-
-					//check intentions (plans)
-
-                    Thread.Sleep(1000);
-                }
+                
+				//Check the agent's mail box and update its workbench according to the last received message
+                checkMailBox();
 
                 Console.WriteLine("Checking environment changes...");
-                lock (parentAgent.lock_perceivedEnvironmentChanges)
-                {
-                    //Update the agent workbench
-                    perceptEnvironement();
 
-                    //Trigger possible events caused by the update of agent's workbench
-                    triggerEvents();
+                //Update the agent workbench
+                updateWorkbenchChanges();
 
-                    //Clear the agent's queue of perceived environment changes
-                    parentAgent.perceivedEnvironementChanges.Clear();
-                }
+				//check events
+				checkEvents ();
+
+                //Trigger possible events caused by the update of agent's workbench
+                triggerEvents();
+
+                //Clear the agent's queue of perceived environment changes
+				parentAgent.PerceivedEnvironementChanges.Clear();
+
+
+
+				//check intentions (plans)
+
 
                 Console.WriteLine("######### done reasoning...");
                 Thread.Sleep(ReasoningUpdateTime);
@@ -198,59 +191,64 @@ namespace AgentLibrary
 		}
 
         /// <summary>
-        /// Checks the mail box.
+        /// Checks the agent's mail box.
         /// </summary>
         private void checkMailBox()
         {
-			//TODO solo un messaggio alla volta viene processato
-            //foreach (KeyValuePair<AgentPassport, AgentMessage> p in parentAgent.mailBox)
-			AgentPassport passport;
-			AgentMessage msg;
-			foreach (Tuple<AgentPassport, AgentMessage> p in parentAgent.MailBox) 
+			if (parentAgent.MailBox.Count <= 0)
+				return;
+			//Take the last message within the mail box
+			Tuple<AgentPassport, AgentMessage> last_message = parentAgent.MailBox.Pop ();
+			AgentPassport passport = last_message.Item1;
+			AgentMessage msg = last_message.Item2;
+
+			//TODO log checked mailbox
+
+			//process the message
+			switch (msg.InfoType) 
 			{
-				msg = p.Item2 as AgentMessage;
-				passport = p.Item1 as AgentPassport;
+			case InformationType.Tell:
+				Console.WriteLine ("[" + parentAgent.Name + "] perceiving TELL: " + msg.ToString ());
+				parentAgent.Workbench.AddStatement (FormulaParser.Parse (msg.Message as string));
+				break;
 
-				switch (msg.InfoType) 
-				{
-				case InformationType.Tell:
-					Console.WriteLine ("[" + parentAgent.Name + "] perceiving TELL: " + msg.ToString ());
-					parentAgent.Workbench.AddStatement (FormulaParser.Parse (msg.Message as string));
-					break;
+			case InformationType.Untell:
+				Console.WriteLine ("[" + parentAgent.Name + "] perceiving UNTELL: " + msg.ToString ());
+				parentAgent.Workbench.RemoveStatement (FormulaParser.Parse (msg.Message as string));
+				break;
 
-				case InformationType.Untell:
-					Console.WriteLine ("[" + parentAgent.Name + "] perceiving UNTELL: " + msg.ToString ());
-					parentAgent.Workbench.RemoveStatement (FormulaParser.Parse (msg.Message as string));
-					break;
+			case InformationType.Achieve:
 
-				case InformationType.Achieve:
+                    //!!!
 
-                        //!!!
-
-					break;
-				
-				}
-            }
+				break;
+			}
         }
 
         /// <summary>
-        /// Percept the environment changes and updates the workbench of the parent agent and trigger events.
+        /// Percept the environment changes and updates the workbench of the parent agent
         /// </summary>
-        private void perceptEnvironement()
+        private void updateWorkbenchChanges()
         {
-            if (parentAgent.perceivedEnvironementChanges.Count <= 0)
+			if (parentAgent.PerceivedEnvironementChanges.Count <= 0)
                 return;
 
-			foreach (KeyValuePair<IList, PerceptionType> p in parentAgent.perceivedEnvironementChanges) 
+			foreach (Tuple<IList, PerceptionType> p in parentAgent.PerceivedEnvironementChanges) 
 			{
-				switch (p.Value) 
+				IList changes_list = p.Item1;
+				PerceptionType perception_type = p.Item2;
+
+				switch (perception_type) 
 				{
 				case PerceptionType.AddBelief:
 					//Add the statement to the agent's workbench
-					parentAgent.Workbench.AddStatement (p.Key);
+					parentAgent.Workbench.AddStatement (changes_list);
+
+
+
 
 					//Check for event 
-					foreach (AtomicFormula formula in p.Key)
+					/*foreach (AtomicFormula formula in p.Key)
 					{
 						Console.WriteLine ("[" + parentAgent.Name + "] perceiving " + p.Value.ToString () + ": " + formula.ToString());
 
@@ -258,11 +256,11 @@ namespace AgentLibrary
 						Events.TryGetValue (new Tuple<string, PerceptionType> (formula.ToString (), p.Value), out plan_to_execute);
 						if (plan_to_execute != null) 
 							AgentIntentions.Enqueue (plan_to_execute);
-					}
+					}*/
 					break;
 
 				case PerceptionType.RemoveBelief:
-					parentAgent.Workbench.AddStatement (p.Key);
+					parentAgent.Workbench.AddStatement (changes_list);
 					break;
 
 				case PerceptionType.SetBeliefValue:
@@ -285,12 +283,15 @@ namespace AgentLibrary
         /// </summary>
         private void triggerEvents()
         {
-            if (parentAgent.perceivedEnvironementChanges.Count <= 0)
+			if (parentAgent.PerceivedEnvironementChanges.Count <= 0)
                 return;
 
-            foreach (KeyValuePair<IList, PerceptionType> p in parentAgent.perceivedEnvironementChanges)
+			foreach (Tuple<IList, PerceptionType> p in parentAgent.PerceivedEnvironementChanges) 
             {
-                switch (p.Value)
+				IList changes_list = p.Item1;
+				PerceptionType perception_type = p.Item2;
+
+                switch (perception_type)
                 {
                     case PerceptionType.AddBelief:
                         //TRIGGER
