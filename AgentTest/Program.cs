@@ -67,11 +67,8 @@ namespace AgentTest
 		void wella(Dictionary<string,object> args)
 		{
 			Console.WriteLine ("Ciao!");
-			//Thread.Sleep (5000);
-
 			ExecuteStep ("other_step1");
 		}
-
 
 		[PlanStep]
 		void other_step1()

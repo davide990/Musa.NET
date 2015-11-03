@@ -217,11 +217,6 @@ namespace AgentLibrary
 		}
 		private string role;
 
-		public Queue<Type> AgentIntentions
-		{
-			get { return reasoner.AgentIntentions; }
-			private set { reasoner.AgentIntentions = value; }
-		}
 
 		#endregion
 
@@ -387,8 +382,8 @@ namespace AgentLibrary
 			if (!Plan.BaseType.IsEquivalentTo (typeof(PlanModel)))
 				throw new Exception ("Argument #1 in ExecutePlan(Type) must be of type PlanModel.");
 			
-			Type planInstanceType = typeof(PlanInstance<>).MakeGenericType (Plan);
-			IPlanInstance the_plan = null;
+			Type planInstanceType 	= typeof(PlanInstance<>).MakeGenericType (Plan);
+			IPlanInstance the_plan 	= null;
 
 			//Search for the input plan
 			PlansCollection.TryGetValue(Plan, out the_plan );

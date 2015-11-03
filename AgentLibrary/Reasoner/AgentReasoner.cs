@@ -52,50 +52,46 @@ namespace AgentLibrary
         }
 
 		/// <summary>
-		/// Gets the the set of intentions of the agent, that is, the set of plans that the agent is intended to 
-		/// execute.
+		/// The events catalogue this agent reacts to. The key is a couple Formula-Perception type, while the value is a PlanModel
+		///  that indicates the plan to execute.
 		/// </summary>
-		public Queue<Type> AgentIntentions
+		public Dictionary<Tuple<string, PerceptionType>, Type> EventsCatalogue
 		{
-			get { return intentions; }
-			set 
-			{ 
-				lock(intentions_lock)
+			get { return eventsCatalogue; }
+			private set 
+			{
+				lock (events_catalogue_lock) 
 				{
-					intentions = value;	
+					eventsCatalogue = value; 
 				}
 			}
 		}
-		private Queue<Type> intentions;
-		private object intentions_lock;
+		private Dictionary<Tuple<string, PerceptionType>, Type> eventsCatalogue;
+		private object events_catalogue_lock;
 
-		/// <summary>
-		/// The events this agent reacts to. The key is a couple Formula-Perception type, while the value is a PlanModel
-		///  that indicates the plan to execute.
-		/// </summary>
-		public Dictionary<Tuple<string,PerceptionType>, Type> Events
+
+		public Stack<Tuple<string, PerceptionType, Type>> Events 
 		{
 			get { return events; }
 			private set 
 			{
-				lock(events_lock)
+				lock (events_lock) 
 				{
 					events = value; 
 				}
 			}
 		}
-		private Dictionary<Tuple<string,PerceptionType>, Type> events;
+		private Stack<Tuple<string, PerceptionType, Type>> events;
 		private object events_lock;
 
 
         public AgentReasoner(Agent agent)
         {
-			intentions_lock = new object ();
 			events_lock 	= new object ();
+			events_catalogue_lock = new object ();
 
-			Events = new Dictionary<Tuple<string, PerceptionType>, Type> ();
-
-			AgentIntentions = new Queue<Type> ();
+			EventsCatalogue = new Dictionary<Tuple<string, PerceptionType>, Type> ();
+			Events = new Stack<Tuple<string, PerceptionType, Type>> ();
 
             parentAgent 	= agent;
             AgentThread      = new Thread(new ThreadStart(agentReasoningMain));
@@ -147,48 +143,26 @@ namespace AgentLibrary
 
                 Console.WriteLine("Checking environment changes...");
 
-                //Update the agent workbench
+				Thread.Sleep (500);
+
+	            //Update the agent workbench
                 updateWorkbenchChanges();
 
-				//check events
-				checkEvents ();
+				Thread.Sleep (500);
 
-                //Trigger possible events caused by the update of agent's workbench
-                triggerEvents();
+				//check events
+				checkEventToTrigger ();
+				triggerEvent ();
 
                 //Clear the agent's queue of perceived environment changes
 				parentAgent.PerceivedEnvironementChanges.Clear();
 
-
-
 				//check intentions (plans)
-
 
                 Console.WriteLine("######### done reasoning...");
                 Thread.Sleep(ReasoningUpdateTime);
-                //#Environment percept
-                //-> percept belief changes in environment
-                //-> percept/trigger events
-                //#Jobs scheduling
-                //-> dequeue and execute
             }
         }
-
-		/// <summary>
-		/// Checks the events.
-		/// </summary>
-		private void checkEvents()
-		{
-			/**
-				per ogni messaggio MSG ricevuto
-				{
-					Se MSG è contenuto in events e il tipo di messaggio è uguale al tipo di percezione dell'evento,
-					  aggiungi il piano corrispondente alle intenzioni
-				}
-
-			*/
-
-		}
 
         /// <summary>
         /// Checks the agent's mail box.
@@ -233,7 +207,7 @@ namespace AgentLibrary
 			if (parentAgent.PerceivedEnvironementChanges.Count <= 0)
                 return;
 
-			foreach (Tuple<IList, PerceptionType> p in parentAgent.PerceivedEnvironementChanges) 
+			foreach (Tuple<IList, PerceptionType> p in parentAgent.PerceivedEnvironementChanges)
 			{
 				IList changes_list = p.Item1;
 				PerceptionType perception_type = p.Item2;
@@ -243,12 +217,9 @@ namespace AgentLibrary
 				case PerceptionType.AddBelief:
 					//Add the statement to the agent's workbench
 					parentAgent.Workbench.AddStatement (changes_list);
-
-
-
-
+					 
 					//Check for event 
-					/*foreach (AtomicFormula formula in p.Key)
+					/*foreach (AtomicFormula formula in changes_list)
 					{
 						Console.WriteLine ("[" + parentAgent.Name + "] perceiving " + p.Value.ToString () + ": " + formula.ToString());
 
@@ -278,47 +249,49 @@ namespace AgentLibrary
 			}
         }
 
-        /// <summary>
-        /// Trigger events. Events triggers may be caused by the agent's perception of changes within the environment.
-        /// </summary>
-        private void triggerEvents()
-        {
-			if (parentAgent.PerceivedEnvironementChanges.Count <= 0)
-                return;
 
+		/// <summary>
+		/// Given the perceived evironment changes, checks for the events to trigger.
+		/// </summary>
+		private void checkEventToTrigger()
+		{
+			Type plan_to_execute = null;
 			foreach (Tuple<IList, PerceptionType> p in parentAgent.PerceivedEnvironementChanges) 
-            {
+			{
 				IList changes_list = p.Item1;
 				PerceptionType perception_type = p.Item2;
 
-                switch (perception_type)
-                {
-                    case PerceptionType.AddBelief:
-                        //TRIGGER
-                        break;
+				foreach (AtomicFormula formula in changes_list) 
+				{
+					EventsCatalogue.TryGetValue (new Tuple<string, PerceptionType> (formula.ToString (), perception_type), out plan_to_execute);
 
-                    case PerceptionType.RemoveBelief:
-                        //TRIGGER
-                        break;
+					if (plan_to_execute != null)
+						Events.Push (new Tuple<string, PerceptionType, Type> (formula.ToString (), perception_type, plan_to_execute));
 
-                    case PerceptionType.SetBeliefValue:
-                        //TRIGGER
-                        break;
+					plan_to_execute = null;
+				}
+			}
+		}
 
-                    case PerceptionType.UnSetBeliefValue:
-                        //TRIGGER
-                        break;
 
-                    case PerceptionType.UpdateBeliefValue:
-                        //TRIGGER
-                        break;
+        /// <summary>
+        /// Trigger events. Events triggers may be caused by the agent's perception of changes within the environment.
+        /// </summary>
+        private void triggerEvent()
+        {
+			if (Events.Count <= 0)
+				return;
 
-                    case PerceptionType.Null:
-                        break;
-                }
-            }
+			Tuple<string, PerceptionType, Type> eventTuple = Events.Pop ();
+
+			string formula = eventTuple.Item1;
+			PerceptionType perception_type = eventTuple.Item2;
+			Type plan_to_execute = eventTuple.Item3;
+
+			//Execute the plan (if exists)
+			//TODO args here
+			parentAgent.ExecutePlan (plan_to_execute);
         }
-
 
 		/// <summary>
 		/// Adds an event.
@@ -333,7 +306,7 @@ namespace AgentLibrary
 				throw new Exception ("Argument #3 in AddEvent(...) must be of type PlanModel.");
 
 			//Add the event
-			Events.Add (new Tuple<string, PerceptionType> (formula, perception), Plan);
+			EventsCatalogue.Add (new Tuple<string, PerceptionType> (formula, perception), Plan);
 		}
     }
 }
