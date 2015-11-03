@@ -136,7 +136,7 @@ namespace AgentLibrary
 		/// <summary>
 		/// Gets the plan's name that this agent is currently executing.
 		/// </summary>
-		public string CurrentExecutingPlan
+		public IPlanInstance CurrentExecutingPlan
 		{
 			get
 			{
@@ -148,7 +148,7 @@ namespace AgentLibrary
 
 			private set { current_executing_plan = value; }
 		}
-		private string current_executing_plan;
+		private IPlanInstance current_executing_plan;
 
         #endregion
 
@@ -300,6 +300,28 @@ namespace AgentLibrary
         }
 
 		/// <summary>
+		/// Pause this agent's execution.
+		/// </summary>
+		public void Pause()
+		{
+			reasoner.pauseReasoning ();
+			CurrentExecutingPlan.Pause ();
+			Console.WriteLine ("##PAUSE##");
+		}
+
+		/// <summary>
+		/// Resume this agent's execution.
+		/// </summary>
+		public void Resume()
+		{
+			Console.WriteLine ("##RESUME##");
+			reasoner.resumeReasoning ();
+			CurrentExecutingPlan.Resume ();
+
+		}
+
+
+		/// <summary>
 		/// Adds a plan to this agent.
 		/// </summary>
 		/// <returns><c>true</c>, if plan was added, <c>false</c> otherwise.</returns>
@@ -352,19 +374,14 @@ namespace AgentLibrary
 		/// <param name="result">Result.</param>
 		private void onPlanInstanceRegisterResult(string result)
 		{
-			Formula resultFormula = null;
+			Formula resultFormula = FormulaParser.Parse(result);;
 
-			try
+			if(resultFormula != null)
 			{
-				resultFormula = FormulaParser.Parse(result);
 				Workbench.AddStatement(resultFormula);
 
 				//TODO log register result
-				Console.WriteLine("[Agent "+Name+"] registered result: "+result);
-			}
-			catch(Exception e)
-			{
-				Console.WriteLine ("Unable to parse formula '" + result + "'.\n" + e.Message);
+				Console.WriteLine("[Agent "+Name+"] registered result: "+result);	
 			}
 		}
 
@@ -399,10 +416,14 @@ namespace AgentLibrary
 			Busy = true;
 
 			//Set the value for CurrentExecutingPlan 
-			CurrentExecutingPlan = Plan.Name;
+			CurrentExecutingPlan = the_plan;
 
 			//Execute the plan
 			execute_method.Invoke (the_plan, new object[]{ args });
+
+			//TODO migliorare il sistema di bloccaggio delll'agente
+			//Lock the agent's reasoning life cycle until the invoked plan terminates its execution
+			while (Busy);
 		}
 
 		/// <summary>

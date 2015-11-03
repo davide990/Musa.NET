@@ -34,10 +34,24 @@ namespace AgentTest
         static void Main(string[] args)
         {
             //startMUSA();
+
+
+
 			AgentEnvironement env = AgentEnvironement.GetInstance();
 			Agent a = new Agent ("agent_1").Start();
-			a.AddPlan (typeof(PlanExample2));
-			a.AddEvent ("f(x)", PerceptionType.AddBelief, typeof(PlanExample2));
+
+			BackgroundWorker wk = new BackgroundWorker ();
+			wk.DoWork += delegate 
+			{
+				Thread.Sleep(10000);
+				a.Pause();
+				Thread.Sleep(20000);
+				a.Resume();
+			};
+			wk.RunWorkerAsync ();
+
+			a.AddPlan (typeof(PlanExample));
+			a.AddEvent ("f(x)", PerceptionType.AddBelief, typeof(PlanExample));
 
 			env.RegisterAgent (a);
 
@@ -73,7 +87,13 @@ namespace AgentTest
 		[PlanStep]
 		void other_step1()
 		{
-			RegisterResult ("f(x)");
+			Console.WriteLine ("Ciao 2");
+			Thread.Sleep (500);
+
+			Console.WriteLine ("Ciao 3");
+			Thread.Sleep (50000);
+
+			//RegisterResult ("f(x)");
 		}
 	}
 
@@ -84,10 +104,11 @@ namespace AgentTest
 		[PlanEntryPoint]
 		void entry_point(Dictionary<string,object> args)
 		{
-			object a;
-			args.TryGetValue ("nome",out a);
+			//object a;
+			//args.TryGetValue ("nome",out a);
 
-			Console.WriteLine ("Hello from " + EntryPointName + " to " + a.ToString());
+			//Console.WriteLine ("Hello from " + EntryPointName + " to " + a.ToString());
+			Console.WriteLine ("Hello plan =)");
 
 			ExecuteStep ("wella", new Dictionary<string, object> (){ { "nome", "davide" } });
 		}

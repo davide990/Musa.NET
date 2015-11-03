@@ -16,6 +16,16 @@ namespace PlanLibrary
 		/// Gets the name of this plan.
 		/// </summary>
 		string GetName();
+
+		/// <summary>
+		/// Pause this plan instance.
+		/// </summary>
+		void Pause();
+
+		/// <summary>
+		/// Resume this plan instance.
+		/// </summary>
+		void Resume();
 	}
 
 	/// <summary>
@@ -216,6 +226,7 @@ namespace PlanLibrary
 
 		#endregion Background worker methods
 
+
 		#region Methods
 
 		/// <summary>
@@ -250,7 +261,6 @@ namespace PlanLibrary
 			else
 			{
 				//TODO decidere se generare una eccezione o non fare nulla
-				//Else, ...
 				throw new Exception("Plan '"+Name+"' already running.");
 			}
 		}
@@ -304,6 +314,15 @@ namespace PlanLibrary
 				else
 					Console.WriteLine (e.ToString ());
 			}
+		}
+
+		/// <summary>
+		/// Returns a string that represents the current <see cref="PlanLibrary.PlanInstance`1"/>.
+		/// </summary>
+		/// <returns>A <see cref="System.String"/> that represents the current <see cref="PlanLibrary.PlanInstance`1"/>.</returns>
+		public override string ToString ()
+		{
+			return Name;
 		}
 
 		#region IPlanInstance inherithed methods

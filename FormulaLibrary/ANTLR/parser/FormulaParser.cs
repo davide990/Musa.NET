@@ -12,6 +12,7 @@ using Antlr4.Runtime.Tree;
 using FormulaLibrary.ANTLR.visitor;
 using System.IO;
 using System.Text;
+using System;
 
 namespace FormulaLibrary.ANTLR
 {
@@ -31,17 +32,29 @@ namespace FormulaLibrary.ANTLR
 
             // convert stream to string
             StreamReader reader = new StreamReader(m_stream);
+			AntlrInputStream stream = new AntlrInputStream(reader);
+			ITokenSource lexer = new formula_grammarLexer(stream);
+			ITokenStream tokens = new CommonTokenStream(lexer);
+			formula_grammarParser parser = new formula_grammarParser(tokens);
 
-            AntlrInputStream stream = new AntlrInputStream(reader);
-            ITokenSource lexer = new formula_grammarLexer(stream);
-            ITokenStream tokens = new CommonTokenStream(lexer);
-            formula_grammarParser parser = new formula_grammarParser(tokens);
-            
-            IParseTree tree = parser.disjunction();
+			//Invoke the parser
+			IParseTree tree = parser.disjunction();	
+			/*
+			catch(Exception e)
+			{
+				if (e is InputMismatchException)
+					Console.WriteLine ("Input '" + formula + "' is not a valid formula.\n" + e.Message);
+				if (e is RecognitionException)
+					Console.WriteLine ("Recognition exception with formula '" + formula + "'.\n" + e.Message);
+
+				return null;
+			}                
+            */
             Formula formulaObject;
             using (FormulaVisitor vv = new FormulaVisitor())
             {
-                formulaObject = vv.Visit(tree);
+				//Visit the parse tree
+				formulaObject = vv.Visit(tree);	     
             }
 
             stream.Reset();

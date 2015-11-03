@@ -85,17 +85,36 @@ namespace AgentLibrary
 		private object events_lock;
 
 
+		/// <summary>
+		/// Gets a value indicating whether this reasoner is running.
+		/// </summary>
+		public bool IsRunning
+		{
+			get { return is_running; }
+			private set 
+			{ 
+				lock(is_running_lock)
+				{
+					is_running = value;	
+				}
+			}
+		}
+		private bool is_running;
+		private object is_running_lock;
+
+
         public AgentReasoner(Agent agent)
         {
 			events_lock 	= new object ();
 			events_catalogue_lock = new object ();
+			is_running_lock = new object ();
 
 			EventsCatalogue = new Dictionary<Tuple<string, PerceptionType>, Type> ();
 			Events = new Stack<Tuple<string, PerceptionType, Type>> ();
 
-            parentAgent 	= agent;
-            AgentThread      = new Thread(new ThreadStart(agentReasoningMain));
-            AgentThread.Name = parentAgent.Name;
+            parentAgent 		= agent;
+            AgentThread      	= new Thread(new ThreadStart(agentReasoningMain));
+            AgentThread.Name 	= parentAgent.Name;
         }
 
         internal void startReasoning()
@@ -103,11 +122,13 @@ namespace AgentLibrary
 			//TODO log this
             //TODO segna un timestamp in cui inizia il reasoning
             Console.WriteLine("Starting agent [" + parentAgent.Name + "] reasoning...");
-            AgentThread.Start();
+			IsRunning = true;
+			AgentThread.Start();
         }
 
         public void stopReasoning()
         {
+			IsRunning = false;
 			//TODO log this
             //TODO segna un timestamp in cui ferma il reasoning
 
@@ -115,6 +136,7 @@ namespace AgentLibrary
 
         public void pauseReasoning()
         {
+			IsRunning = false;
 			//TODO log this
             //TODO segna un timestamp in cui pausa il reasoning
             
@@ -122,6 +144,7 @@ namespace AgentLibrary
 
         public void resumeReasoning()
         {
+			IsRunning = true;
 			//TODO log this
             //TODO segna un timestamp in cui ripristina il reasoning
             
@@ -132,7 +155,7 @@ namespace AgentLibrary
 		/// </summary>
         private void agentReasoningMain()
         {
-            while(true)
+			while(IsRunning)
             {
 				//TODO log here
                 Console.WriteLine("reasoning cycle #"+ currentReasoningCycle++);
