@@ -143,7 +143,6 @@ namespace PlanLibrary
 			if(RegisterResult != null) 
 			{
 				//TODO log result to logger
-				//background_worker.ReportProgress(0,result);
 				RegisterResult (result);
 			}
 			else

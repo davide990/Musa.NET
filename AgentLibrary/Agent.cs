@@ -305,6 +305,8 @@ namespace AgentLibrary
 		public void Pause()
 		{
 			reasoner.pauseReasoning ();
+
+			//Check if plan is ATOMIC
 			CurrentExecutingPlan.Pause ();
 			Console.WriteLine ("##PAUSE##");
 		}
@@ -427,10 +429,9 @@ namespace AgentLibrary
 		}
 
 		/// <summary>
-		/// Tell this agent to execute the specified plan
+		/// Tell this agent to achieve a goal by executing a specified plan
 		/// </summary>
-		/// <param name="Plan">Plan.</param>
-		public void Intend(Type Plan)
+		public void AchieveGoal(Type Plan)
 		{
 			//TODO implementare
 		}
@@ -441,9 +442,10 @@ namespace AgentLibrary
 		/// <param name="formula">The formula to reason on.</param>
 		/// <param name="perception">The perception this event reacts to.</param>
 		/// <param name="Plan">The plan to execute.</param>
-		public void AddEvent(string formula, PerceptionType perception, Type Plan)
+		/// <param name="Args">The plan to execute.</param>
+		public void AddEvent(string formula, PerceptionType perception, Type Plan, Dictionary<string,object> Args = null)
 		{
-			reasoner.AddEvent (formula, perception, Plan);
+			reasoner.AddEvent (formula, perception, Plan, Args);
 		}
 
 

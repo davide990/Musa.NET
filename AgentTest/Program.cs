@@ -48,15 +48,16 @@ namespace AgentTest
 				Thread.Sleep(20000);
 				a.Resume();
 			};
-			wk.RunWorkerAsync ();
+			//wk.RunWorkerAsync ();
 
 			a.AddPlan (typeof(PlanExample));
-			a.AddEvent ("f(x)", PerceptionType.AddBelief, typeof(PlanExample));
-
+			a.AddPlan (typeof(PlanForEvent));
+			//a.AddEvent ("f(x)", PerceptionType.AddBelief, typeof(PlanExample));
+			a.AddEvent ("f(x)", PerceptionType.AddBelief, typeof(PlanForEvent), new Dictionary<string, object> (){ {"nome", "davide"} });
 			env.RegisterAgent (a);
 
 			env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
-
+			env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
 
 
 			//a.ExecutePlan (typeof(PlanExample2));
@@ -73,6 +74,21 @@ namespace AgentTest
 		}
 
     }
+
+
+	[Plan]
+	class PlanForEvent : PlanModel
+	{
+		[PlanEntryPoint]
+		void entry_point(Dictionary<string, object> args)
+		{
+			object a;
+			args.TryGetValue ("nome",out a);
+
+			Console.WriteLine ("Hello from " + EntryPointName + " to " + a.ToString());
+		}
+	}
+
 
 	[Plan]
 	class PlanExample2 : PlanModel

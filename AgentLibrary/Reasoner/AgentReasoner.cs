@@ -35,7 +35,7 @@ namespace AgentLibrary
     public sealed class AgentReasoner
     {
         private int currentReasoningCycle = 0;
-		private readonly int ReasoningUpdateTime = 5000;
+		private readonly int ReasoningUpdateTime = 500;
 
         /// <summary>
         /// The agent this reasoner belongs to
@@ -68,6 +68,21 @@ namespace AgentLibrary
 		}
 		private Dictionary<Tuple<string, PerceptionType>, Type> eventsCatalogue;
 		private object events_catalogue_lock;
+
+
+		public Dictionary<Tuple<string, PerceptionType>, Dictionary<string,object>> EventsArgs
+		{
+			get { return events_args; }
+			private set 
+			{
+				lock (events_args_lock) 
+				{
+					events_args = value; 
+				}
+			}
+		}
+		private Dictionary<Tuple<string, PerceptionType>, Dictionary<string,object>> events_args;
+		private object events_args_lock;
 
 
 		public Stack<Tuple<string, PerceptionType, Type>> Events 
@@ -107,10 +122,12 @@ namespace AgentLibrary
         {
 			events_lock 	= new object ();
 			events_catalogue_lock = new object ();
+			events_args_lock = new object ();
 			is_running_lock = new object ();
 
 			EventsCatalogue = new Dictionary<Tuple<string, PerceptionType>, Type> ();
 			Events = new Stack<Tuple<string, PerceptionType, Type>> ();
+			EventsArgs = new Dictionary<Tuple<string, PerceptionType>, Dictionary<string, object>> ();
 
             parentAgent 		= agent;
             AgentThread      	= new Thread(new ThreadStart(agentReasoningMain));
@@ -136,6 +153,7 @@ namespace AgentLibrary
 
         public void pauseReasoning()
         {
+			Console.WriteLine ("### " + parentAgent.Name + " PAUSED ###");
 			IsRunning = false;
 			//TODO log this
             //TODO segna un timestamp in cui pausa il reasoning
@@ -144,6 +162,7 @@ namespace AgentLibrary
 
         public void resumeReasoning()
         {
+			Console.WriteLine ("### " + parentAgent.Name + " RESUMED ###");
 			IsRunning = true;
 			//TODO log this
             //TODO segna un timestamp in cui ripristina il reasoning
@@ -155,7 +174,7 @@ namespace AgentLibrary
 		/// </summary>
         private void agentReasoningMain()
         {
-			while(IsRunning)
+			while (IsRunning)
             {
 				//TODO log here
                 Console.WriteLine("reasoning cycle #"+ currentReasoningCycle++);
@@ -194,15 +213,16 @@ namespace AgentLibrary
         {
 			if (parentAgent.MailBox.Count <= 0)
 				return;
+			
 			//Take the last message within the mail box
 			Tuple<AgentPassport, AgentMessage> last_message = parentAgent.MailBox.Pop ();
-			AgentPassport passport = last_message.Item1;
-			AgentMessage msg = last_message.Item2;
+			AgentPassport passport 	= last_message.Item1;
+			AgentMessage msg 		= last_message.Item2;
 
 			//TODO log checked mailbox
 
 			//process the message
-			switch (msg.InfoType) 
+			switch (msg.InfoType)
 			{
 			case InformationType.Tell:
 				Console.WriteLine ("[" + parentAgent.Name + "] perceiving TELL: " + msg.ToString ());
@@ -213,9 +233,8 @@ namespace AgentLibrary
 				Console.WriteLine ("[" + parentAgent.Name + "] perceiving UNTELL: " + msg.ToString ());
 				parentAgent.Workbench.RemoveStatement (FormulaParser.Parse (msg.Message as string));
 				break;
-
+			
 			case InformationType.Achieve:
-
                     //!!!
 
 				break;
@@ -238,23 +257,11 @@ namespace AgentLibrary
 				switch (perception_type) 
 				{
 				case PerceptionType.AddBelief:
-					//Add the statement to the agent's workbench
 					parentAgent.Workbench.AddStatement (changes_list);
-					 
-					//Check for event 
-					/*foreach (AtomicFormula formula in changes_list)
-					{
-						Console.WriteLine ("[" + parentAgent.Name + "] perceiving " + p.Value.ToString () + ": " + formula.ToString());
-
-						Type plan_to_execute = null;
-						Events.TryGetValue (new Tuple<string, PerceptionType> (formula.ToString (), p.Value), out plan_to_execute);
-						if (plan_to_execute != null) 
-							AgentIntentions.Enqueue (plan_to_execute);
-					}*/
 					break;
 
 				case PerceptionType.RemoveBelief:
-					parentAgent.Workbench.AddStatement (changes_list);
+					parentAgent.Workbench.RemoveStatement (changes_list);
 					break;
 
 				case PerceptionType.SetBeliefValue:
@@ -274,46 +281,55 @@ namespace AgentLibrary
 
 
 		/// <summary>
-		/// Given the perceived evironment changes, checks for the events to trigger.
+		/// Given the perceived evironment changes, checks for the events to trigger. Only ONE event is trigged for
+		/// reasoning cycle is handled.
 		/// </summary>
 		private void checkEventToTrigger()
 		{
+			if (parentAgent.PerceivedEnvironementChanges.Count <= 0)
+				return;
+
 			Type plan_to_execute = null;
-			foreach (Tuple<IList, PerceptionType> p in parentAgent.PerceivedEnvironementChanges) 
+			Tuple<IList, PerceptionType> p = parentAgent.PerceivedEnvironementChanges.Pop ();
+			IList changes_list = p.Item1;
+			PerceptionType perception_type = p.Item2;
+
+			foreach (AtomicFormula formula in changes_list) 
 			{
-				IList changes_list = p.Item1;
-				PerceptionType perception_type = p.Item2;
+				EventsCatalogue.TryGetValue (new Tuple<string, PerceptionType> (formula.ToString (), perception_type), out plan_to_execute);
 
-				foreach (AtomicFormula formula in changes_list) 
-				{
-					EventsCatalogue.TryGetValue (new Tuple<string, PerceptionType> (formula.ToString (), perception_type), out plan_to_execute);
+				if (plan_to_execute != null)
+					Events.Push (new Tuple<string, PerceptionType, Type> (formula.ToString (), perception_type, plan_to_execute));
 
-					if (plan_to_execute != null)
-						Events.Push (new Tuple<string, PerceptionType, Type> (formula.ToString (), perception_type, plan_to_execute));
-
-					plan_to_execute = null;
-				}
+				//set plan_to_execute to null for the next iteration
+				plan_to_execute = null;
 			}
 		}
 
 
         /// <summary>
-        /// Trigger events. Events triggers may be caused by the agent's perception of changes within the environment.
+		/// Trigger the top event within the events stack. Events may be triggered by the agent's perception of changes
+		/// within the environment it's located. 
         /// </summary>
         private void triggerEvent()
         {
+			//Do nothing if the events stack is empty
 			if (Events.Count <= 0)
 				return;
 
+			//Get the top event, and their info
 			Tuple<string, PerceptionType, Type> eventTuple = Events.Pop ();
 
-			string formula = eventTuple.Item1;
-			PerceptionType perception_type = eventTuple.Item2;
-			Type plan_to_execute = eventTuple.Item3;
+			string formula 					= eventTuple.Item1;
+			PerceptionType perception_type 	= eventTuple.Item2;
+			Type plan_to_execute 			= eventTuple.Item3;
+
+			//Try get values related to this event
+			Dictionary<string,object> args = null;
+			EventsArgs.TryGetValue (new Tuple<string, PerceptionType> (formula, perception_type), out args);
 
 			//Execute the plan (if exists)
-			//TODO args here
-			parentAgent.ExecutePlan (plan_to_execute);
+			parentAgent.ExecutePlan (plan_to_execute, args);
         }
 
 		/// <summary>
@@ -322,14 +338,23 @@ namespace AgentLibrary
 		/// <param name="formula">The formula to reason on.</param>
 		/// <param name="perception">The perception this event reacts to.</param>
 		/// <param name="Plan">The plan to execute.</param>
-		public void AddEvent(string formula, PerceptionType perception, Type Plan)
+		public void AddEvent(string formula, PerceptionType perception, Type Plan, Dictionary<string,object> Args = null)
 		{
 			//If Plan is not of type PlanModel, then throw an exception
 			if (!Plan.BaseType.IsEquivalentTo (typeof(PlanModel)))
 				throw new Exception ("Argument #3 in AddEvent(...) must be of type PlanModel.");
+			
+			Tuple<string,PerceptionType> the_key = new Tuple<string, PerceptionType> (formula, perception);
+
+			//Check if the event is already contained within the agent's event catalogue
+			if (EventsCatalogue.ContainsKey (the_key))
+				return;
 
 			//Add the event
-			EventsCatalogue.Add (new Tuple<string, PerceptionType> (formula, perception), Plan);
+			EventsCatalogue.Add (the_key, Plan);
+
+			//Add the event's args
+			EventsArgs.Add (the_key, Args);
 		}
     }
 }
