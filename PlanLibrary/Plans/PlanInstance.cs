@@ -26,6 +26,11 @@ namespace PlanLibrary
 		/// Resume this plan instance.
 		/// </summary>
 		void Resume();
+
+		/// <summary>
+		/// Determines whether this plan is atomic.
+		/// </summary>
+		bool IsAtomic();
 	}
 
 	/// <summary>
@@ -329,6 +334,11 @@ namespace PlanLibrary
 		public string GetName()
 		{
 			return Name;
+		}
+
+		public bool IsAtomic()
+		{
+			return plan_model.IsAtomic;
 		}
 
 		#endregion IPlanInstance inherithed methods

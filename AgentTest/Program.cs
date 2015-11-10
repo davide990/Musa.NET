@@ -45,19 +45,21 @@ namespace AgentTest
 			{
 				Thread.Sleep(10000);
 				a.Pause();
-				Thread.Sleep(20000);
+				Thread.Sleep(10000);
 				a.Resume();
 			};
-			//wk.RunWorkerAsync ();
+			wk.RunWorkerAsync ();
 
 			a.AddPlan (typeof(PlanExample));
 			a.AddPlan (typeof(PlanForEvent));
-			//a.AddEvent ("f(x)", PerceptionType.AddBelief, typeof(PlanExample));
-			a.AddEvent ("f(x)", PerceptionType.AddBelief, typeof(PlanForEvent), new Dictionary<string, object> (){ {"nome", "davide"} });
+			a.AddEvent ("f(x)", PerceptionType.AddBelief, typeof(PlanExample));
+			//a.AddEvent ("f(x)", PerceptionType.AddBelief, typeof(PlanForEvent), new Dictionary<string, object> (){ {"nome", "davide"} });
 			env.RegisterAgent (a);
 
 			env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
-			env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
+
+			//non succede nulla quando lo faccio due volte di fila
+			//env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
 
 
 			//a.ExecutePlan (typeof(PlanExample2));
@@ -75,7 +77,6 @@ namespace AgentTest
 
     }
 
-
 	[Plan]
 	class PlanForEvent : PlanModel
 	{
@@ -88,6 +89,7 @@ namespace AgentTest
 			Console.WriteLine ("Hello from " + EntryPointName + " to " + a.ToString());
 		}
 	}
+
 
 
 	[Plan]
@@ -113,7 +115,7 @@ namespace AgentTest
 		}
 	}
 
-
+	//[AtomicPlan]
 	[Plan]
 	class PlanExample : PlanModel
 	{

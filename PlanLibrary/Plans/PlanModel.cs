@@ -98,6 +98,16 @@ namespace PlanLibrary
 			}
 		}
 
+		/// <summary>
+		/// Gets a value indicating whether this plan is atomic, that is, it cannot be paused.
+		/// </summary>
+		public bool IsAtomic
+		{
+			get { return is_atomic; }
+			private set { is_atomic = value; }
+		}
+		private bool is_atomic;
+
 		#endregion Fields/Properties
 
 		internal delegate void onRegisterResult(string result);
@@ -118,6 +128,7 @@ namespace PlanLibrary
 
 			try
 			{
+				checkAtomicPlan();
 				parsePlanAttributes ();
 				setPlanSteps ();
 				setEntryPointMethod ();
@@ -126,6 +137,14 @@ namespace PlanLibrary
 			{
 				Console.WriteLine (e.Message);
 			}
+		}
+
+		/// <summary>
+		/// Checks if this plan is decorated with [AtomicPlan] attribute.
+		/// </summary>
+		private void checkAtomicPlan()
+		{
+			IsAtomic = GetType ().GetCustomAttributes (typeof(AtomicPlanAttribute), true).ToList().Count > 0;
 		}
 
 		/// <summary>

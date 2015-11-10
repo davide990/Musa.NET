@@ -150,6 +150,16 @@ namespace AgentLibrary
 		}
 		private IPlanInstance current_executing_plan;
 
+		/// <summary>
+		/// A value indicating wheter this agent must be paused after its current reasoning cycle.
+		/// </summary>
+		private bool pause_requested;
+
+		/// <summary>
+		/// A boolean value used to handle the resumption of this agent's reasoning activity.
+		/// </summary>
+		private bool resume_reasoning;
+
         #endregion
 
 		#region Properties
@@ -217,10 +227,27 @@ namespace AgentLibrary
 		}
 		private string role;
 
+		/// <summary>
+		/// Gets a value indicating whether this agent is paused.
+		/// </summary>
+		public bool Paused
+		{
+			get { return _paused; }
+			private set { _paused = value; }
+		}
+		private bool _paused;
+
 
 		#endregion
 
         #region Constructors
+
+		/// <summary>
+		/// Create a new agent
+		/// </summary>
+		public Agent () : this ("agent_" + (new Random ().Next (Int32.MaxValue)).ToString())
+		{
+		}
 
         /// <summary>
         /// Create a new agent
@@ -228,6 +255,7 @@ namespace AgentLibrary
         /// <param name="agent_name"></param>
         public Agent(string agent_name)
         {
+			pause_requested = false;
             name = agent_name;
             ID = Guid.NewGuid();
             jobs = new List<AgentJob>();
@@ -237,7 +265,7 @@ namespace AgentLibrary
 			PerceivedEnvironementChanges = new Stack<Tuple<IList, PerceptionType>>();
 			mailBox = new Stack<Tuple<AgentPassport, AgentMessage>> ();// new Dictionary<AgentPassport, AgentMessage>();
 			createdAt = DateTime.Now;
-
+			resume_reasoning = false;
 			PlansCollection = new Dictionary<Type, IPlanInstance> ();
 
 			Busy = false;
@@ -304,10 +332,26 @@ namespace AgentLibrary
 		/// </summary>
 		public void Pause()
 		{
-			reasoner.pauseReasoning ();
+			if (current_executing_plan.IsAtomic ())
+			{
+				//TODO log agent cannot be paused
+				Console.WriteLine ("Agent " + Name + " is executing an atomic plan. It Will be paused after the plan has finished its execution.");
 
-			//Check if plan is ATOMIC
+				//Request this agent to pause only after the current atomic plan has finished its execution
+				pause_requested = true;
+				return;
+			}
+
+			//Set the pause state 
+			Paused = true;
+
+			//Pause the agent's reasoner
+			reasoner.Pause ();
+
+			//Suspend the current executing plan
 			CurrentExecutingPlan.Pause ();
+
+			//TODO log agent paused 
 			Console.WriteLine ("##PAUSE##");
 		}
 
@@ -316,10 +360,24 @@ namespace AgentLibrary
 		/// </summary>
 		public void Resume()
 		{
+			if (!Paused)
+				return;
+			
+			Paused = false;
+
+			//TODO log resume execution
 			Console.WriteLine ("##RESUME##");
-			reasoner.resumeReasoning ();
+
+			//Resume the execution of the suspended plan
 			CurrentExecutingPlan.Resume ();
 
+			if (CurrentExecutingPlan == null)
+				reasoner.Resume ();
+			else 
+			{
+				//resume the reasoning activity only after the current plan execution has finished.
+				resume_reasoning = true;
+			}
 		}
 
 
@@ -353,8 +411,10 @@ namespace AgentLibrary
 			PlansCollection.Add (Plan, plan_instance as IPlanInstance);
 		}
 
+		#region Agent's plans event handlers
+
 		/// <summary>
-		/// Invoked when a plan terminates its execution.
+		/// Invoked when a plan executed by this agent terminates its execution.
 		/// </summary>
 		/// <param name="sender">The executed plan.</param>
 		/// <param name="args">Arguments.</param>
@@ -368,6 +428,28 @@ namespace AgentLibrary
 
 			//Set the agent busy state to false
 			Busy = false;
+
+			//Check if a pause has been requested
+			if(pause_requested)
+			{
+				//Set the pause state 
+				Paused = true;
+
+				pause_requested = false;
+
+				//Pause the agent's reasoner
+				reasoner.Pause ();
+
+				//TODO log agent paused 
+				Console.WriteLine ("##PAUSE##");
+				return;
+			}
+
+			if (resume_reasoning) 
+			{
+				reasoner.Resume ();
+				resume_reasoning = false;
+			}
 		}
 
 		/// <summary>
@@ -386,6 +468,8 @@ namespace AgentLibrary
 				Console.WriteLine("[Agent "+Name+"] registered result: "+result);	
 			}
 		}
+
+		#endregion Agent's plans event handlers
 
 		/// <summary>
 		/// Executes a plan.

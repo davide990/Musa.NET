@@ -47,6 +47,7 @@
     <Compile Include="Plans\PlanStep.cs" />
     <Compile Include="Plans\PlanInstance.cs" />
     <Compile Include="Attributes\PlanEntryPoint.cs" />
+    <Compile Include="Attributes\AtomicPlanAttribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

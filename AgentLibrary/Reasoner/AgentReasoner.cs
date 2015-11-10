@@ -35,7 +35,7 @@ namespace AgentLibrary
     public sealed class AgentReasoner
     {
         private int currentReasoningCycle = 0;
-		private readonly int ReasoningUpdateTime = 500;
+		private readonly int ReasoningUpdateTime = 1500;
 
         /// <summary>
         /// The agent this reasoner belongs to
@@ -52,8 +52,8 @@ namespace AgentLibrary
         }
 
 		/// <summary>
-		/// The events catalogue this agent reacts to. The key is a couple Formula-Perception type, while the value is a PlanModel
-		///  that indicates the plan to execute.
+		/// The events catalogue this agent reacts to. The key is a couple Formula-Perception type, while the value is a
+		/// PlanModel that indicates the plan to execute.
 		/// </summary>
 		public Dictionary<Tuple<string, PerceptionType>, Type> EventsCatalogue
 		{
@@ -69,7 +69,9 @@ namespace AgentLibrary
 		private Dictionary<Tuple<string, PerceptionType>, Type> eventsCatalogue;
 		private object events_catalogue_lock;
 
-
+		/// <summary>
+		/// The arguments to be passed to plans triggered by events.
+		/// </summary>
 		public Dictionary<Tuple<string, PerceptionType>, Dictionary<string,object>> EventsArgs
 		{
 			get { return events_args; }
@@ -84,7 +86,9 @@ namespace AgentLibrary
 		private Dictionary<Tuple<string, PerceptionType>, Dictionary<string,object>> events_args;
 		private object events_args_lock;
 
-
+		/// <summary>
+		/// The stack containing the events to be triggered during the reasoning activity
+		/// </summary>
 		public Stack<Tuple<string, PerceptionType, Type>> Events 
 		{
 			get { return events; }
@@ -98,7 +102,6 @@ namespace AgentLibrary
 		}
 		private Stack<Tuple<string, PerceptionType, Type>> events;
 		private object events_lock;
-
 
 		/// <summary>
 		/// Gets a value indicating whether this reasoner is running.
@@ -117,7 +120,35 @@ namespace AgentLibrary
 		private bool is_running;
 		private object is_running_lock;
 
+		/// <summary>
+		/// Gets a value indicating whether this agent is paused.
+		/// </summary>
+		public bool Paused
+		{
+			get { return _paused; }
+			private set 
+			{ 
+				_paused = value; 
+				if (pause_requested)
+					pause_requested = false;
+			}
+		}
+		private bool _paused;
 
+		/// <summary>
+		/// A value indicating wheter this reasoner must be paused after the current reasoning cycle.
+		/// </summary>
+		private bool pause_requested;
+
+		/// <summary>
+		/// The reasoning timer. This timer is used to trigger every X milliseconds the main reasoning method
+		/// </summary>
+		private System.Threading.Timer reasoning_timer;
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="AgentLibrary.AgentReasoner"/> class.
+		/// </summary>
+		/// <param name="agent">The <see cref="AgentLibrary.Agent"/> this reasoner is related.</param>
         public AgentReasoner(Agent agent)
         {
 			events_lock 	= new object ();
@@ -129,9 +160,13 @@ namespace AgentLibrary
 			Events = new Stack<Tuple<string, PerceptionType, Type>> ();
 			EventsArgs = new Dictionary<Tuple<string, PerceptionType>, Dictionary<string, object>> ();
 
+			Paused = false;
+			pause_requested = false;
+
             parentAgent 		= agent;
-            AgentThread      	= new Thread(new ThreadStart(agentReasoningMain));
-            AgentThread.Name 	= parentAgent.Name;
+
+			TimerCallback reasoning_method_callback = new TimerCallback (agentReasoningMain);
+			reasoning_timer = new System.Threading.Timer (reasoning_method_callback, new object(), ReasoningUpdateTime, ReasoningUpdateTime);
         }
 
         internal void startReasoning()
@@ -140,7 +175,6 @@ namespace AgentLibrary
             //TODO segna un timestamp in cui inizia il reasoning
             Console.WriteLine("Starting agent [" + parentAgent.Name + "] reasoning...");
 			IsRunning = true;
-			AgentThread.Start();
         }
 
         public void stopReasoning()
@@ -151,20 +185,31 @@ namespace AgentLibrary
 
         }
 
-        public void pauseReasoning()
-        {
+		/// <summary>
+		/// Requests this reasoner to pause. More precisely, this reasoner is paused after the current reasoning cycle.
+		/// </summary>
+		public void Pause()
+		{
+			//TODO log pause reasoning
 			Console.WriteLine ("### " + parentAgent.Name + " PAUSED ###");
-			IsRunning = false;
-			//TODO log this
-            //TODO segna un timestamp in cui pausa il reasoning
-            
-        }
 
-        public void resumeReasoning()
+			pause_requested = true;
+		}
+
+		/// <summary>
+		/// Resume the reasoning activity.
+		/// </summary>
+        public void Resume()
         {
 			Console.WriteLine ("### " + parentAgent.Name + " RESUMED ###");
-			IsRunning = true;
-			//TODO log this
+
+			//Set the Paused value to false
+			Paused = false;
+
+			//Change the reasoner start time/interval
+			reasoning_timer.Change (ReasoningUpdateTime, ReasoningUpdateTime);
+
+			//TODO log resume reasoning
             //TODO segna un timestamp in cui ripristina il reasoning
             
         }
@@ -172,38 +217,49 @@ namespace AgentLibrary
 		/// <summary>
 		/// This is the main agent's reasoning method. It is executed on a unique thread.
 		/// </summary>
-        private void agentReasoningMain()
+		private void agentReasoningMain(object state)
         {
-			while (IsRunning)
-            {
-				//TODO log here
-                Console.WriteLine("reasoning cycle #"+ currentReasoningCycle++);
-                Console.WriteLine("Checking mail box...");
-                
-				//Check the agent's mail box and update its workbench according to the last received message
-                checkMailBox();
+			//wait until this reasoning cycle has finished
+			reasoning_timer.Change (Timeout.Infinite, Timeout.Infinite);
 
-                Console.WriteLine("Checking environment changes...");
+			//TODO log here
+            Console.WriteLine("reasoning cycle #"+ currentReasoningCycle++);
+            Console.WriteLine("Checking mail box...");
+            
+			//Check the agent's mail box and update its workbench according to the last received message
+            checkMailBox();
 
-				Thread.Sleep (500);
+            Console.WriteLine("Checking environment changes...");
 
-	            //Update the agent workbench
-                updateWorkbenchChanges();
+			Thread.Sleep (500);
 
-				Thread.Sleep (500);
+            //Update the agent workbench
+            updateWorkbenchChanges();
 
-				//check events
-				checkEventToTrigger ();
-				triggerEvent ();
+			Thread.Sleep (500);
 
-                //Clear the agent's queue of perceived environment changes
-				parentAgent.PerceivedEnvironementChanges.Clear();
+			//check events
+			checkEventToTrigger ();
+			triggerEvent ();
 
-				//check intentions (plans)
+            //Clear the agent's queue of perceived environment changes
+			parentAgent.PerceivedEnvironementChanges.Clear();
 
-                Console.WriteLine("######### done reasoning...");
-                Thread.Sleep(ReasoningUpdateTime);
-            }
+			//check intentions (plans)
+
+            Console.WriteLine("######### done reasoning...");
+            Thread.Sleep(ReasoningUpdateTime);
+
+			//If a pause request is pending
+			if (pause_requested)
+			{
+				reasoning_timer.Change (Timeout.Infinite, Timeout.Infinite);
+				Paused = true;
+				return;
+			}
+
+			if (!Paused && !parentAgent.Busy)
+				reasoning_timer.Change (ReasoningUpdateTime, ReasoningUpdateTime);
         }
 
         /// <summary>
