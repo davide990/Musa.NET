@@ -187,11 +187,14 @@ namespace AgentLibrary
             List<object> variableTerms = new List<object>();
             foreach (AtomicFormula ff in f)
             {
+				//Convert [ff] to a simple (non parametric) formula, and get its variable terms as list
                 variableTerms = ff.ConvertToSimpleFormula();
 
+				//Continue if the statements set contains already the formula [ff]
                 if (statements.Contains(ff))
                     continue;
 
+				//Iterate the formula's variable terms
                 foreach (object varTerm in variableTerms)
                 {
                     //get the type info for the current term
@@ -202,6 +205,7 @@ namespace AgentLibrary
                     object value = variableTermType.GetProperty("Value").GetValue(varTerm);
                     value = Convert.ChangeType(value, varTerm.GetType().GetGenericArguments()[0]);
 
+					//Add the assignment to the assignment set
                     assignment_set.Add(AssignmentType.CreateAssignmentForTerm((string)name, value, varTerm.GetType().GetGenericArguments()[0]));
                 }
 

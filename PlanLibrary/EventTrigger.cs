@@ -4,10 +4,11 @@ namespace PlanLibrary
 {
 	public enum EventTrigger
 	{
-		ConditionVerified,
+		ConditionVerified, //TODO probabilmente si dovrà rimuovere
 		AddStatement,
 		RemoveStatement,
-		UpdateStatementValue
+		UpdateStatementValue,
+		Achievement
 	}
 }
 

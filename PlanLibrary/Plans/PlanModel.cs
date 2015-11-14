@@ -160,9 +160,10 @@ namespace PlanLibrary
 												TriggerCondition 	= attributes.TriggerCondition,
 												ExpectedResult 		= attributes.ExpectedResult};
 
+			//Raise an exception if the class/plan is not decorated with [Plan] attribute
 			if (plan_attribute.ToList ().Count <= 0)
 				throw new Exception ("Class " + GetType ().Name + " is not decorated with [Plan] attribute.");
-
+			
 			TriggerCondition 	= plan_attribute.ToList()[0].TriggerCondition;
 			ExpectedResult 		= plan_attribute.ToList()[0].ExpectedResult;
 
@@ -234,6 +235,9 @@ namespace PlanLibrary
 					continue;
 
 				plan_found = true;
+
+				//TODO log internal event?
+				//Internal event
 				step.Execute (args);
 			}
 
@@ -245,7 +249,7 @@ namespace PlanLibrary
 		protected void ExecuteExternalPlan()
 		{
 			
-			// TODO implementare invocazione piani esterni
+			// TODO implementare invocazione piani esterni (cioè in ambienti remoti)
 		}
 
 

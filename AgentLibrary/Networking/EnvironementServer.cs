@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
+using System.Net.Sockets;
 
 namespace AgentLibrary.Networking
 {
@@ -30,6 +31,8 @@ namespace AgentLibrary.Networking
         }
         AgentEnvironement env;
         
+		private bool HostOpened;
+
         #endregion
         
         #region Events
@@ -45,6 +48,7 @@ namespace AgentLibrary.Networking
         public EnvironmentServer(AgentEnvironement env)
         {
             Environment = env;
+			HostOpened = false;
         }
         
 
@@ -78,7 +82,20 @@ namespace AgentLibrary.Networking
             Uri address = new Uri("http://" + local_ip_address + ":" + port);
             Host = new ServiceHost(this);
             Host.AddServiceEndpoint(typeof(IMusaCommunicationService), new BasicHttpBinding(), address);
-            Host.Open();
+			Host.Opened += delegate 
+			{
+				HostOpened = true;
+			};
+
+			try
+			{
+				Host.Open();
+			}
+			catch(SocketException ex)
+			{
+				//Log SocketException
+				Console.WriteLine ("Cannot setup networking for MUSA.net");
+			}
 
             // Once networking service is active, raise an event
             if (onNetworkServiceStart != null)
@@ -90,6 +107,10 @@ namespace AgentLibrary.Networking
         /// </summary>
         public void StopNetworkingService()
         {
+			if (!HostOpened)
+				return;
+
+			HostOpened = false;
             Host.Close();
         }
 

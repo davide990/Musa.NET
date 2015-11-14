@@ -18,6 +18,7 @@ using System.Reflection;
 using FormulaLibrary;
 using FormulaLibrary.ANTLR;
 
+
 namespace AgentLibrary
 {
     public class Agent
@@ -40,17 +41,12 @@ namespace AgentLibrary
         private AgentWorkbench workbench;
 
         /// <summary>
-        /// The list of jobs this agent is appointed to do
-        /// </summary>
-        private List<AgentJob> jobs;
-
-        /// <summary>
         /// A unique identifier for this agent
         /// </summary>
         private readonly Guid ID;
 
         /// <summary>
-        /// The date in which this agent started its life cycle.
+        /// The date in which this agent has been created
         /// </summary>
 		public DateTime CreatedAt
 		{
@@ -58,25 +54,23 @@ namespace AgentLibrary
 		}
 		private readonly DateTime createdAt;
 
-		/// <summary>
-		/// The agent thread.
-		/// </summary>
-		internal Thread Thread
-		{
-			get { return agent_thread; }
-			set { agent_thread = value; }
-		}
-        private Thread agent_thread;
-
         /// <summary>
         /// This queue contains the changes to the environment that this agent have to perceive. Since an agent can be 
 		/// busy in doing other activities such event-handling or execution of plans, the perceived environment changes 
 		/// are accumulated temporarily in this queue until the agent start a perception activity.
-		/// The key contains the formula(s) to be perceived (AtomicFormula type)
+		/// The key contains the formula(s) to be perceived (AtomicFormula type).
+		/// 
+		/// Ogni percezione può coinvolgere più di una singola credenza
         /// </summary>
 		public Stack<Tuple<IList, PerceptionType>> PerceivedEnvironementChanges
 		{
-			get { return perceivedEnvironementChanges; }
+			get 
+			{
+				lock (lock_perceivedEnvironmentChanges) 
+				{
+					return perceivedEnvironementChanges; 
+				}
+			}
 			private set 
 			{
 				lock (lock_perceivedEnvironmentChanges)
@@ -190,11 +184,12 @@ namespace AgentLibrary
 		private readonly string name;
 
 		/// <summary>
-		/// Check if actually is working time for this agent.
+		/// Check if this agent is active (in other words, if this agent is doing a reasoning activity)
 		/// </summary>
 		public bool IsActive
 		{
-			get { DateTime now = DateTime.UtcNow; return now >= WorkScheduleStart && now < WorkScheduleEnd; }
+			//get { DateTime now = DateTime.UtcNow; return now >= WorkScheduleStart && now < WorkScheduleEnd; }
+			get { return reasoner.IsRunning; }
 		}
 
 		/// <summary>
@@ -258,7 +253,6 @@ namespace AgentLibrary
 			pause_requested = false;
             name = agent_name;
             ID = Guid.NewGuid();
-            jobs = new List<AgentJob>();
             roles = new List<AgentRole>();
             workbench = new AgentWorkbench(this);
             reasoner = new AgentReasoner(this);
@@ -278,7 +272,6 @@ namespace AgentLibrary
         ~Agent()
         {
             //TODO notify agent retirement
-            jobs.Clear();
             roles.Clear();
 
             //scheduler.Shutdown();
@@ -317,7 +310,7 @@ namespace AgentLibrary
         }
 
         /// <summary>
-        /// Start the agent activity
+        /// Start this agent
         /// </summary>
         public Agent Start()
         {
@@ -476,10 +469,25 @@ namespace AgentLibrary
 		/// </summary>
 		/// <param name="Plan">Plan.</param>
 		/// <param name="args">Arguments.</param>
-		public void ExecutePlan(Type Plan, Dictionary<string, object> args = null)
+		internal void ExecutePlan(Type Plan, Dictionary<string, object> args = null)
 		{
-			if (Busy)
+			if (Busy) 
+			{
+				//TODO Aggiungere il piano alla lista delle intenzioni
+
+
+
+
+
+
+
+
+
+
 				throw new Exception ("Agent [" + Name + "] is currently executing plan " + CurrentExecutingPlan);
+				return;
+			}
+				
 			
 			//If Plan is not of type PlanModel, then throw an exception
 			if (!Plan.BaseType.IsEquivalentTo (typeof(PlanModel)))
@@ -507,7 +515,7 @@ namespace AgentLibrary
 			//Execute the plan
 			execute_method.Invoke (the_plan, new object[]{ args });
 
-			//TODO migliorare il sistema di bloccaggio delll'agente
+			//TODO [ALTA PRIORITÀ] migliorare il sistema di bloccaggio dell'agente
 			//Lock the agent's reasoning life cycle until the invoked plan terminates its execution
 			while (Busy);
 		}
@@ -515,9 +523,17 @@ namespace AgentLibrary
 		/// <summary>
 		/// Tell this agent to achieve a goal by executing a specified plan
 		/// </summary>
-		public void AchieveGoal(Type Plan)
+		public void AchieveGoal(Type Plan, Dictionary<string,object> Args = null)
 		{
-			//TODO implementare
+			if (Plan == null) 
+				throw new ArgumentNullException ("Plan", "Argument #1 'Plan' cannot be null.");
+
+			//Set the achievement of the plan [Plan] as an agent's perception
+			PerceivedEnvironementChanges.Push (new Tuple<IList, PerceptionType> (new List<Type> (){ Plan }, PerceptionType.Achieve));
+
+			//Set the parameters to be used when the plan [Plan] is invoked
+			if (Args != null)
+				reasoner.EventsArgs.Add (new Tuple<string, PerceptionType> (Plan.Name, PerceptionType.Achieve), Args);
 		}
 
 		/// <summary>
@@ -530,6 +546,24 @@ namespace AgentLibrary
 		public void AddEvent(string formula, PerceptionType perception, Type Plan, Dictionary<string,object> Args = null)
 		{
 			reasoner.AddEvent (formula, perception, Plan, Args);
+		}
+
+		/// <summary>
+		/// Adds the beliefs to this agent's workbench. Each formula is added as a unique agent perception.
+		/// </summary>
+		public void AddBelief(params AtomicFormula[] formula)
+		{
+			foreach (AtomicFormula ff in formula) 
+				PerceivedEnvironementChanges.Push (new Tuple<IList, PerceptionType> (new List<AtomicFormula> (){ ff }, PerceptionType.AddBelief));
+		}
+
+		/// <summary>
+		/// Adds a belief to this agent's workbench.
+		/// </summary>
+		/// <param name="formula">Formula.</param>
+		public void AddBelief(AtomicFormula formula)
+		{
+			PerceivedEnvironementChanges.Push (new Tuple<IList, PerceptionType> (new List<AtomicFormula> (){ formula }, PerceptionType.AddBelief));
 		}
 
 

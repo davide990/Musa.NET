@@ -53,21 +53,15 @@ namespace AgentTest
 			a.AddPlan (typeof(PlanExample));
 			a.AddPlan (typeof(PlanForEvent));
 			a.AddEvent ("f(x)", PerceptionType.AddBelief, typeof(PlanExample));
-			//a.AddEvent ("f(x)", PerceptionType.AddBelief, typeof(PlanForEvent), new Dictionary<string, object> (){ {"nome", "davide"} });
+
 			env.RegisterAgent (a);
 
-			env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
-
-			//non succede nulla quando lo faccio due volte di fila
 			//env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
 
+			a.AchieveGoal (typeof(PlanExample));
 
-			//a.ExecutePlan (typeof(PlanExample2));
-
-			//Console.WriteLine ("Executing plan " + a.CurrentExecutingPlan);
-			while (a.Busy);
-
-			Console.ReadKey();
+			//TODO implementare un meccanismo di attesa per tutti gli agenti registrati nel sistema
+			env.WaitForAgents ();
         }
 
 		static void A_RegisterResult (string result)
@@ -130,7 +124,6 @@ namespace AgentTest
 
 			ExecuteStep ("wella", new Dictionary<string, object> (){ { "nome", "davide" } });
 		}
-
 
 		[PlanStep]
 		void wella(Dictionary<string,object> args)

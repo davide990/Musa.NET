@@ -29,7 +29,9 @@ namespace AgentLibrary
         RemoveBelief        = 0x2,              //A belief has been removed
         UpdateBeliefValue   = 0x3,              //A belief's value must be updated
         SetBeliefValue      = 0x4,              //A belief's value must be set
-        UnSetBeliefValue    = 0x5               //A belief's value must be unset
+        UnSetBeliefValue    = 0x5,              //A belief's value must be unset
+		Achieve				= 0x6,
+		Test				= 0x7
     }
 
     public sealed class AgentReasoner
@@ -41,15 +43,6 @@ namespace AgentLibrary
         /// The agent this reasoner belongs to
         /// </summary>
         private readonly Agent parentAgent;
-
-        /// <summary>
-        /// Gets or sets the agent thread.
-        /// </summary>
-        private Thread AgentThread
-        {
-			get { return parentAgent.Thread; }
-			set { parentAgent.Thread = value; }
-        }
 
 		/// <summary>
 		/// The events catalogue this agent reacts to. The key is a couple Formula-Perception type, while the value is a
@@ -163,10 +156,11 @@ namespace AgentLibrary
 			Paused = false;
 			pause_requested = false;
 
-            parentAgent 		= agent;
+            parentAgent = agent;
 
 			TimerCallback reasoning_method_callback = new TimerCallback (agentReasoningMain);
 			reasoning_timer = new System.Threading.Timer (reasoning_method_callback, new object(), ReasoningUpdateTime, ReasoningUpdateTime);
+
         }
 
         internal void startReasoning()
@@ -233,13 +227,17 @@ namespace AgentLibrary
 
 			Thread.Sleep (500);
 
+			//update the agent's workbench according to the internal beliefs update
+
+
+
             //Update the agent workbench
             updateWorkbenchChanges();
 
 			Thread.Sleep (500);
 
 			//check events
-			checkEventToTrigger ();
+			CheckExternalEventsToTrigger ();
 			triggerEvent ();
 
             //Clear the agent's queue of perceived environment changes
@@ -277,6 +275,11 @@ namespace AgentLibrary
 
 			//TODO log checked mailbox
 
+
+			//TODO [importante] bisogna capire qui se un evento è interno o esterno
+
+
+
 			//process the message
 			switch (msg.InfoType)
 			{
@@ -305,13 +308,24 @@ namespace AgentLibrary
 			if (parentAgent.PerceivedEnvironementChanges.Count <= 0)
                 return;
 
-			foreach (Tuple<IList, PerceptionType> p in parentAgent.PerceivedEnvironementChanges)
+			Tuple<IList, PerceptionType> p;
+			while(parentAgent.PerceivedEnvironementChanges.Count > 0)
 			{
+				p = parentAgent.PerceivedEnvironementChanges.Pop ();
 				IList changes_list = p.Item1;
 				PerceptionType perception_type = p.Item2;
 
 				switch (perception_type) 
 				{
+				case PerceptionType.Achieve:
+					Type plan_to_execute = changes_list [0] as Type;
+
+					Dictionary<string,object> args = null;
+					EventsArgs.TryGetValue (new Tuple<string, PerceptionType> (plan_to_execute.Name, perception_type), out args);
+
+					parentAgent.ExecutePlan (plan_to_execute, args);
+					break;
+
 				case PerceptionType.AddBelief:
 					parentAgent.Workbench.AddStatement (changes_list);
 					break;
@@ -339,9 +353,12 @@ namespace AgentLibrary
 		/// <summary>
 		/// Given the perceived evironment changes, checks for the events to trigger. Only ONE event is trigged for
 		/// reasoning cycle is handled.
+		/// 
+		/// The perceived changes in the environment could trigger (external) events.
 		/// </summary>
-		private void checkEventToTrigger()
+		private void CheckExternalEventsToTrigger()
 		{
+			//return if the agent did not perceive any change in the environment
 			if (parentAgent.PerceivedEnvironementChanges.Count <= 0)
 				return;
 
@@ -350,10 +367,13 @@ namespace AgentLibrary
 			IList changes_list = p.Item1;
 			PerceptionType perception_type = p.Item2;
 
+			//Iterate each agent's perceived change in the environment
 			foreach (AtomicFormula formula in changes_list) 
 			{
+				//Check if an handler for the perceived change exists.
 				EventsCatalogue.TryGetValue (new Tuple<string, PerceptionType> (formula.ToString (), perception_type), out plan_to_execute);
 
+				//If exists, an external event is triggered, and a specific plan is triggered.
 				if (plan_to_execute != null)
 					Events.Push (new Tuple<string, PerceptionType, Type> (formula.ToString (), perception_type, plan_to_execute));
 
@@ -373,7 +393,7 @@ namespace AgentLibrary
 			if (Events.Count <= 0)
 				return;
 
-			//Get the top event, and their info
+			//Get the top event, and its info
 			Tuple<string, PerceptionType, Type> eventTuple = Events.Pop ();
 
 			string formula 					= eventTuple.Item1;

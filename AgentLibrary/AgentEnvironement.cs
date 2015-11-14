@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Net;
 using System.Reflection;
 using System.ServiceModel;
+using System.Threading;
 
 namespace AgentLibrary
 {
@@ -33,6 +34,8 @@ namespace AgentLibrary
             get { return registeredAgents; }
             set { if (value != null) registeredAgents = value; }
         }
+
+		private static ManualResetEvent mre = new ManualResetEvent(false);
 
         #endregion Fields
 
@@ -88,7 +91,7 @@ namespace AgentLibrary
                 // port <- parseConfigFile(Port)
                 // ip_address <- parseConfigFile(IP)
 
-                srv.StartNetworking(port, ip_address);
+                //srv.StartNetworking(port, ip_address);
             }
 
             return instance;
@@ -101,6 +104,7 @@ namespace AgentLibrary
         /// </summary>
         private AgentEnvironement()
         {
+			
             statements = new ObservableCollection<AtomicFormula>();
             attributes = new ObservableCollection<AssignmentType>();
             registeredAgents = new ObservableCollection<Agent>();
@@ -115,6 +119,11 @@ namespace AgentLibrary
 
         private void RegisteredAgents_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+			if (RegisteredAgents.Count > 0)
+				mre.Reset ();
+			else
+				mre.Set ();
+
             switch(e.Action)
             {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
@@ -244,6 +253,15 @@ namespace AgentLibrary
             throw new NotImplementedException();
         }
         
+		/// <summary>
+		/// Block the execution of the main process until at least one agent is registered within this environment.
+		/// </summary>
+		public void WaitForAgents()
+		{
+			mre.WaitOne ();
+		}
+
+
         #endregion
 
     }
