@@ -273,8 +273,6 @@ namespace AgentLibrary
         {
             //TODO notify agent retirement
             roles.Clear();
-
-            //scheduler.Shutdown();
         }
 
         #endregion
@@ -473,22 +471,10 @@ namespace AgentLibrary
 		{
 			if (Busy) 
 			{
-				//TODO Aggiungere il piano alla lista delle intenzioni
-
-
-
-
-
-
-
-
-
-
 				throw new Exception ("Agent [" + Name + "] is currently executing plan " + CurrentExecutingPlan);
 				return;
 			}
 				
-			
 			//If Plan is not of type PlanModel, then throw an exception
 			if (!Plan.BaseType.IsEquivalentTo (typeof(PlanModel)))
 				throw new Exception ("Argument #1 in ExecutePlan(Type) must be of type PlanModel.");

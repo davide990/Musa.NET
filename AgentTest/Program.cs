@@ -43,22 +43,30 @@ namespace AgentTest
 			BackgroundWorker wk = new BackgroundWorker ();
 			wk.DoWork += delegate 
 			{
+				Thread.Sleep(3000);
+				env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
+
+				Thread.Sleep(2000);
+				env.DeleteStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
+
+				/*a.Pause();
 				Thread.Sleep(10000);
-				a.Pause();
-				Thread.Sleep(10000);
-				a.Resume();
+				a.Resume();*/
 			};
 			wk.RunWorkerAsync ();
 
 			a.AddPlan (typeof(PlanExample));
+			a.AddPlan (typeof(PlanExample2));
 			a.AddPlan (typeof(PlanForEvent));
-			a.AddEvent ("f(x)", PerceptionType.AddBelief, typeof(PlanExample));
+			a.AddEvent ("f(x)", PerceptionType.AddBelief, typeof(PlanExample2));
+			a.AddEvent ("f(x)", PerceptionType.RemoveBelief, typeof(PlanExample2));
+
 
 			env.RegisterAgent (a);
 
 			//env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
 
-			a.AchieveGoal (typeof(PlanExample));
+			//a.AchieveGoal (typeof(PlanExample2));
 
 			//TODO implementare un meccanismo di attesa per tutti gli agenti registrati nel sistema
 			env.WaitForAgents ();
@@ -103,7 +111,7 @@ namespace AgentTest
 			Thread.Sleep (500);
 
 			Console.WriteLine ("Ciao 3");
-			Thread.Sleep (50000);
+			Thread.Sleep (500);
 
 			//RegisterResult ("f(x)");
 		}

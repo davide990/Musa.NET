@@ -211,6 +211,7 @@ namespace AgentLibrary
 		/// <summary>
 		/// This is the main agent's reasoning method. It is executed on a unique thread.
 		/// </summary>
+		// TODO da cambiare in agentReasoningCycle()
 		private void agentReasoningMain(object state)
         {
 			//wait until this reasoning cycle has finished
@@ -232,13 +233,15 @@ namespace AgentLibrary
 
 
             //Update the agent workbench
-            updateWorkbenchChanges();
+            perceive();
 
 			Thread.Sleep (500);
 
-			//check events
-			CheckExternalEventsToTrigger ();
 			triggerEvent ();
+
+			//check events
+			//triggerEvent ();
+			//triggerEvent ();
 
             //Clear the agent's queue of perceived environment changes
 			parentAgent.PerceivedEnvironementChanges.Clear();
@@ -256,6 +259,7 @@ namespace AgentLibrary
 				return;
 			}
 
+			//Restore the time interval for the next reasoning cycle
 			if (!Paused && !parentAgent.Busy)
 				reasoning_timer.Change (ReasoningUpdateTime, ReasoningUpdateTime);
         }
@@ -301,54 +305,53 @@ namespace AgentLibrary
         }
 
         /// <summary>
-        /// Percept the environment changes and updates the workbench of the parent agent
+        /// Perceive the environment changes and updates the workbench of the parent agent
         /// </summary>
-        private void updateWorkbenchChanges()
+        private void perceive()
         {
 			if (parentAgent.PerceivedEnvironementChanges.Count <= 0)
                 return;
 
 			Tuple<IList, PerceptionType> p;
-			while(parentAgent.PerceivedEnvironementChanges.Count > 0)
+
+			p = parentAgent.PerceivedEnvironementChanges.Pop ();
+			IList changes_list = p.Item1;
+			PerceptionType perception_type = p.Item2;
+
+			switch (perception_type) 
 			{
-				p = parentAgent.PerceivedEnvironementChanges.Pop ();
-				IList changes_list = p.Item1;
-				PerceptionType perception_type = p.Item2;
+			case PerceptionType.Achieve:
+				Type plan_to_execute = changes_list [0] as Type;
 
-				switch (perception_type) 
-				{
-				case PerceptionType.Achieve:
-					Type plan_to_execute = changes_list [0] as Type;
+				Dictionary<string,object> args = null;
+				EventsArgs.TryGetValue (new Tuple<string, PerceptionType> (plan_to_execute.Name, perception_type), out args);
 
-					Dictionary<string,object> args = null;
-					EventsArgs.TryGetValue (new Tuple<string, PerceptionType> (plan_to_execute.Name, perception_type), out args);
+				parentAgent.ExecutePlan (plan_to_execute, args);
+				break;
 
-					parentAgent.ExecutePlan (plan_to_execute, args);
-					break;
+			case PerceptionType.AddBelief:
+				parentAgent.Workbench.AddStatement (changes_list);
+				checkExternalEvents(changes_list, perception_type);
+				break;
 
-				case PerceptionType.AddBelief:
-					parentAgent.Workbench.AddStatement (changes_list);
-					break;
+			case PerceptionType.RemoveBelief:
+				parentAgent.Workbench.RemoveStatement (changes_list);
+				checkExternalEvents(changes_list, perception_type);
+				break;
 
-				case PerceptionType.RemoveBelief:
-					parentAgent.Workbench.RemoveStatement (changes_list);
-					break;
+			case PerceptionType.SetBeliefValue:
+				break;
 
-				case PerceptionType.SetBeliefValue:
-					break;
+			case PerceptionType.UnSetBeliefValue:
+				break;
 
-				case PerceptionType.UnSetBeliefValue:
-					break;
+			case PerceptionType.UpdateBeliefValue:
+				break;
 
-				case PerceptionType.UpdateBeliefValue:
-					break;
-
-				case PerceptionType.Null:
-					break;
-				}
+			case PerceptionType.Null:
+				break;
 			}
         }
-
 
 		/// <summary>
 		/// Given the perceived evironment changes, checks for the events to trigger. Only ONE event is trigged for
@@ -356,16 +359,9 @@ namespace AgentLibrary
 		/// 
 		/// The perceived changes in the environment could trigger (external) events.
 		/// </summary>
-		private void CheckExternalEventsToTrigger()
+		private void checkExternalEvents(IList changes_list, PerceptionType perception_type)
 		{
-			//return if the agent did not perceive any change in the environment
-			if (parentAgent.PerceivedEnvironementChanges.Count <= 0)
-				return;
-
 			Type plan_to_execute = null;
-			Tuple<IList, PerceptionType> p = parentAgent.PerceivedEnvironementChanges.Pop ();
-			IList changes_list = p.Item1;
-			PerceptionType perception_type = p.Item2;
 
 			//Iterate each agent's perceived change in the environment
 			foreach (AtomicFormula formula in changes_list) 
@@ -374,20 +370,23 @@ namespace AgentLibrary
 				EventsCatalogue.TryGetValue (new Tuple<string, PerceptionType> (formula.ToString (), perception_type), out plan_to_execute);
 
 				//If exists, an external event is triggered, and a specific plan is triggered.
-				if (plan_to_execute != null)
+				if (plan_to_execute != null) 
+				{
 					Events.Push (new Tuple<string, PerceptionType, Type> (formula.ToString (), perception_type, plan_to_execute));
+
+					Console.WriteLine ("PUSHED EVENT " + formula.ToString () + "<->" + perception_type);
+				}
 
 				//set plan_to_execute to null for the next iteration
 				plan_to_execute = null;
 			}
 		}
 
-
         /// <summary>
 		/// Trigger the top event within the events stack. Events may be triggered by the agent's perception of changes
 		/// within the environment it's located. 
         /// </summary>
-        private void triggerEvent()
+		private void triggerEvent()
         {
 			//Do nothing if the events stack is empty
 			if (Events.Count <= 0)

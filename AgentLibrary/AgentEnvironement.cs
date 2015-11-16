@@ -220,8 +220,58 @@ namespace AgentLibrary
                 //Add the formula to this environment
                 statements.Add(ff);
             }
-
         }
+
+		/// <summary>
+		/// Given a set of atomic formulas, this method removes the matching formulas from this environment and also its
+		/// corresponding assignments.
+		/// </summary>
+		public void DeleteStatementAndAssignment(params AtomicFormula[] f)
+		{
+			List<object> variableTerms = new List<object>();
+			foreach (AtomicFormula ff in f)
+			{
+				variableTerms = ff.ConvertToSimpleFormula();
+
+				if (!statements.Contains(ff))
+					continue;
+
+				foreach (object varTerm in variableTerms)
+				{
+					//get the type info for the current term
+					Type variableTermType = typeof(VariableTerm<>).MakeGenericType(varTerm.GetType().GetGenericArguments()[0]);
+
+					//get the value of the current term
+					object name = Convert.ChangeType(variableTermType.GetProperty("Name").GetValue(varTerm), typeof(string));
+					object value = variableTermType.GetProperty("Value").GetValue(varTerm);
+					value = Convert.ChangeType(value, varTerm.GetType().GetGenericArguments()[0]);
+
+					attributes.Remove(AssignmentType.CreateAssignmentForTerm((string)name, value, varTerm.GetType().GetGenericArguments()[0]));
+				}
+
+				//Remove the formula from this environment
+				statements.Remove(ff);
+			}
+		}
+
+		/// <summary>
+		/// Given a set of atomic formulas, this method removes the matching formulas from this environment.
+		/// </summary>
+		public void DeleteStatement(params AtomicFormula[] f)
+		{
+			List<object> variableTerms = new List<object>();
+			foreach (AtomicFormula ff in f)
+			{
+				//Convert the formula to a simple formula
+				ff.ConvertToSimpleFormula();
+
+				if (!statements.Contains(ff))
+					continue;
+
+				//Remove the formula from this environment
+				statements.Remove(ff);
+			}
+		}
         
         /// <summary>
         /// Check if an agent is registered to this environment
