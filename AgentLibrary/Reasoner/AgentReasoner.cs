@@ -158,7 +158,7 @@ namespace AgentLibrary
 
             parentAgent = agent;
 
-			TimerCallback reasoning_method_callback = new TimerCallback (agentReasoningMain);
+			TimerCallback reasoning_method_callback = new TimerCallback (reasoningMain);
 			reasoning_timer = new System.Threading.Timer (reasoning_method_callback, new object(), ReasoningUpdateTime, ReasoningUpdateTime);
 
         }
@@ -205,14 +205,13 @@ namespace AgentLibrary
 
 			//TODO log resume reasoning
             //TODO segna un timestamp in cui ripristina il reasoning
-            
         }
 
 		/// <summary>
 		/// This is the main agent's reasoning method. It is executed on a unique thread.
 		/// </summary>
 		// TODO da cambiare in agentReasoningCycle()
-		private void agentReasoningMain(object state)
+		private void reasoningMain(object state)
         {
 			//wait until this reasoning cycle has finished
 			reasoning_timer.Change (Timeout.Infinite, Timeout.Infinite);
@@ -228,25 +227,13 @@ namespace AgentLibrary
 
 			Thread.Sleep (500);
 
-			//update the agent's workbench according to the internal beliefs update
-
-
-
-            //Update the agent workbench
+            //Perceive the environment changes
             perceive();
 
 			Thread.Sleep (500);
 
+			//Trigger potential events produced by this agent's environment perception
 			triggerEvent ();
-
-			//check events
-			//triggerEvent ();
-			//triggerEvent ();
-
-            //Clear the agent's queue of perceived environment changes
-			parentAgent.PerceivedEnvironementChanges.Clear();
-
-			//check intentions (plans)
 
             Console.WriteLine("######### done reasoning...");
             Thread.Sleep(ReasoningUpdateTime);
@@ -371,11 +358,7 @@ namespace AgentLibrary
 
 				//If exists, an external event is triggered, and a specific plan is triggered.
 				if (plan_to_execute != null) 
-				{
 					Events.Push (new Tuple<string, PerceptionType, Type> (formula.ToString (), perception_type, plan_to_execute));
-
-					Console.WriteLine ("PUSHED EVENT " + formula.ToString () + "<->" + perception_type);
-				}
 
 				//set plan_to_execute to null for the next iteration
 				plan_to_execute = null;

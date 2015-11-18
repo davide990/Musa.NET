@@ -46,7 +46,7 @@ namespace AgentTest
 				Thread.Sleep(3000);
 				env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
 
-				Thread.Sleep(2000);
+				//Thread.Sleep(2000);
 				env.DeleteStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
 
 				/*a.Pause();
