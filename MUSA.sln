@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormulaLibraryTestProject",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlanLibrary", "PlanLibrary\PlanLibrary.csproj", "{5EB4BE6E-6C14-43D5-9F98-86E635F74C78}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusaConfiguration", "MusaConfiguration\MusaConfiguration.csproj", "{E05E465D-3BBD-4708-B00E-8001089DE01B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{C56594B3-805A-4BA7-A18A-96C4B39BC0DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C56594B3-805A-4BA7-A18A-96C4B39BC0DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C56594B3-805A-4BA7-A18A-96C4B39BC0DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E05E465D-3BBD-4708-B00E-8001089DE01B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E05E465D-3BBD-4708-B00E-8001089DE01B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E05E465D-3BBD-4708-B00E-8001089DE01B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E05E465D-3BBD-4708-B00E-8001089DE01B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FEDB7C88-DAC3-43CA-B798-5D7533952408}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FEDB7C88-DAC3-43CA-B798-5D7533952408}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEDB7C88-DAC3-43CA-B798-5D7533952408}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -15,6 +15,8 @@ using System.Collections.Generic;
 using PlanLibrary;
 using System.Threading;
 using System.ComponentModel;
+using MusaConfig;
+using NLog;
 
 namespace AgentTest
 {
@@ -36,7 +38,7 @@ namespace AgentTest
             //startMUSA();
 
 
-
+			/*
 			AgentEnvironement env = AgentEnvironement.GetInstance();
 			Agent a = new Agent ("agent_1").Start();
 
@@ -51,7 +53,7 @@ namespace AgentTest
 
 				/*a.Pause();
 				Thread.Sleep(10000);
-				a.Resume();*/
+				a.Resume();  ******
 			};
 			wk.RunWorkerAsync ();
 
@@ -69,7 +71,14 @@ namespace AgentTest
 			//a.AchieveGoal (typeof(PlanExample2));
 
 			//TODO implementare un meccanismo di attesa per tutti gli agenti registrati nel sistema
-			env.WaitForAgents ();
+			env.WaitForAgents ();*/
+
+			Console.WriteLine ("Hello World!");
+
+			MusaConfig.MusaConfig a = MusaConfig.MusaConfig.ReadFromFile ("../../test_conf.xml");
+
+			a.ConsoleLogger.Log (LogLevel.Info, "ciao");
+
         }
 
 		static void A_RegisterResult (string result)

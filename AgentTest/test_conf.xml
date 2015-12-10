@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<MusaConfiguration xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<MaxNumAgent>2000</MaxNumAgent>
+	<MusaAddress>localhost</MusaAddress>
+	<MusaAddressPort>8080</MusaAddressPort>
+	<NetworkingEnabled>true</NetworkingEnabled>
+
+	<Logging>
+		<ConsoleLogger Enabled="true"/>
+		<!--<MongoDBLogger
+			Enabled="true"
+            MongoDBAddress="localhost"
+			MongoDBPort="27017"
+			MongoDBCollectionName="musa_log"
+			MongoDBUser="musa_user"
+			MongoDBPass="admin"/>-->
+
+		<WCFLogger  Enabled="true"
+					EndpointAddress="http://localhost:8089/"/>
+		<FileLogger Enabled="true"
+					FileName="/home/davide/log.txt"/>
+	</Logging>
+
+</MusaConfiguration>
