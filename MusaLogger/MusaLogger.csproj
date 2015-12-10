@@ -38,15 +38,36 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c">
-      <HintPath>..\packages\NLog.4.1.2\lib\net45\NLog.dll</HintPath>
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="MongoDB.Bson">
+      <HintPath>..\packages\MongoDB.Bson.2.2.0\lib\net45\MongoDB.Bson.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver.Core">
+      <HintPath>..\packages\MongoDB.Driver.Core.2.2.0\lib\net45\MongoDB.Driver.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver">
+      <HintPath>..\packages\MongoDB.Driver.2.2.0\lib\net45\MongoDB.Driver.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver.Legacy">
+      <HintPath>..\packages\mongocsharpdriver.2.2.0\lib\net45\MongoDB.Driver.Legacy.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog">
+      <HintPath>..\packages\NLog.4.2.2\lib\net45\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog.MongoDB">
+      <HintPath>..\packages\NLog.MongoTarget.0.8.0\lib\net40\NLog.MongoDB.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AgentLogger.cs" />
-    <Compile Include="LoggingTarget.cs" />
-    <Compile Include="MusaLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="MusaLogger.cs" />
+    <Compile Include="Targets\ConsoleLogger.cs" />
+    <Compile Include="Targets\FileLogger.cs" />
+    <Compile Include="Targets\MongoDBLogger.cs" />
+    <Compile Include="Targets\WCF\IMusaWCFLogger.cs" />
+    <Compile Include="Targets\WCF\WCFClient.cs" />
+    <Compile Include="Targets\WCF\WCFLogger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="UML\MusaLogger.cd" />
@@ -60,4 +81,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Folder Include="Targets\" />
+  </ItemGroup>
 </Project>
