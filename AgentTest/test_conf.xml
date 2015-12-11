@@ -17,8 +17,8 @@
 
 		<WCFLogger  Enabled="true"
 					EndpointAddress="http://localhost:8089/"/>
-		<FileLogger Enabled="true"
-					FileName="/home/davide/log.txt"/>
+		<!--<FileLogger Enabled="true"
+					FileName="/home/davide/log.txt"/>-->
 	</Logging>
 
 </MusaConfiguration>

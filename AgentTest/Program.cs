@@ -77,7 +77,9 @@ namespace AgentTest
 
 			MusaConfig.MusaConfig a = MusaConfig.MusaConfig.ReadFromFile ("../../test_conf.xml");
 
-			a.ConsoleLogger.Log (LogLevel.Info, "ciao");
+
+			a.WCFLogger.Log (LogLevel.Info, "ciao da WCF");
+			//a.ConsoleLogger.Log (LogLevel.Info, "ciao");
 
         }
 
