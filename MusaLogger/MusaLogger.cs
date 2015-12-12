@@ -3,7 +3,7 @@ using NLog.Config;
 using NLog;
 using System.Diagnostics;
 
-namespace MusaConfig
+namespace MusaConfiguration
 {
 	/// <summary>
 	/// The abstract class that defines the behaviour of the logger
@@ -15,7 +15,7 @@ namespace MusaConfig
 		/// </summary>
 		/// <value>The configuration.</value>
 		[XmlIgnore()]
-		public LoggingConfiguration Configuration
+		public static LoggingConfiguration Configuration
 		{
 			get
 			{
@@ -30,7 +30,7 @@ namespace MusaConfig
 			}
 		}
 		[XmlIgnore()]
-		private LoggingConfiguration conf;
+		private static LoggingConfiguration conf;
 
 		/// <summary>
 		/// Gets the nlog logger.

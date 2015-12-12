@@ -3,7 +3,7 @@ using NLog.Config;
 using NLog.Targets;
 using NLog;
 
-namespace MusaConfig
+namespace MusaConfiguration
 {
 	public class ConsoleLogger : MusaLogger
 	{

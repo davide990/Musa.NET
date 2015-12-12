@@ -6,7 +6,7 @@
 	<NetworkingEnabled>true</NetworkingEnabled>
 
 	<Logging>
-		<ConsoleLogger Enabled="true"/>
+		<ConsoleLogger Enabled="false"/>
 		<!--<MongoDBLogger
 			Enabled="true"
             MongoDBAddress="localhost"
@@ -15,10 +15,10 @@
 			MongoDBUser="musa_user"
 			MongoDBPass="admin"/>-->
 
-		<WCFLogger  Enabled="true"
-					EndpointAddress="http://localhost:8089/"/>
-		<!--<FileLogger Enabled="true"
-					FileName="/home/davide/log.txt"/>-->
+		<!--<WCFLogger  Enabled="true"
+					EndpointAddress="http://localhost:8089/"/>-->
+		<FileLogger Enabled="true"
+					FileName="/home/davide/log.txt"/>
 	</Logging>
 
 </MusaConfiguration>

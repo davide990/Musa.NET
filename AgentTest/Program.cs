@@ -15,8 +15,9 @@ using System.Collections.Generic;
 using PlanLibrary;
 using System.Threading;
 using System.ComponentModel;
-using MusaConfig;
+using MusaConfiguration;
 using NLog;
+using MusaLogger;
 
 namespace AgentTest
 {
@@ -36,7 +37,6 @@ namespace AgentTest
         static void Main(string[] args)
         {
             //startMUSA();
-
 
 			/*
 			AgentEnvironement env = AgentEnvironement.GetInstance();
@@ -75,12 +75,10 @@ namespace AgentTest
 
 			Console.WriteLine ("Hello World!");
 
-			MusaConfig.MusaConfig a = MusaConfig.MusaConfig.ReadFromFile ("../../test_conf.xml");
+			MusaConfig.ReadFromFile ("../../test_conf.xml");
 
-
-			a.WCFLogger.Log (LogLevel.Info, "ciao da WCF");
-			//a.ConsoleLogger.Log (LogLevel.Info, "ciao");
-
+			MusaConfig a = MusaConfig.GetConfig ();
+			MusaConfig.GetLoggerSet ().Log (LogLevel.Info, "ciaooooo");
         }
 
 		static void A_RegisterResult (string result)

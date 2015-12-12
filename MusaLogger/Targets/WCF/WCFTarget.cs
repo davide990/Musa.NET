@@ -1,6 +1,6 @@
 ﻿using System;
 using NLog.Targets;
-using MusaConfig;
+using MusaConfiguration;
 using System.ServiceModel;
 using NLog;
 

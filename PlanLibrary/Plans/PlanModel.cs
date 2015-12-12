@@ -252,8 +252,6 @@ namespace PlanLibrary
 			// TODO implementare invocazione piani esterni (cioè in ambienti remoti)
 		}
 
-
-
 		/// <summary>
 		/// Registers a result to the workbench of the agent that executes this plan.
 		/// </summary>

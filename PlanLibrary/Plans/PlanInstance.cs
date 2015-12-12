@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Reflection;
-using System.Linq;
 using FormulaLibrary;
 using FormulaLibrary.ANTLR;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace PlanLibrary
 {
@@ -53,7 +51,7 @@ namespace PlanLibrary
 		/// <summary>
 		/// The plan model this instance references to.
 		/// </summary>
-		private PlanModel plan_model;
+		private readonly PlanModel plan_model;
 
 		/// <summary>
 		/// Gets the entry point method for this plan.

@@ -6,7 +6,7 @@ using MusaLogger;
 using NLog.Config;
 using NLog;
 
-namespace MusaConfig
+namespace MusaConfiguration
 {
 	
 	public class WCFLogger : MusaLogger

@@ -3,7 +3,7 @@ using System.ServiceModel;
 using System.ServiceModel.Web;
 using NLog;
 
-namespace MusaConfig
+namespace MusaConfiguration
 {
 	[ServiceContract]
 	public interface IMusaWCFLogger

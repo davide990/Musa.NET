@@ -2,7 +2,7 @@
 using System.ServiceModel.Channels;
 using System.ServiceModel;
 
-namespace MusaConfig
+namespace MusaConfiguration
 {
 	public class WCFClient : ClientBase<IMusaWCFLogger>, IMusaWCFLogger
 	{

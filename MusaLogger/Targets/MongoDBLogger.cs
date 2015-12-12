@@ -4,7 +4,7 @@ using NLog;
 using NLog.Config;
 using NLog.MongoDB;
 
-namespace MusaConfig
+namespace MusaConfiguration
 {
 	/// <summary>
 	/// Mongo DB logger.

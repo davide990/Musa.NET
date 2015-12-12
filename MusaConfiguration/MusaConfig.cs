@@ -2,8 +2,9 @@
 using System.Xml.Serialization;
 using System.IO;
 using System.Collections.Generic;
+using MusaLogger;
 
-namespace MusaConfig
+namespace MusaConfiguration
 {
 	/// <summary>
 	/// Musa config.
@@ -32,6 +33,8 @@ namespace MusaConfig
 		public List<MusaLogger> Loggers { get; set;	}
 		#endregion XML elements
 
+		#region Properties
+
 		/// <summary>
 		/// Gets or sets the name of the MUSA configuration file this object is related to.
 		/// </summary>
@@ -53,81 +56,46 @@ namespace MusaConfig
 		private string _fname;
 
 		[XmlIgnore()]
-		public MongoDBLogger MongoDBLogger 
+		public MongoDBLogger MongoDBLogger { get { return Loggers.Find (x => x is MongoDBLogger) as MongoDBLogger; } }
+
+		[XmlIgnore()]
+		public ConsoleLogger ConsoleLogger { get { return Loggers.Find (x => x is ConsoleLogger) as ConsoleLogger; } }
+
+		[XmlIgnore()]
+		public FileLogger FileLogger { get { return Loggers.Find (x => x is FileLogger) as FileLogger; } }
+
+		[XmlIgnore()]
+		public WCFLogger WCFLogger { get { return Loggers.Find (x => x is WCFLogger) as WCFLogger; } }
+
+		#endregion
+
+		[XmlIgnore()]
+		private static MusaConfig instance;
+
+		[XmlIgnore()]
+		private static LoggerSet loggerSet;
+
+		public static LoggerSet GetLoggerSet()
 		{
-			get
-			{
-				if (_mongoDBLogger == null)
-					throw new Exception ("An exception occurred. Ensure to read the configuration using ReadFromFile(...) method.\n");
+			if (loggerSet != null)
+				return loggerSet;
 
-				return _mongoDBLogger;
-			}
-			private set
-			{
-				_mongoDBLogger = value;
-			}
+			loggerSet = new LoggerSet (instance.Loggers);
+			return loggerSet;
 		}
-		[XmlIgnore()]
-		private MongoDBLogger _mongoDBLogger;
 
-		[XmlIgnore()]
-		public ConsoleLogger ConsoleLogger 
+		/// <summary>
+		/// Gets the MUSA configuration.
+		/// </summary>
+		public static MusaConfig GetConfig()
 		{
-			get
-			{
-				if (_consoleLogger == null)
-					throw new Exception ("An exception occurred. Ensure to read the configuration using ReadFromFile(...) method.\n");
-
-				return _consoleLogger;
-			}
-			private set
-			{
-				_consoleLogger = value;
-			}
+			return instance;
 		}
-		[XmlIgnore()]
-		private ConsoleLogger _consoleLogger;
-
-		[XmlIgnore()]
-		public FileLogger FileLogger
-		{
-			get
-			{
-				if (_fileLogger == null)
-					throw new Exception ("An exception occurred. Ensure to read the configuration using ReadFromFile(...) method.\n");
-
-				return _fileLogger;
-			}
-			private set
-			{
-				_fileLogger = value;
-			}
-		}
-		[XmlIgnore()]
-		private FileLogger _fileLogger;
-
-		[XmlIgnore()]
-		public WCFLogger WCFLogger 
-		{
-			get
-			{
-				if (_wcfLogger == null)
-					throw new Exception ("An exception occurred. Ensure to read the configuration using ReadFromFile(...) method.\n");
-
-				return _wcfLogger;
-			}
-			private set
-			{
-				_wcfLogger = value;
-			}
-		}
-		[XmlIgnore()]
-		private WCFLogger _wcfLogger;
 
 		/// <summary>
 		/// Reads a MUSA configuration from file.
 		/// </summary>
-		public static MusaConfig ReadFromFile(string filename)
+		public static void ReadFromFile(string filename)
 		{
 			// Creates an instance of the XmlSerializer class;
 			// specifies the type of object to be deserialized.
@@ -137,26 +105,10 @@ namespace MusaConfig
 			FileStream fs = new FileStream(filename, FileMode.Open);
 
 			// Declares an object variable of the type to be deserialized.
-			MusaConfig po;
 
 			// Uses the Deserialize method to restore the object's state 
 			// with data from the XML document. */
-			po = (MusaConfig) serializer.Deserialize(fs);
-
-
-			foreach(MusaLogger l in po.Loggers)
-			{
-				if (l is WCFLogger)
-					po.WCFLogger = l as WCFLogger;
-				else if (l is MongoDBLogger)
-					po.MongoDBLogger = l as MongoDBLogger;
-				else if (l is FileLogger)
-					po.FileLogger = l as FileLogger;
-				else
-					po.ConsoleLogger = l as ConsoleLogger;
-			}
-
-			return po;
+			instance = (MusaConfig) serializer.Deserialize(fs);
 		}
 
 		/// <summary>
@@ -172,6 +124,8 @@ namespace MusaConfig
 				
 			// Serialize the MUSA configuration, and close the TextWriter.
 			serializer.Serialize(writer, this);
+
+			// Close the serializer
 			writer.Close();
 		}
 

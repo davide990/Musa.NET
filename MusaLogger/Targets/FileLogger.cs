@@ -7,7 +7,7 @@ using System.Reflection;
 using System;
 
 
-namespace MusaConfig
+namespace MusaConfiguration
 {
 	public class FileLogger : MusaLogger
 	{
@@ -39,7 +39,7 @@ namespace MusaConfig
 		void configure ()
 		{
 			var fileTarget = new FileTarget ();
-			Configuration.AddTarget ("file", fileTarget);
+			Configuration.AddTarget (GetType().Name, fileTarget);
 
 			if (string.IsNullOrEmpty (FileName))
 				FileName = "${basedir}/file.txt";
