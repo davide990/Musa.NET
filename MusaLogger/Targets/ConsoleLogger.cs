@@ -3,9 +3,9 @@ using NLog.Config;
 using NLog.Targets;
 using NLog;
 
-namespace MusaConfiguration
+namespace MusaLogger
 {
-	public class ConsoleLogger : MusaLogger
+	public class ConsoleLogger : Logger
 	{
 		[XmlAttribute("Enabled")]
 		public bool Enabled { get; set; }
@@ -19,7 +19,7 @@ namespace MusaConfiguration
 		{
 			// Create targets and add them to the configuration 
 			var consoleTarget = new ColoredConsoleTarget();
-			Configuration.AddTarget("console", consoleTarget);
+			Configuration.AddTarget(GetType().Name, consoleTarget);
 
 			// Set target properties 
 			consoleTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
@@ -35,7 +35,7 @@ namespace MusaConfiguration
 		public override void Log (LogLevel level, string message)
 		{
 			if (Enabled)
-				Logger.Log (level, message);
+				logger.Log (level, message);
 		}
 
 		public override string ToString ()

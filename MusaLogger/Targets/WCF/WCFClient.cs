@@ -1,10 +1,12 @@
-﻿using System;
-using System.ServiceModel.Channels;
+﻿using System.ServiceModel.Channels;
 using System.ServiceModel;
 
-namespace MusaConfiguration
+namespace MusaLogger
 {
-	public class WCFClient : ClientBase<IMusaWCFLogger>, IMusaWCFLogger
+	/// <summary>
+	/// The base WCF client used by WCFLogger.
+	/// </summary>
+	internal sealed class WCFClient : ClientBase<IMusaWCFLogger>, IMusaWCFLogger
 	{
 		public WCFClient (Binding binding, EndpointAddress address)
 			: base (binding, address)

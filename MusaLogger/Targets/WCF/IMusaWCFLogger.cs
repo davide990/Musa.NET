@@ -1,10 +1,11 @@
-﻿using System;
-using System.ServiceModel;
+﻿using System.ServiceModel;
 using System.ServiceModel.Web;
-using NLog;
 
-namespace MusaConfiguration
+namespace MusaLogger
 {
+	/// <summary>
+	/// The common interface that defines how logs are sent remotely using WCF service.
+	/// </summary>
 	[ServiceContract]
 	public interface IMusaWCFLogger
 	{

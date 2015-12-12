@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using NLog;
 using System.Linq;
 
 namespace MusaLogger
@@ -9,25 +8,30 @@ namespace MusaLogger
 	/// </summary>
 	public class LoggerSet
 	{
-		public List<MusaConfiguration.MusaLogger> loggers 
+		public List<Logger> loggers 
 		{
 			get;
 			private set;
 		}
 
-		public LoggerSet(List<MusaConfiguration.MusaLogger> loggers)
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MusaLogger.LoggerSet"/> class.
+		/// </summary>
+		/// <param name="loggers">The logger set found within the <see cref="MusaConfiguration.MusaConfig"/>
+		/// configuration.</param>
+		public LoggerSet(List<Logger> loggers)
 		{
-			this.loggers = loggers;
+			this.loggers = loggers.Where(x => x != null).ToList();
 		}
 
 		/// <summary>
 		/// Log the specified message using all the registered loggers.
 		/// </summary>
-		public void Log(LogLevel level, string message)
+		public void Log(NLog.LogLevel level, string message)
 		{
-			foreach(MusaConfiguration.MusaLogger a in loggers)
+			foreach (Logger a in loggers) 
 			{
-				if(a != null)
+				if (a != null)
 					a.Log (level, message);
 			}
 		}
@@ -35,9 +39,9 @@ namespace MusaLogger
 		/// <summary>
 		/// Gets the avaible registered loggers.
 		/// </summary>
-		public List<MusaConfiguration.MusaLogger> GetLoggers()
+		public List<Logger> GetLoggers()
 		{
-			return loggers.Where (x => x != null).ToList();
+			return loggers;
 		}
 
 	}

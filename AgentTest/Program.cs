@@ -73,12 +73,12 @@ namespace AgentTest
 			//TODO implementare un meccanismo di attesa per tutti gli agenti registrati nel sistema
 			env.WaitForAgents ();*/
 
-			Console.WriteLine ("Hello World!");
-
 			MusaConfig.ReadFromFile ("../../test_conf.xml");
 
-			MusaConfig a = MusaConfig.GetConfig ();
-			MusaConfig.GetLoggerSet ().Log (LogLevel.Info, "ciaooooo");
+			//MusaConfig a = MusaConfig.GetConfig ();
+			//MusaConfig.GetLoggerSet ().Log (LogLevel.Info, "ciaooooo");
+			MusaConfig.GetLoggerSet ().Log (LogLevel.Info, "ciao mondo");
+
         }
 
 		static void A_RegisterResult (string result)

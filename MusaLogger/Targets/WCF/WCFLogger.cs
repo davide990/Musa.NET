@@ -1,15 +1,13 @@
 ﻿using System.Xml.Serialization;
 using System.ServiceModel;
 using System;
-using NLog.Targets;
 using MusaLogger;
 using NLog.Config;
 using NLog;
 
-namespace MusaConfiguration
+namespace MusaLogger
 {
-	
-	public class WCFLogger : MusaLogger
+	public class WCFLogger : Logger
 	{
 		[XmlAttribute("Enabled")]
 		public bool Enabled { get; set; }
@@ -22,12 +20,10 @@ namespace MusaConfiguration
 
 		public void configure()
 		{
-			//client = new WCFClient (new BasicHttpBinding (), new EndpointAddress (EndpointAddress));
-
 			// Create targets and add them to the configuration 
 			var wcfTarget = new WCFTarget();
 			wcfTarget.EndpointAddress = EndpointAddress;
-			Configuration.AddTarget("WCF", wcfTarget);
+			Configuration.AddTarget(GetType().Name, wcfTarget);
 
 			// Set target properties 
 			wcfTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
@@ -54,7 +50,7 @@ namespace MusaConfiguration
 			{
 				try
 				{
-					Logger.Log(level, message);
+					logger.Log(level, message);
 				}
 				catch(EndpointNotFoundException e)
 				{

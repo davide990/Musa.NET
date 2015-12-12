@@ -2,14 +2,14 @@
 using System;
 using NLog;
 using NLog.Config;
-using NLog.MongoDB;
+using NLog.Mongo;
 
-namespace MusaConfiguration
+namespace MusaLogger
 {
 	/// <summary>
 	/// Mongo DB logger.
 	/// </summary>
-	public sealed class MongoDBLogger : MusaLogger
+	public sealed class MongoDBLogger : Logger
 	{
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="MusaConfig.MongoDBLogger"/> is enabled.
@@ -70,12 +70,12 @@ namespace MusaConfiguration
 		private void configure ()
 		{
 			// Create a new MongoDB nlog target
-			var mongoTarget = new MongoDBTarget ();
-			Configuration.AddTarget ("mongodb", mongoTarget);
+			var mongoTarget = new NLog.Mongo.MongoTarget ();
+			Configuration.AddTarget (GetType().Name, mongoTarget);
 
 			// set the attributes
 			mongoTarget.CollectionName = MongoDBCollectionName;
-			mongoTarget.ConnectionString = String.Format ("mongodb://{0}:{1}@{2}:{3}/musa_log?connectTimeoutMS=10000", MongoDBUser, MongoDBPass, MongoDBAddress, MongoDBPort);
+			mongoTarget.ConnectionString = String.Format ("mongodb://{0}:{1}@{2}:{3}/musa_log", MongoDBUser, MongoDBPass, MongoDBAddress, MongoDBPort);
 
 			// Define rules
 			var rule1 = new LoggingRule ("*", LogLevel.Debug, mongoTarget);
@@ -108,7 +108,7 @@ namespace MusaConfiguration
 			}
 
 			if (Enabled)
-				Logger.Log (level, message);
+				logger.Log (level, message);
 		}
 	}
 }

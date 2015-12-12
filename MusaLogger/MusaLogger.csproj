@@ -55,13 +55,12 @@
     <Reference Include="NLog">
       <HintPath>..\packages\NLog.4.2.2\lib\net45\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="NLog.MongoDB">
-      <HintPath>..\packages\NLog.MongoTarget.0.8.0\lib\net40\NLog.MongoDB.dll</HintPath>
+    <Reference Include="NLog.Mongo">
+      <HintPath>..\packages\NLog.Mongo.4.0.0.38\lib\net45\NLog.Mongo.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MusaLogger.cs" />
     <Compile Include="Targets\ConsoleLogger.cs" />
     <Compile Include="Targets\FileLogger.cs" />
     <Compile Include="Targets\MongoDBLogger.cs" />
@@ -70,6 +69,7 @@
     <Compile Include="Targets\WCF\WCFLogger.cs" />
     <Compile Include="Targets\WCF\WCFTarget.cs" />
     <Compile Include="LoggerSet.cs" />
+    <Compile Include="Logger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="UML\MusaLogger.cd" />

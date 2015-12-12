@@ -2,14 +2,10 @@
 using NLog.Config;
 using NLog;
 using System.Xml.Serialization;
-using System.Diagnostics;
-using System.Reflection;
-using System;
 
-
-namespace MusaConfiguration
+namespace MusaLogger
 {
-	public class FileLogger : MusaLogger
+	public class FileLogger : Logger
 	{
 		[XmlAttribute ("Enabled")]
 		public bool Enabled { get; set; }
@@ -67,7 +63,7 @@ namespace MusaConfiguration
 			}
 
 			if (Enabled)
-				Logger.Log (level, message);
+				logger.Log (level, message);
 		}
 	}
 }

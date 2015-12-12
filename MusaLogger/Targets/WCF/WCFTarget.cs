@@ -1,6 +1,4 @@
-﻿using System;
-using NLog.Targets;
-using MusaConfiguration;
+﻿using NLog.Targets;
 using System.ServiceModel;
 using NLog;
 
@@ -10,7 +8,7 @@ namespace MusaLogger
 	/// A custom nlog target using WCF service.
 	/// </summary>
 	[Target("WCFTarget")]
-	public class WCFTarget : TargetWithLayout
+	internal class WCFTarget : TargetWithLayout
 	{
 		/// <summary>
 		/// The client used for sending logs.

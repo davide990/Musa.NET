@@ -6,9 +6,6 @@ using MusaLogger;
 
 namespace MusaConfiguration
 {
-	/// <summary>
-	/// Musa config.
-	/// </summary>
 	[XmlRoot("MusaConfiguration")]
 	public sealed class MusaConfig
 	{
@@ -30,7 +27,7 @@ namespace MusaConfiguration
 		[XmlArrayItem("FileLogger", typeof(FileLogger))]
 		[XmlArrayItem("MongoDBLogger", typeof(MongoDBLogger))]
 		[XmlArrayItem("WCFLogger", typeof(WCFLogger))]
-		public List<MusaLogger> Loggers { get; set;	}
+		public List<Logger> Loggers { get; set;	}
 		#endregion XML elements
 
 		#region Properties
@@ -56,25 +53,71 @@ namespace MusaConfiguration
 		private string _fname;
 
 		[XmlIgnore()]
-		public MongoDBLogger MongoDBLogger { get { return Loggers.Find (x => x is MongoDBLogger) as MongoDBLogger; } }
+		public MongoDBLogger MongoDBLogger 
+		{ 
+			get { return Loggers.Find (x => x is MongoDBLogger) as MongoDBLogger; } 
+			set 
+			{ 
+				Loggers.RemoveAll (x => x is MongoDBLogger); 
+				if (value is MongoDBLogger)
+					Loggers.Add (value);
+			}
+		}
 
 		[XmlIgnore()]
-		public ConsoleLogger ConsoleLogger { get { return Loggers.Find (x => x is ConsoleLogger) as ConsoleLogger; } }
+		public ConsoleLogger ConsoleLogger 
+		{ 
+			get { return Loggers.Find (x => x is ConsoleLogger) as ConsoleLogger; } 
+			set 
+			{ 
+				Loggers.RemoveAll (x => x is MongoDBLogger); 
+				if (value is ConsoleLogger)
+					Loggers.Add (value);
+			}
+		}
 
 		[XmlIgnore()]
-		public FileLogger FileLogger { get { return Loggers.Find (x => x is FileLogger) as FileLogger; } }
+		public FileLogger FileLogger 
+		{ 
+			get { return Loggers.Find (x => x is FileLogger) as FileLogger; } 
+			set 
+			{ 
+				Loggers.RemoveAll (x => x is MongoDBLogger); 
+				if (value is FileLogger)
+					Loggers.Add (value);
+			}
+		}
 
 		[XmlIgnore()]
-		public WCFLogger WCFLogger { get { return Loggers.Find (x => x is WCFLogger) as WCFLogger; } }
+		public WCFLogger WCFLogger 
+		{ 
+			get { return Loggers.Find (x => x is WCFLogger) as WCFLogger; } 
+			set 
+			{ 
+				Loggers.RemoveAll (x => x is MongoDBLogger); 
+				if (value is WCFLogger)
+					Loggers.Add (value);
+			}
+		}
 
 		#endregion
 
+		/// <summary>
+		/// The unique configuration instance for this MUSA environment.
+		/// </summary>
 		[XmlIgnore()]
 		private static MusaConfig instance;
 
+		/// <summary>
+		/// The set of loggers registered within this configuration.
+		/// </summary>
 		[XmlIgnore()]
 		private static LoggerSet loggerSet;
 
+		/// <summary>
+		/// Gets the logger set. This class contains all the avaible registered loggers.
+		/// </summary>
+		/// <returns>The logger set.</returns>
 		public static LoggerSet GetLoggerSet()
 		{
 			if (loggerSet != null)

@@ -3,19 +3,19 @@ using NLog.Config;
 using NLog;
 using System.Diagnostics;
 
-namespace MusaConfiguration
+namespace MusaLogger
 {
 	/// <summary>
 	/// The abstract class that defines the behaviour of the logger
 	/// </summary>
-	public abstract class MusaLogger
+	public abstract class Logger
 	{
 		/// <summary>
 		/// Gets or sets the nlog logging configuration.
 		/// </summary>
 		/// <value>The configuration.</value>
 		[XmlIgnore()]
-		public static LoggingConfiguration Configuration
+		public LoggingConfiguration Configuration
 		{
 			get
 			{
@@ -30,14 +30,14 @@ namespace MusaConfiguration
 			}
 		}
 		[XmlIgnore()]
-		private static LoggingConfiguration conf;
+		private LoggingConfiguration conf;
 
 		/// <summary>
 		/// Gets the nlog logger.
 		/// </summary>
 		/// <value>The logger.</value>
 		[XmlIgnore()]
-		protected Logger Logger
+		protected NLog.Logger logger
 		{
 			get { return LogManager.GetLogger (GetType ().Name); }
 		}
@@ -48,7 +48,8 @@ namespace MusaConfiguration
 		[XmlIgnore()]
 		protected string LoggerName
 		{
-			get{
+			get
+			{
 				var m = new StackTrace().GetFrame(3).GetMethod();
 				return m.DeclaringType.Name;
 			}
