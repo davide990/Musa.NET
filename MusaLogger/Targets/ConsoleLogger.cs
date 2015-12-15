@@ -25,7 +25,7 @@ namespace MusaLogger
 			consoleTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
 
 			// Define rules
-			var rule1 = new LoggingRule("*", LogLevel.Debug, consoleTarget);
+			var rule1 = new LoggingRule("*", GetLogLevel(LogLevel.Debug), consoleTarget);
 			Configuration.LoggingRules.Add(rule1);
 
 			// Activate the configuration
@@ -35,7 +35,7 @@ namespace MusaLogger
 		public override void Log (LogLevel level, string message)
 		{
 			if (Enabled)
-				logger.Log (level, message);
+				logger.Log (GetLogLevel(level), message);
 		}
 
 		public override string ToString ()

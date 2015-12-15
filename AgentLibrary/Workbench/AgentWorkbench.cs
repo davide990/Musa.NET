@@ -14,6 +14,10 @@ __  __                                     _
 | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
 |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 */
+using MusaConfiguration;
+using MusaLogger;
+
+
 namespace AgentLibrary
 {
     /// <summary>
@@ -70,6 +74,8 @@ namespace AgentLibrary
         /// </summary>
         private readonly Agent parentAgent;
         
+		private LoggerSet logger;
+
         /// <summary>
         /// Create a new agent workbench
         /// </summary>
@@ -80,7 +86,9 @@ namespace AgentLibrary
             assignment_set  = new ObservableCollection<AssignmentType>();
 
             assignment_set.CollectionChanged    += on_assignment_set_changed;
-            statements.CollectionChanged        += on_workbench_changed;
+			statements.CollectionChanged        += on_workbench_changed;
+
+			logger = MusaConfig.GetLoggerSet();
         }
 
         /// <summary>
@@ -95,7 +103,8 @@ namespace AgentLibrary
 
             switch (e.Action)
             {
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+			case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+					logger.Log (LogLevel.Trace, "[WORKBENCH] ITEM ADDED");
                     Console.WriteLine("[WORKBENCH] ITEM ADDED");
                     break;  
 

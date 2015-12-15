@@ -55,6 +55,31 @@ namespace MusaLogger
 			}
 		}
 
+		protected NLog.LogLevel GetLogLevel(LogLevel level)
+		{
+			switch(level)
+			{
+			case LogLevel. Fatal:
+				return NLog.LogLevel.Fatal;
+
+			case LogLevel. Error:
+				return NLog.LogLevel.Error;
+
+			case LogLevel. Warn:
+				return NLog.LogLevel.Warn;
+
+			case LogLevel. Info:
+				return NLog.LogLevel.Info;
+
+			case LogLevel. Debug:
+				return NLog.LogLevel.Debug;
+
+			case LogLevel. Trace:
+			default:
+				return NLog.LogLevel.Trace;
+			}
+		}
+
 		/// <summary>
 		/// Log the specified message.
 		/// </summary>

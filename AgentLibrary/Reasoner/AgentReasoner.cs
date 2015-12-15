@@ -8,7 +8,6 @@
 
 */
 using System.Collections.Generic;
-using Quartz;
 using System.Collections;
 using System.Threading;
 using System;
@@ -16,6 +15,8 @@ using AgentLibrary.Networking;
 using FormulaLibrary.ANTLR;
 using FormulaLibrary;
 using PlanLibrary;
+using MusaLogger;
+using MusaConfiguration;
 
 namespace AgentLibrary
 {
@@ -138,6 +139,8 @@ namespace AgentLibrary
 		/// </summary>
 		private System.Threading.Timer reasoning_timer;
 
+		LoggerSet logger;
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AgentLibrary.AgentReasoner"/> class.
 		/// </summary>
@@ -161,21 +164,20 @@ namespace AgentLibrary
 			TimerCallback reasoning_method_callback = new TimerCallback (reasoningMain);
 			reasoning_timer = new System.Threading.Timer (reasoning_method_callback, new object(), ReasoningUpdateTime, ReasoningUpdateTime);
 
+			//Get the default logger set from the environment configuration
+			logger = MusaConfig.GetLoggerSet();
         }
 
         internal void startReasoning()
         {
-			//TODO log this
-            //TODO segna un timestamp in cui inizia il reasoning
-            Console.WriteLine("Starting agent [" + parentAgent.Name + "] reasoning...");
+			logger.Log (LogLevel.Trace, parentAgent.Name + " starts reasoning");
 			IsRunning = true;
         }
 
         public void stopReasoning()
         {
+			logger.Log (LogLevel.Trace, parentAgent.Name + " stops reasoning");
 			IsRunning = false;
-			//TODO log this
-            //TODO segna un timestamp in cui ferma il reasoning
 
         }
 
@@ -184,9 +186,7 @@ namespace AgentLibrary
 		/// </summary>
 		public void Pause()
 		{
-			//TODO log pause reasoning
-			Console.WriteLine ("### " + parentAgent.Name + " PAUSED ###");
-
+			logger.Log (LogLevel.Trace, parentAgent.Name + " paused");
 			pause_requested = true;
 		}
 
@@ -195,16 +195,13 @@ namespace AgentLibrary
 		/// </summary>
         public void Resume()
         {
-			Console.WriteLine ("### " + parentAgent.Name + " RESUMED ###");
+			logger.Log (LogLevel.Trace, parentAgent.Name + " resumed");
 
 			//Set the Paused value to false
 			Paused = false;
 
 			//Change the reasoner start time/interval
 			reasoning_timer.Change (ReasoningUpdateTime, ReasoningUpdateTime);
-
-			//TODO log resume reasoning
-            //TODO segna un timestamp in cui ripristina il reasoning
         }
 
 		/// <summary>
@@ -216,14 +213,12 @@ namespace AgentLibrary
 			//wait until this reasoning cycle has finished
 			reasoning_timer.Change (Timeout.Infinite, Timeout.Infinite);
 
-			//TODO log here
-            Console.WriteLine("reasoning cycle #"+ currentReasoningCycle++);
-            Console.WriteLine("Checking mail box...");
+			logger.Log (LogLevel.Trace, parentAgent.Name + ": reasoning cycle #"+currentReasoningCycle++);
             
 			//Check the agent's mail box and update its workbench according to the last received message
             checkMailBox();
 
-            Console.WriteLine("Checking environment changes...");
+			logger.Log (LogLevel.Trace, "Checking environment changes...");
 
 			Thread.Sleep (500);
 
@@ -235,7 +230,8 @@ namespace AgentLibrary
 			//Trigger potential events produced by this agent's environment perception
 			triggerEvent ();
 
-            Console.WriteLine("######### done reasoning...");
+			logger.Log (LogLevel.Trace, "######### done reasoning...");
+
             Thread.Sleep(ReasoningUpdateTime);
 
 			//If a pause request is pending
@@ -275,12 +271,12 @@ namespace AgentLibrary
 			switch (msg.InfoType)
 			{
 			case InformationType.Tell:
-				Console.WriteLine ("[" + parentAgent.Name + "] perceiving TELL: " + msg.ToString ());
+				logger.Log (LogLevel.Trace, "[" + parentAgent.Name + "] perceiving TELL: " + msg);
 				parentAgent.Workbench.AddStatement (FormulaParser.Parse (msg.Message as string));
 				break;
 
 			case InformationType.Untell:
-				Console.WriteLine ("[" + parentAgent.Name + "] perceiving UNTELL: " + msg.ToString ());
+				logger.Log (LogLevel.Trace, "[" + parentAgent.Name + "] perceiving UNTELL: " + msg);
 				parentAgent.Workbench.RemoveStatement (FormulaParser.Parse (msg.Message as string));
 				break;
 			

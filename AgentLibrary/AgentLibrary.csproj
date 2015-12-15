@@ -41,9 +41,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="Quartz, Version=2.3.3.0, Culture=neutral, PublicKeyToken=f6b8c98a402cc8a4">
-      <HintPath>..\packages\Quartz.2.3.3\lib\net40\Quartz.dll</HintPath>
-    </Reference>
     <Reference Include="Common.Logging.Core">
       <HintPath>..\packages\Common.Logging.Core.3.3.1\lib\net40\Common.Logging.Core.dll</HintPath>
     </Reference>
@@ -54,10 +51,6 @@
   <ItemGroup>
     <Compile Include="Agent.cs" />
     <Compile Include="AgentEnvironement.cs" />
-    <Compile Include="AgentJob\AgentJob.cs" />
-    <Compile Include="AgentJob\AgentJobHeader.cs" />
-    <Compile Include="AgentJob\AgentJobResult.cs" />
-    <Compile Include="AgentJob\AgentJobState.cs" />
     <Compile Include="AgentRole.cs" />
     <Compile Include="Networking\AgentMessage.cs" />
     <Compile Include="Networking\AgentPassport.cs" />
@@ -77,9 +70,6 @@
     <Compile Include="Trigger\TriggerType.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="job_scheduling_data_2_0.xsd">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="packages.config" />
     <None Include="UML\AgentLibrary.cd" />
     <None Include="UML\MusaNetworking.cd" />
@@ -92,6 +82,14 @@
     <ProjectReference Include="..\PlanLibrary\PlanLibrary.csproj">
       <Project>{5EB4BE6E-6C14-43D5-9F98-86E635F74C78}</Project>
       <Name>PlanLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MusaLogger\MusaLogger.csproj">
+      <Project>{5CF5FB93-94DC-4A88-BCB1-95F2AD757F01}</Project>
+      <Name>MusaLogger</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MusaConfiguration\MusaConfiguration.csproj">
+      <Project>{E05E465D-3BBD-4708-B00E-8001089DE01B}</Project>
+      <Name>MusaConfiguration</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

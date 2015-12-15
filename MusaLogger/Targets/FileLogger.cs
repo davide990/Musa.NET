@@ -46,7 +46,7 @@ namespace MusaLogger
 			fileTarget.FileName = FileName;
 			fileTarget.Layout = Layout;
 
-			var rule2 = new LoggingRule ("*", LogLevel.Debug, fileTarget);
+			var rule2 = new LoggingRule ("*", GetLogLevel(LogLevel.Debug), fileTarget);
 			Configuration.LoggingRules.Add (rule2);
 
 			// Activate the configuration
@@ -63,7 +63,7 @@ namespace MusaLogger
 			}
 
 			if (Enabled)
-				logger.Log (level, message);
+				logger.Log (GetLogLevel(level), message);
 		}
 	}
 }

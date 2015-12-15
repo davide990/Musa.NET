@@ -18,7 +18,7 @@ namespace AgentLibrary
         {
             
         }
-        private AgentJobHeader jobHeader;
+        
         private Trigger trigger;
     }
 }

@@ -27,7 +27,7 @@ namespace MusaLogger
 		/// <summary>
 		/// Log the specified message using all the registered loggers.
 		/// </summary>
-		public void Log(NLog.LogLevel level, string message)
+		public void Log(LogLevel level, string message)
 		{
 			foreach (Logger a in loggers) 
 			{

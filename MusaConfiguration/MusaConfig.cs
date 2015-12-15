@@ -123,6 +123,10 @@ namespace MusaConfiguration
 			if (loggerSet != null)
 				return loggerSet;
 
+			//If no logger has been found, create a "default" console logger
+			if (instance.Loggers.Count <= 0)
+				instance.Loggers.Add (new ConsoleLogger ());
+
 			loggerSet = new LoggerSet (instance.Loggers);
 			return loggerSet;
 		}

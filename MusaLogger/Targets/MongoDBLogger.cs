@@ -78,7 +78,7 @@ namespace MusaLogger
 			mongoTarget.ConnectionString = String.Format ("mongodb://{0}:{1}@{2}:{3}/musa_log", MongoDBUser, MongoDBPass, MongoDBAddress, MongoDBPort);
 
 			// Define rules
-			var rule1 = new LoggingRule ("*", LogLevel.Debug, mongoTarget);
+			var rule1 = new LoggingRule ("*", GetLogLevel(LogLevel.Debug), mongoTarget);
 			Configuration.LoggingRules.Add (rule1);
 
 			// Activate the configuration
@@ -108,7 +108,7 @@ namespace MusaLogger
 			}
 
 			if (Enabled)
-				logger.Log (level, message);
+				logger.Log (GetLogLevel(level), message);
 		}
 	}
 }

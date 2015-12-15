@@ -29,7 +29,7 @@ namespace MusaLogger
 			wcfTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
 
 			// Define rules
-			var rule1 = new LoggingRule("*", LogLevel.Debug, wcfTarget);
+			var rule1 = new LoggingRule("*", GetLogLevel(LogLevel.Debug), wcfTarget);
 			Configuration.LoggingRules.Add(rule1);
 
 			// Activate the configuration
@@ -50,7 +50,7 @@ namespace MusaLogger
 			{
 				try
 				{
-					logger.Log(level, message);
+					logger.Log(GetLogLevel(level), message);
 				}
 				catch(EndpointNotFoundException e)
 				{
