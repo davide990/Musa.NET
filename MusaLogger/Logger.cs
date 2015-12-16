@@ -1,7 +1,6 @@
 ﻿using System.Xml.Serialization;
 using NLog.Config;
 using NLog;
-using System.Diagnostics;
 
 namespace MusaLogger
 {
@@ -46,14 +45,17 @@ namespace MusaLogger
 		/// Gets the name of this logger (the class type name)
 		/// </summary>
 		[XmlIgnore()]
-		protected string LoggerName
-		{
-			get
-			{
-				var m = new StackTrace().GetFrame(3).GetMethod();
+		protected string LoggerName {
+			/*get {
+				var m = new StackTrace ().GetFrame (3).GetMethod ();
 				return m.DeclaringType.Name;
+			}*/
+			get
+			{ 
+				return GetType ().Name;
 			}
 		}
+
 
 		protected NLog.LogLevel GetLogLevel(LogLevel level)
 		{

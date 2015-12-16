@@ -17,6 +17,8 @@ using PlanLibrary;
 using System.Reflection;
 using FormulaLibrary;
 using FormulaLibrary.ANTLR;
+using MusaLogger;
+using MusaConfiguration;
 
 
 namespace AgentLibrary
@@ -235,12 +237,18 @@ namespace AgentLibrary
 
 		#endregion
 
+		/// <summary>
+		/// The logger of this agent. It is automatically configured using the environment configuration file. If this
+		/// file is missing, a console logger is automatically set up.
+		/// </summary>
+		private LoggerSet Logger;
+
         #region Constructors
 
 		/// <summary>
 		/// Create a new agent
 		/// </summary>
-		public Agent () : this ("agent_" + (new Random ().Next (Int32.MaxValue)).ToString())
+		public Agent () : this ("agent_" + (new Random ().Next (Int32.MaxValue)))
 		{
 		}
 
@@ -261,6 +269,7 @@ namespace AgentLibrary
 			createdAt = DateTime.Now;
 			resume_reasoning = false;
 			PlansCollection = new Dictionary<Type, IPlanInstance> ();
+			Logger = MusaConfig.GetLoggerSet ();
 
 			Busy = false;
         }
@@ -300,9 +309,8 @@ namespace AgentLibrary
 		/// formula to be added to this agent's workbench</param>
         internal void notifyEnvironementChanges(PerceptionType action, IList changes)
         {
-			//TODO log environment change
 			foreach (var v in changes)
-				Console.WriteLine ("[Agent " + name + "] received " + action.ToString () + " -> " + v.ToString ());
+				Logger.Log (LogLevel.Trace, "[" + name + "] received " + action + " -> " + v);
             
 			PerceivedEnvironementChanges.Push (new Tuple<IList, PerceptionType> (changes, action));
         }
@@ -325,8 +333,7 @@ namespace AgentLibrary
 		{
 			if (current_executing_plan.IsAtomic ())
 			{
-				//TODO log agent cannot be paused
-				Console.WriteLine ("Agent " + Name + " is executing an atomic plan. It Will be paused after the plan has finished its execution.");
+				Logger.Log (LogLevel.Trace, "[" + Name + "] I'm executing an atomic plan. It Will be paused after the plan has finished its execution.");
 
 				//Request this agent to pause only after the current atomic plan has finished its execution
 				pause_requested = true;
@@ -342,8 +349,7 @@ namespace AgentLibrary
 			//Suspend the current executing plan
 			CurrentExecutingPlan.Pause ();
 
-			//TODO log agent paused 
-			Console.WriteLine ("##PAUSE##");
+			Logger.Log (LogLevel.Trace, "["+Name + "] paused");
 		}
 
 		/// <summary>
@@ -356,8 +362,7 @@ namespace AgentLibrary
 			
 			Paused = false;
 
-			//TODO log resume execution
-			Console.WriteLine ("##RESUME##");
+			Logger.Log (LogLevel.Trace, "["+Name + "] resumed");
 
 			//Resume the execution of the suspended plan
 			CurrentExecutingPlan.Resume ();
@@ -376,7 +381,7 @@ namespace AgentLibrary
 		/// Adds a plan to this agent.
 		/// </summary>
 		/// <returns><c>true</c>, if plan was added, <c>false</c> otherwise.</returns>
-		/// <param name="plan">The plan model to be added. An instance of this plan is instantiated</param>
+		/// <param name="Plan">The plan model to be added. An instance of this plan is instantiated</param>
 		public void AddPlan(Type Plan)
 		{
 			if (!Plan.BaseType.IsEquivalentTo (typeof(PlanModel)))
@@ -398,6 +403,10 @@ namespace AgentLibrary
 			Delegate plan_finished_delegate = Delegate.CreateDelegate (plan_finished_event.EventHandlerType, this, plan_finished_delegate_method);
 			plan_finished_event.AddEventHandler (plan_instance, plan_finished_delegate);
 
+			//Attach the plan's logger to this agent's logger
+			PropertyInfo plan_logger = planInstanceType.GetProperty ("Logger", BindingFlags.NonPublic|BindingFlags.Instance);
+			plan_logger.SetValue (plan_instance, Logger);
+
 			//Add the plan to the agent's plan collection
 			PlansCollection.Add (Plan, plan_instance as IPlanInstance);
 		}
@@ -411,8 +420,7 @@ namespace AgentLibrary
 		/// <param name="args">Arguments.</param>
 		private void onPlanInstanceFinished(object sender, EventArgs args)
 		{
-			//TODO log [agent + plan + event->finished]
-			Console.WriteLine ("[Agent " + Name + "] plan " + (sender as IPlanInstance).GetName() + " finished its execution.");
+			Logger.Log (LogLevel.Trace, "[" + Name + "] plan " + (sender as IPlanInstance).GetName() + " finished its execution.");
 
 			//Set the value of CurrentExecutingPlan to null
 			CurrentExecutingPlan = null;
@@ -431,8 +439,6 @@ namespace AgentLibrary
 				//Pause the agent's reasoner
 				reasoner.Pause ();
 
-				//TODO log agent paused 
-				Console.WriteLine ("##PAUSE##");
 				return;
 			}
 
@@ -456,7 +462,7 @@ namespace AgentLibrary
 				Workbench.AddStatement(resultFormula);
 
 				//TODO log register result
-				Console.WriteLine("[Agent "+Name+"] registered result: "+result);	
+				Logger.Log (LogLevel.Trace, "["+Name+"] registered result: "+result);
 			}
 		}
 
@@ -472,7 +478,6 @@ namespace AgentLibrary
 			if (Busy) 
 			{
 				throw new Exception ("Agent [" + Name + "] is currently executing plan " + CurrentExecutingPlan);
-				return;
 			}
 				
 			//If Plan is not of type PlanModel, then throw an exception

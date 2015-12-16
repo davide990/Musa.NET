@@ -13,6 +13,8 @@ using PlanLibrary;
 using System.Threading;
 using MusaConfiguration;
 using MusaLogger;
+using FormulaLibrary;
+using System.ComponentModel;
 
 namespace AgentTest
 {
@@ -33,13 +35,16 @@ namespace AgentTest
         {
             //startMUSA();
 
-			/*
+			MusaConfig.ReadFromFile ("../../test_conf.xml");
+			MusaConfig.GetLoggerSet ().Log (LogLevel.Info, "wella");
+
 			AgentEnvironement env = AgentEnvironement.GetInstance();
 			Agent a = new Agent ("agent_1").Start();
 
 			BackgroundWorker wk = new BackgroundWorker ();
 			wk.DoWork += delegate 
 			{
+				MusaConfig.GetLoggerSet ().Log (LogLevel.Info, "wella from bgworker");
 				Thread.Sleep(3000);
 				env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
 
@@ -48,7 +53,7 @@ namespace AgentTest
 
 				/*a.Pause();
 				Thread.Sleep(10000);
-				a.Resume();  ******
+				a.Resume();  ******/
 			};
 			wk.RunWorkerAsync ();
 
@@ -61,18 +66,12 @@ namespace AgentTest
 
 			env.RegisterAgent (a);
 
-			//env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
+			env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
 
 			//a.AchieveGoal (typeof(PlanExample2));
 
 			//TODO implementare un meccanismo di attesa per tutti gli agenti registrati nel sistema
-			env.WaitForAgents ();*/
-
-			MusaConfig.ReadFromFile ("../../test_conf.xml");
-
-			//MusaConfig a = MusaConfig.GetConfig ();
-			//MusaConfig.GetLoggerSet ().Log (LogLevel.Info, "ciaooooo");
-			MusaConfig.GetLoggerSet ().Log (LogLevel.Info, "ciao mondo");
+			env.WaitForAgents ();
 
         }
 
@@ -104,19 +103,15 @@ namespace AgentTest
 		[PlanEntryPoint]
 		void wella(Dictionary<string,object> args)
 		{
-			Console.WriteLine ("Ciao!");
+			log (LogLevel.Info, "Ciao 1");
 			ExecuteStep ("other_step1");
 		}
 
 		[PlanStep]
 		void other_step1()
 		{
-			Console.WriteLine ("Ciao 2");
-			Thread.Sleep (500);
-
-			Console.WriteLine ("Ciao 3");
-			Thread.Sleep (500);
-
+			log (LogLevel.Info, "Ciao 2");
+			log (LogLevel.Info, "Ciao 3");
 			//RegisterResult ("f(x)");
 		}
 	}

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
+using MusaLogger;
 
 namespace PlanLibrary
 {
@@ -116,6 +116,9 @@ namespace PlanLibrary
 		/// </summary>
 		internal event onRegisterResult RegisterResultEvent;
 
+
+		internal delegate void onLog(LogLevel level, string message);
+		internal event onLog Log;
 
 
 		/// <summary>
@@ -248,7 +251,6 @@ namespace PlanLibrary
 
 		protected void ExecuteExternalPlan()
 		{
-			
 			// TODO implementare invocazione piani esterni (cioè in ambienti remoti)
 		}
 
@@ -261,6 +263,16 @@ namespace PlanLibrary
 			RegisterResultEvent (result);
 		}
 
+		/// <summary>
+		/// Log the specified message.
+		/// </summary>
+		protected void log(LogLevel level, string message)
+		{
+			//Raise an event that will be catched from the PlanInstance instance this model is related to. As it's 
+			//catched, the PlanInstance's logger will log the requested message.
+			if (Log != null) 
+				Log (level, message);
+		}
 	}
 }
 

@@ -136,6 +136,16 @@ namespace MusaConfiguration
 		/// </summary>
 		public static MusaConfig GetConfig()
 		{
+			if(instance == null)
+			{
+				instance = new MusaConfig ();
+				instance.MaxNumAgent = "100";
+				instance.MusaAddress = "127.0.0.1";
+				instance.MusaAddressPort = 8089;
+				instance.NetworkingEnabled = true;
+				instance.Loggers = new List<Logger> (){ new ConsoleLogger () };
+			}
+			
 			return instance;
 		}
 

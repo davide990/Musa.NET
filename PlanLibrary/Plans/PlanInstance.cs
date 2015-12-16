@@ -5,6 +5,7 @@ using FormulaLibrary.ANTLR;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
+using MusaLogger;
 
 namespace PlanLibrary
 {
@@ -100,6 +101,15 @@ namespace PlanLibrary
 		/// </summary>
 		public event EventHandler Finished;
 
+		/// <summary>
+		/// Gets the logger of the agent this plan is registered to.
+		/// </summary>
+		protected LoggerSet Logger 
+		{
+			get;
+			private set;
+		}
+
 		#endregion Fields/Properties
 
 
@@ -119,7 +129,8 @@ namespace PlanLibrary
 		{
 			plan_model = Activator.CreateInstance (typeof(T)) as PlanModel;
 			plan_model.RegisterResultEvent += OnRegisterResult;
-				
+			plan_model.Log += Log;
+		
 			//add an event handler for step's execution
 			foreach(PlanStep step in plan_model.Steps)
 				step.ExecuteStep += onExecuteStep;
@@ -135,6 +146,12 @@ namespace PlanLibrary
 				
 			//Initialize the ManualResetEvent object
 			_busy = new ManualResetEvent (true);
+		}
+
+
+		private void Log (LogLevel level, string message)
+		{
+			Logger.Log (level, message);
 		}
 
 		/// <summary>

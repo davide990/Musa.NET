@@ -2,10 +2,25 @@
 using NLog.Config;
 using NLog.Targets;
 using NLog;
+using System.Diagnostics;
+using System;
 
 namespace MusaLogger
 {
-	public class ConsoleLogger : Logger
+	public class ConsoleTarget : TargetWithLayout
+	{
+		protected override void Write (LogEventInfo logEvent)
+		{
+			string logMessage = Layout.Render(logEvent);
+
+			if (Debugger.IsAttached)
+				Trace.WriteLine (logMessage);
+			else
+				Console.WriteLine (logMessage);
+		}
+	}
+
+	public sealed class ConsoleLogger : Logger
 	{
 		[XmlAttribute("Enabled")]
 		public bool Enabled { get; set; }
@@ -18,7 +33,8 @@ namespace MusaLogger
 		private void configure()
 		{
 			// Create targets and add them to the configuration 
-			var consoleTarget = new ColoredConsoleTarget();
+			//var consoleTarget = new ColoredConsoleTarget();
+			var consoleTarget = new ConsoleTarget();
 			Configuration.AddTarget(GetType().Name, consoleTarget);
 
 			// Set target properties 
