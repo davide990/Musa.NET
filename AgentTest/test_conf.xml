@@ -1,9 +1,10 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <MusaConfiguration xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<MaxNumAgent>2000</MaxNumAgent>
+	<!--<MaxNumAgent>2000</MaxNumAgent>
 	<MusaAddress>localhost</MusaAddress>
 	<MusaAddressPort>8089</MusaAddressPort>
 	<NetworkingEnabled>true</NetworkingEnabled>
+	<MinimumLogLevel>3</MinimumLogLevel>-->
 
 	<Logging>
 		<ConsoleLogger Enabled="true"/>

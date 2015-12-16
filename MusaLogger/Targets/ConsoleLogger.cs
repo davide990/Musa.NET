@@ -50,8 +50,13 @@ namespace MusaLogger
 
 		public override void Log (LogLevel level, string message)
 		{
-			if (Enabled)
-				logger.Log (GetLogLevel(level), message);
+			
+			if (Enabled && (int)level >= MinimumLogLevel)
+			{
+				string s = String.Format ("{0}\t{1}\t{2}\t{3} ", DateTime.Now, LoggerName, level.ToString ().ToUpper(), message);	
+				Console.WriteLine (s);
+			}
+				//logger.Log (GetLogLevel(level), message);
 		}
 
 		public override string ToString ()

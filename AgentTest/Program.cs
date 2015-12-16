@@ -36,7 +36,6 @@ namespace AgentTest
             //startMUSA();
 
 			MusaConfig.ReadFromFile ("../../test_conf.xml");
-			MusaConfig.GetLoggerSet ().Log (LogLevel.Info, "wella");
 
 			AgentEnvironement env = AgentEnvironement.GetInstance();
 			Agent a = new Agent ("agent_1").Start();
@@ -44,7 +43,6 @@ namespace AgentTest
 			BackgroundWorker wk = new BackgroundWorker ();
 			wk.DoWork += delegate 
 			{
-				MusaConfig.GetLoggerSet ().Log (LogLevel.Info, "wella from bgworker");
 				Thread.Sleep(3000);
 				env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
 
@@ -63,7 +61,7 @@ namespace AgentTest
 			a.AddEvent ("f(x)", PerceptionType.AddBelief, typeof(PlanExample2));
 			a.AddEvent ("f(x)", PerceptionType.RemoveBelief, typeof(PlanExample2));
 
-
+		
 			env.RegisterAgent (a);
 
 			env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
@@ -111,7 +109,10 @@ namespace AgentTest
 		void other_step1()
 		{
 			log (LogLevel.Info, "Ciao 2");
+			Thread.Sleep (500);
+
 			log (LogLevel.Info, "Ciao 3");
+			Thread.Sleep (500);
 			//RegisterResult ("f(x)");
 		}
 	}

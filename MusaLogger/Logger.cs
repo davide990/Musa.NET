@@ -9,6 +9,9 @@ namespace MusaLogger
 	/// </summary>
 	public abstract class Logger
 	{
+		[XmlElement("MinimumLogLevel")]
+		public int MinimumLogLevel { get; set; }
+
 		/// <summary>
 		/// Gets or sets the nlog logging configuration.
 		/// </summary>

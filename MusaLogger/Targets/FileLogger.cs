@@ -62,7 +62,7 @@ namespace MusaLogger
 				configure ();
 			}
 
-			if (Enabled)
+			if (Enabled && (int)level >= MinimumLogLevel)
 				logger.Log (GetLogLevel(level), message);
 		}
 	}

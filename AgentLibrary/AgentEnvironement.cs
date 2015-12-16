@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net;
-using System.Reflection;
-using System.ServiceModel;
 using System.Threading;
 using MusaLogger;
 using MusaConfiguration;
@@ -74,6 +72,9 @@ namespace AgentLibrary
 
 		private static AgentEnvironement instance;
 
+		/// <summary>
+		/// The logger this environment uses.
+		/// </summary>
 		private LoggerSet logger;
 
 		/// <summary>

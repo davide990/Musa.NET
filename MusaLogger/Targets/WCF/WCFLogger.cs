@@ -46,7 +46,7 @@ namespace MusaLogger
 				configure ();
 			}
 
-			if (Enabled)
+			if (Enabled && (int)level >= MinimumLogLevel)
 			{
 				try
 				{
