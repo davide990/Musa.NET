@@ -64,7 +64,6 @@
     <Compile Include="Targets\ConsoleLogger.cs" />
     <Compile Include="Targets\FileLogger.cs" />
     <Compile Include="Targets\MongoDBLogger.cs" />
-    <Compile Include="Targets\WCF\IMusaWCFLogger.cs" />
     <Compile Include="Targets\WCF\WCFClient.cs" />
     <Compile Include="Targets\WCF\WCFLogger.cs" />
     <Compile Include="Targets\WCF\WCFTarget.cs" />
@@ -86,5 +85,11 @@
   -->
   <ItemGroup>
     <Folder Include="Targets\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MusaWCFLogger\MusaWCFLogger.csproj">
+      <Project>{ECB83DD7-A309-47E2-B399-AFE88079DAB2}</Project>
+      <Name>MusaWCFLogger</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

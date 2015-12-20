@@ -35,14 +35,16 @@ namespace MusaLogger
 			// Create targets and add them to the configuration 
 			//var consoleTarget = new ColoredConsoleTarget();
 			var consoleTarget = new ConsoleTarget();
-			Configuration.AddTarget(GetType().Name, consoleTarget);
 
 			// Set target properties 
 			consoleTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
 
 			// Define rules
-			var rule1 = new LoggingRule("*", GetLogLevel(LogLevel.Debug), consoleTarget);
+			var rule1 = new LoggingRule(LoggerName, GetLogLevel(LogLevel.Debug), consoleTarget);
+
+			Configuration.AddTarget(LoggerName, consoleTarget);
 			Configuration.LoggingRules.Add(rule1);
+			Configuration.Reload ();
 
 			// Activate the configuration
 			LogManager.Configuration = Configuration;
@@ -51,12 +53,12 @@ namespace MusaLogger
 		public override void Log (LogLevel level, string message)
 		{
 			
-			if (Enabled && (int)level >= MinimumLogLevel)
+			/*if (Enabled && (int)level >= MinimumLogLevel)
 			{
 				string s = String.Format ("{0}\t{1}\t{2}\t{3} ", DateTime.Now, LoggerName, level.ToString ().ToUpper(), message);	
 				Console.WriteLine (s);
-			}
-				//logger.Log (GetLogLevel(level), message);
+			}*/
+			logger.Log (GetLogLevel(level), message);
 		}
 
 		public override string ToString ()

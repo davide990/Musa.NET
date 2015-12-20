@@ -1,6 +1,8 @@
 ﻿using NLog.Targets;
 using System.ServiceModel;
 using NLog;
+using System;
+using NLog.Config;
 
 namespace MusaLogger
 {
@@ -19,6 +21,7 @@ namespace MusaLogger
 		/// Gets or sets the endpoint address to which send logs.
 		/// </summary>
 		/// <value>The endpoint address.</value>
+		[RequiredParameter]
 		public string EndpointAddress { get; set; }
 
 		/// <summary>
@@ -26,6 +29,13 @@ namespace MusaLogger
 		/// </summary>
 		protected override void InitializeTarget ()
 		{
+			/*var binding = new NetTcpBinding ();
+			binding.PortSharingEnabled = true;
+
+
+			client = new WCFClient (binding, new EndpointAddress ("net.tcp://localhost:8089"));*/
+
+
 			client = new WCFClient (new BasicHttpBinding (), new EndpointAddress (EndpointAddress));
 		}
 
@@ -36,7 +46,7 @@ namespace MusaLogger
 		protected override void Write (LogEventInfo logEvent)
 		{
 			string logMessage = Layout.Render(logEvent);
-			client.Log (logEvent.Level.ToString(), logMessage);
+			client.Log (logEvent.Level.ToString (), logMessage);		
 		}
 	}
 }

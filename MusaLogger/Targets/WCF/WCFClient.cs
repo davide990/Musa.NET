@@ -1,5 +1,8 @@
 ﻿using System.ServiceModel.Channels;
 using System.ServiceModel;
+using System;
+using MusaWCFLogger;
+using System.Threading.Tasks;
 
 namespace MusaLogger
 {
@@ -15,6 +18,11 @@ namespace MusaLogger
 		public void Log (string level, string message)
 		{
 			Channel.Log (level, message);
+		}
+
+		public async void GetStringDataAsync(string level, string message)
+		{
+			await Task.Factory.StartNew(() => Channel.Log(level,message));
 		}
 	}
 }

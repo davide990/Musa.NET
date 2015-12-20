@@ -23,18 +23,21 @@ namespace MusaLogger
 			// Create targets and add them to the configuration 
 			var wcfTarget = new WCFTarget();
 			wcfTarget.EndpointAddress = EndpointAddress;
-			Configuration.AddTarget(GetType().Name, wcfTarget);
+			wcfTarget.Name = LoggerName;
 
 			// Set target properties 
 			wcfTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
 
 			// Define rules
-			var rule1 = new LoggingRule("*", GetLogLevel(LogLevel.Debug), wcfTarget);
+			var rule1 = new LoggingRule(GetType().Name, GetLogLevel(LogLevel.Debug), wcfTarget);
+
 			Configuration.LoggingRules.Add(rule1);
+			Configuration.AddTarget(LoggerName, wcfTarget);
+			Configuration.Reload ();
 
 			// Activate the configuration
 			LogManager.Configuration = Configuration;
-		}
+		}	
 
 		public override void Log (LogLevel level, string message)
 		{

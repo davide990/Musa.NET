@@ -3,11 +3,13 @@
 	<!--<MaxNumAgent>2000</MaxNumAgent>
 	<MusaAddress>localhost</MusaAddress>
 	<MusaAddressPort>8089</MusaAddressPort>
-	<NetworkingEnabled>true</NetworkingEnabled>
-	<MinimumLogLevel>3</MinimumLogLevel>-->
 
+	<MinimumLogLevel>3</MinimumLogLevel>-->
+	<NetworkingEnabled>false</NetworkingEnabled>
 	<Logging>
-		<ConsoleLogger Enabled="true"/>
+		<!--<ConsoleLogger Enabled="true"/>-->
+		<WCFLogger Enabled="true"
+					EndpointAddress="http://localhost:8089/"/>
 
 		<FileLogger Enabled="true"
 					FileName="/home/davide/log.txt"/>

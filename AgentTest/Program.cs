@@ -15,6 +15,7 @@ using MusaConfiguration;
 using MusaLogger;
 using FormulaLibrary;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace AgentTest
 {
@@ -31,12 +32,8 @@ namespace AgentTest
 			env.RegisterAgent(c);
         }
 
-        static void Main(string[] args)
-        {
-            //startMUSA();
-
-			MusaConfig.ReadFromFile ("../../test_conf.xml");
-
+		static void configureAndStartMusa()
+		{
 			AgentEnvironement env = AgentEnvironement.GetInstance();
 			Agent a = new Agent ("agent_1").Start();
 
@@ -49,9 +46,6 @@ namespace AgentTest
 				//Thread.Sleep(2000);
 				env.DeleteStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
 
-				/*a.Pause();
-				Thread.Sleep(10000);
-				a.Resume();  ******/
 			};
 			wk.RunWorkerAsync ();
 
@@ -61,7 +55,7 @@ namespace AgentTest
 			a.AddEvent ("f(x)", PerceptionType.AddBelief, typeof(PlanExample2));
 			a.AddEvent ("f(x)", PerceptionType.RemoveBelief, typeof(PlanExample2));
 
-		
+
 			env.RegisterAgent (a);
 
 			env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
@@ -70,7 +64,27 @@ namespace AgentTest
 
 			//TODO implementare un meccanismo di attesa per tutti gli agenti registrati nel sistema
 			env.WaitForAgents ();
+		}
 
+        static void Main(string[] args)
+        {
+            //startMUSA();
+
+			MusaConfig.ReadFromFile ("../../test_conf.xml");
+			/*
+			BackgroundWorker wk = new BackgroundWorker ();
+			wk.DoWork += delegate 
+			{
+				
+				MusaConfig.GetLoggerSet ().Log (LogLevel.Info, "hello from MUSA bg");
+			};
+			wk.RunWorkerAsync ();
+
+			Thread.Sleep (10000);
+			*/
+
+
+			configureAndStartMusa ();
         }
 
 		static void A_RegisterResult (string result)
@@ -101,7 +115,9 @@ namespace AgentTest
 		[PlanEntryPoint]
 		void wella(Dictionary<string,object> args)
 		{
-			log (LogLevel.Info, "Ciao 1");
+			Console.WriteLine ("loggo...");
+
+			log (LogLevel.Info, "Ciao LOGGERRRRRRRRRRRRRRRRRRR");
 			ExecuteStep ("other_step1");
 		}
 

@@ -71,15 +71,17 @@ namespace MusaLogger
 		{
 			// Create a new MongoDB nlog target
 			var mongoTarget = new NLog.Mongo.MongoTarget ();
-			Configuration.AddTarget (GetType().Name, mongoTarget);
 
 			// set the attributes
 			mongoTarget.CollectionName = MongoDBCollectionName;
 			mongoTarget.ConnectionString = String.Format ("mongodb://{0}:{1}@{2}:{3}/musa_log", MongoDBUser, MongoDBPass, MongoDBAddress, MongoDBPort);
 
 			// Define rules
-			var rule1 = new LoggingRule ("*", GetLogLevel(LogLevel.Debug), mongoTarget);
+			var rule1 = new LoggingRule (LoggerName, GetLogLevel(LogLevel.Debug), mongoTarget);
+
+			Configuration.AddTarget (LoggerName, mongoTarget);
 			Configuration.LoggingRules.Add (rule1);
+			Configuration.Reload ();
 
 			// Activate the configuration
 			LogManager.Configuration = Configuration;

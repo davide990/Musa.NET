@@ -2,6 +2,7 @@
 using NLog.Config;
 using NLog;
 using System.Xml.Serialization;
+using System;
 
 namespace MusaLogger
 {
@@ -35,7 +36,7 @@ namespace MusaLogger
 		void configure ()
 		{
 			var fileTarget = new FileTarget ();
-			Configuration.AddTarget (GetType().Name, fileTarget);
+			fileTarget.Name = LoggerName;
 
 			if (string.IsNullOrEmpty (FileName))
 				FileName = "${basedir}/file.txt";
@@ -46,8 +47,11 @@ namespace MusaLogger
 			fileTarget.FileName = FileName;
 			fileTarget.Layout = Layout;
 
-			var rule2 = new LoggingRule ("*", GetLogLevel(LogLevel.Debug), fileTarget);
+			var rule2 = new LoggingRule (LoggerName, GetLogLevel(LogLevel.Debug), fileTarget);
+
+			Configuration.AddTarget (fileTarget);
 			Configuration.LoggingRules.Add (rule2);
+			Configuration.Reload ();
 
 			// Activate the configuration
 			LogManager.Configuration = Configuration;

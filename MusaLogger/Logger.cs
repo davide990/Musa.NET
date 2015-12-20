@@ -17,7 +17,7 @@ namespace MusaLogger
 		/// </summary>
 		/// <value>The configuration.</value>
 		[XmlIgnore()]
-		public LoggingConfiguration Configuration
+		public static LoggingConfiguration Configuration
 		{
 			get
 			{
@@ -32,15 +32,14 @@ namespace MusaLogger
 			}
 		}
 		[XmlIgnore()]
-		private LoggingConfiguration conf;
+		private static LoggingConfiguration conf;
 
 		/// <summary>
 		/// Gets the nlog logger.
 		/// </summary>
 		/// <value>The logger.</value>
 		[XmlIgnore()]
-		protected NLog.Logger logger
-		{
+		protected NLog.Logger logger {
 			get { return LogManager.GetLogger (GetType ().Name); }
 		}
 

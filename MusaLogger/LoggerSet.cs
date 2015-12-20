@@ -32,7 +32,11 @@ namespace MusaLogger
 			foreach (Logger a in loggers) 
 			{
 				if (a != null)
+				{
 					a.Log (level, message);
+
+				}
+					
 			}
 		}
 
