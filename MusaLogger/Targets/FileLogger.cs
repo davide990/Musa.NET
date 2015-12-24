@@ -2,7 +2,6 @@
 using NLog.Config;
 using NLog;
 using System.Xml.Serialization;
-using System;
 
 namespace MusaLogger
 {

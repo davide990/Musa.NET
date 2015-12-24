@@ -58,7 +58,13 @@ namespace MusaConfiguration
 		[XmlIgnore()]
 		public MongoDBLogger MongoDBLogger 
 		{ 
-			get { return Loggers.Find (x => x is MongoDBLogger) as MongoDBLogger; } 
+			get 
+			{ 
+				if (Loggers == null)
+					return null;
+				else
+					return Loggers.Find (x => x is MongoDBLogger) as MongoDBLogger; 
+			} 
 			set 
 			{ 
 				Loggers.RemoveAll (x => x is MongoDBLogger); 
@@ -70,7 +76,13 @@ namespace MusaConfiguration
 		[XmlIgnore()]
 		public ConsoleLogger ConsoleLogger 
 		{ 
-			get { return Loggers.Find (x => x is ConsoleLogger) as ConsoleLogger; } 
+			get 
+			{ 
+				if (Loggers == null)
+					return null;
+				else
+					return Loggers.Find (x => x is ConsoleLogger) as ConsoleLogger; 
+			} 
 			set 
 			{ 
 				Loggers.RemoveAll (x => x is MongoDBLogger); 
@@ -82,7 +94,13 @@ namespace MusaConfiguration
 		[XmlIgnore()]
 		public FileLogger FileLogger 
 		{ 
-			get { return Loggers.Find (x => x is FileLogger) as FileLogger; } 
+			get 
+			{ 
+				if (Loggers == null)
+					return null;
+				else
+					return Loggers.Find (x => x is FileLogger) as FileLogger; 
+			}
 			set 
 			{ 
 				Loggers.RemoveAll (x => x is MongoDBLogger); 
@@ -100,6 +118,24 @@ namespace MusaConfiguration
 				Loggers.RemoveAll (x => x is MongoDBLogger); 
 				if (value is WCFLogger)
 					Loggers.Add (value);
+			}
+		}
+
+		/// <summary>
+		/// A boolean value indicating wheter this configuration have any logger set. If not, the current MUSA instance
+		/// will redirect its output to console.
+		/// </summary>
+		[XmlIgnore()]
+		public bool HasLoggerConfigured 
+		{
+			get 
+			{
+				if (Loggers == null)
+					return false;
+				else if (Loggers.Count <= 0)
+					return false;
+
+				return true;
 			}
 		}
 
