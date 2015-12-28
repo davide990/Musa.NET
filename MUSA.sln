@@ -21,6 +21,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusaConfiguration", "MusaCo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusaWCFLogger", "MusaWCFLogger\MusaWCFLogger.csproj", "{ECB83DD7-A309-47E2-B399-AFE88079DAB2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlanLibraryExample", "PlanLibraryExample\PlanLibraryExample.csproj", "{659ED335-C3DD-438B-ADE1-973083CC5C4F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusaCommon", "MusaCommon\MusaCommon.csproj", "{3B8C5698-817C-4C05-87BF-2340C699CC1F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,10 @@ Global
 		{38CD6D45-FDA6-41E5-86F4-1246E7630F7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38CD6D45-FDA6-41E5-86F4-1246E7630F7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38CD6D45-FDA6-41E5-86F4-1246E7630F7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B8C5698-817C-4C05-87BF-2340C699CC1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B8C5698-817C-4C05-87BF-2340C699CC1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B8C5698-817C-4C05-87BF-2340C699CC1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B8C5698-817C-4C05-87BF-2340C699CC1F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5CF5FB93-94DC-4A88-BCB1-95F2AD757F01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5CF5FB93-94DC-4A88-BCB1-95F2AD757F01}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CF5FB93-94DC-4A88-BCB1-95F2AD757F01}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -47,6 +55,10 @@ Global
 		{5EB4BE6E-6C14-43D5-9F98-86E635F74C78}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5EB4BE6E-6C14-43D5-9F98-86E635F74C78}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5EB4BE6E-6C14-43D5-9F98-86E635F74C78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{659ED335-C3DD-438B-ADE1-973083CC5C4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{659ED335-C3DD-438B-ADE1-973083CC5C4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{659ED335-C3DD-438B-ADE1-973083CC5C4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{659ED335-C3DD-438B-ADE1-973083CC5C4F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C56594B3-805A-4BA7-A18A-96C4B39BC0DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C56594B3-805A-4BA7-A18A-96C4B39BC0DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C56594B3-805A-4BA7-A18A-96C4B39BC0DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -63,6 +75,15 @@ Global
 		{FEDB7C88-DAC3-43CA-B798-5D7533952408}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEDB7C88-DAC3-43CA-B798-5D7533952408}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEDB7C88-DAC3-43CA-B798-5D7533952408}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$1.DirectoryNamespaceAssociation = None
+		$1.ResourceNamePolicy = FileFormatDefault
+		$0.StandardHeader = $2
+		$2.Text = @         __  __                                     _   \n        |  \\/  |                                   | |  \n        | \\  / | _   _  ___   __ _     _ __    ___ | |_ \n        | |\\/| || | | |/ __| / _` |   | '_ \\  / _ \\| __|\n        | |  | || |_| |\\__ \\| (_| | _ | | | ||  __/| |_ \n        |_|  |_| \\__,_||___/ \\__,_|(_)|_| |_| \\___| \\__|\n\n ${FileName}\n \n Author:\n      ${AuthorName} <${AuthorEmail}>\n \n Copyright (c) ${Year} ${CopyrightHolder}\n\n This program is free software: you can redistribute it and/or modify\n it under the terms of the GNU Lesser General Public License as published by\n the Free Software Foundation, either version 3 of the License, or\n (at your option) any later version.\n\n This program is distributed in the hope that it will be useful,\n but WITHOUT ANY WARRANTY; without even the implied warranty of\n MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n GNU Lesser General Public License for more details.\n\n You should have received a copy of the GNU Lesser General Public License\n along with this program.  If not, see <http://www.gnu.org/licenses/>.
+		$2.IncludeInNewFiles = True
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

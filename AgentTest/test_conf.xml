@@ -1,18 +1,32 @@
-﻿<?xml version="1.0" encoding="UTF-8" ?>
-<MusaConfiguration xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<!--<MaxNumAgent>2000</MaxNumAgent>
-	<MusaAddress>localhost</MusaAddress>
-	<MusaAddressPort>8089</MusaAddressPort>
-
-	<MinimumLogLevel>3</MinimumLogLevel>-->
-	<NetworkingEnabled>false</NetworkingEnabled>
-	<Logging>
-		<!--<ConsoleLogger Enabled="true"/>-->
-		<WCFLogger Enabled="true"
-					EndpointAddress="http://localhost:8089/"/>
-
-		<FileLogger Enabled="true"
-					FileName="/home/davide/log.txt"/>
-	</Logging>
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<MusaConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <MaxNumAgent>100</MaxNumAgent>
+  <MusaAddressPort>0</MusaAddressPort>
+  <NetworkingEnabled>false</NetworkingEnabled>
+  <MinimumLogLevel>0</MinimumLogLevel>
+  <Logging>
+    <ConsoleLogger MinimumLogLevel="0" Enabled="true" />
+    <WCFLogger MinimumLogLevel="0" Enabled="true" EndpointAddress="http://localhost:8089/" />
+    <FileLogger MinimumLogLevel="0" Enabled="true" FileName="/home/davide/log.txt" Layout="${longdate}	${level:uppercase=true}	FileLogger	${message}" />
+  </Logging>
+  <Agents>
+    <Agent Name="agent_1">
+      <Plans>
+        <Plan>PlanExample</Plan>
+        <Plan>PlanExample2</Plan>
+        <Plan>PlanForEvent</Plan>
+      </Plans>
+      <BeliefBase />
+      <Events>
+        <Event Formula="f(x)" Plan="PlanExample2" Perception="AddBelief">
+          <EventArgs>
+            <EventArg Name="nome" Value="davide" />
+          </EventArgs>
+        </Event>
+        <Event Formula="f(x)" Plan="PlanExample2" Perception="RemoveBelief">
+          <EventArgs />
+        </Event>
+      </Events>
+    </Agent>
+  </Agents>
 </MusaConfiguration>

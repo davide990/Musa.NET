@@ -9,7 +9,7 @@ namespace MusaLogger
 	/// </summary>
 	public abstract class Logger
 	{
-		[XmlElement("MinimumLogLevel")]
+        [XmlAttribute("MinimumLogLevel")]
 		public int MinimumLogLevel { get; set; }
 
 		/// <summary>
@@ -59,7 +59,7 @@ namespace MusaLogger
 		}
 
 
-		protected NLog.LogLevel GetLogLevel(LogLevel level)
+        protected NLog.LogLevel GetLogLevel(int level)
 		{
 			switch(level)
 			{
@@ -87,7 +87,7 @@ namespace MusaLogger
 		/// <summary>
 		/// Log the specified message.
 		/// </summary>
-		public abstract void Log (LogLevel level, string message);
+        public abstract void Log (int LogLevel, string message);
 
 
 	}

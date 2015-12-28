@@ -114,6 +114,7 @@ namespace FormulaLibrary.ANTLR.visitor
                     //a NullReferenceException exception can occour if the Parse method is not included within a given type reference class.
                     //In this case use a simple ChangeType to cast the string value to the right value type.
                     value = Convert.ChangeType(str_value, type);
+                    Console.WriteLine(e);
                 }
                 finally
                 {

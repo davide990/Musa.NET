@@ -11,13 +11,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 using AgentLibrary.Networking;
-using PlanLibrary;
 using System.Reflection;
 using FormulaLibrary;
 using FormulaLibrary.ANTLR;
-using MusaLogger;
 using MusaConfiguration;
-
+using MusaCommon;
+using MusaLogger;
+using PlanLibrary;
 
 namespace AgentLibrary
 {
@@ -48,207 +48,232 @@ namespace AgentLibrary
         /// <summary>
         /// The date in which this agent has been created
         /// </summary>
-		public DateTime CreatedAt
-		{
-			get { return createdAt; }
-		}
-		private readonly DateTime createdAt;
+        public DateTime CreatedAt
+        {
+            get { return createdAt; }
+        }
+
+        private readonly DateTime createdAt;
 
         /// <summary>
         /// This queue contains the changes to the environment that this agent have to perceive. Since an agent can be 
-		/// busy in doing other activities such event-handling or execution of plans, the perceived environment changes 
-		/// are accumulated temporarily in this queue until the agent start a perception activity.
-		/// The key contains the formula(s) to be perceived (AtomicFormula type).
-		/// 
-		/// Ogni percezione può coinvolgere più di una singola credenza
+        /// busy in doing other activities such event-handling or execution of plans, the perceived environment changes 
+        /// are accumulated temporarily in this queue until the agent start a perception activity.
+        /// The key contains the formula(s) to be perceived (AtomicFormula type).
+        /// 
+        /// Ogni percezione può coinvolgere più di una singola credenza
         /// </summary>
-		public Stack<Tuple<IList, PerceptionType>> PerceivedEnvironementChanges
-		{
-			get 
-			{
-				lock (lock_perceivedEnvironmentChanges) 
-				{
-					return perceivedEnvironementChanges; 
-				}
-			}
-			private set 
-			{
-				lock (lock_perceivedEnvironmentChanges)
-				{
-					perceivedEnvironementChanges = value;
-				}
-			}
-		}
-		private Stack<Tuple<IList, PerceptionType>> perceivedEnvironementChanges;
+        public Stack<Tuple<IList, AgentPerception>> PerceivedEnvironementChanges
+        {
+            get
+            {
+                lock (lock_perceivedEnvironmentChanges)
+                {
+                    return perceivedEnvironementChanges; 
+                }
+            }
+            private set
+            {
+                lock (lock_perceivedEnvironmentChanges)
+                {
+                    perceivedEnvironementChanges = value;
+                }
+            }
+        }
+
+        private Stack<Tuple<IList, AgentPerception>> perceivedEnvironementChanges;
         private object lock_perceivedEnvironmentChanges = new object();
 
         /// <summary>
-		/// TODO cambiare la descrizione
-		/// 
+        /// TODO cambiare la descrizione
+        /// 
         /// This stack is the mailbox of the agent. In this structure are collected all the messages that the agent
-		/// may receive from other agents in the same, or different, environment. The messages are processed, one by 
-		/// one, during the agent's reasoning cycles.
+        /// may receive from other agents in the same, or different, environment. The messages are processed, one by 
+        /// one, during the agent's reasoning cycles.
         /// </summary>
-		public Stack<Tuple<AgentPassport, AgentMessage>> MailBox
-		{
-			get { return mailBox; }
-			internal set 
-			{
-				lock(lock_mailBox)
-				{
-					mailBox = value;
-				}
-			}
-		}
-		private Stack<Tuple<AgentPassport, AgentMessage>> mailBox;
+        public Stack<Tuple<AgentPassport, AgentMessage>> MailBox
+        {
+            get { return mailBox; }
+            internal set
+            {
+                lock (lock_mailBox)
+                {
+                    mailBox = value;
+                }
+            }
+        }
+
+        private Stack<Tuple<AgentPassport, AgentMessage>> mailBox;
         private object lock_mailBox = new object();
 
-		/// <summary>
-		/// Gets the plans of this agent.
-		/// </summary>
-		/// <value>The plans.</value>
-		public List<Type> Plans
-		{
-			get { return new List<Type>(PlansCollection.Keys); }
-		}
+        /// <summary>
+        /// Gets the plans of this agent.
+        /// </summary>
+        /// <value>The plans.</value>
+        public List<Type> Plans
+        {
+            get { return new List<Type>(PlansCollection.Keys); }
+        }
 
-		/// <summary>
-		/// The plans collection.
-		/// </summary>
-		private Dictionary<Type, IPlanInstance> PlansCollection;
+        /// <summary>
+        /// The plans collection.
+        /// </summary>
+        //private Dictionary<Type, IPlanInstance> PlansCollection;
+        private PlanLibrary.PlanCollection PlansCollection;
 
-		/// <summary>
-		/// Gets a value indicating whether this agent is busy (executing a plan).
-		/// </summary>
-		public bool Busy
-		{
-			get { return agent_is_busy; }
-			private set {agent_is_busy = value; }
-		}
-		private bool agent_is_busy;
+        /// <summary>
+        /// Gets the events.
+        /// </summary>
+        /// <value>The events.</value>
+        public Dictionary<AgentEventKey, Type> Events
+        {
+            get { return reasoner.EventsCatalogue; }
+        }
 
-		/// <summary>
-		/// Gets the plan's name that this agent is currently executing.
-		/// </summary>
-		public IPlanInstance CurrentExecutingPlan
-		{
-			get
-			{
-				if (Busy)
-					return current_executing_plan;
-				else
-					return null;
-			}
+        /// <summary>
+        /// Gets the events arguments.
+        /// </summary>
+        /// <value>The events arguments.</value>
+        public Dictionary<AgentEventKey, AgentEventArgs> EventsArgs
+        {
+            get { return reasoner.EventsArgs; }
+        }
 
-			private set { current_executing_plan = value; }
-		}
-		private IPlanInstance current_executing_plan;
+        /// <summary>
+        /// Gets a value indicating whether this agent is busy (executing a plan).
+        /// </summary>
+        public bool Busy
+        {
+            get { return agent_is_busy; }
+            private set { agent_is_busy = value; }
+        }
 
-		/// <summary>
-		/// A value indicating wheter this agent must be paused after its current reasoning cycle.
-		/// </summary>
-		private bool pause_requested;
+        private bool agent_is_busy;
 
-		/// <summary>
-		/// A boolean value used to handle the resumption of this agent's reasoning activity.
-		/// </summary>
-		private bool resume_reasoning;
+        /// <summary>
+        /// Gets the plan's name that this agent is currently executing.
+        /// </summary>
+        public IPlanInstance CurrentExecutingPlan
+        {
+            get
+            {
+                if (Busy)
+                    return current_executing_plan;
+                else
+                    return null;
+            }
+
+            private set { current_executing_plan = value; }
+        }
+
+        private IPlanInstance current_executing_plan;
+
+        /// <summary>
+        /// A value indicating wheter this agent must be paused after its current reasoning cycle.
+        /// </summary>
+        private bool pause_requested;
+
+        /// <summary>
+        /// A boolean value used to handle the resumption of this agent's reasoning activity.
+        /// </summary>
+        private bool resume_reasoning;
 
         #endregion
 
-		#region Properties
+        #region Properties
 
-		/// <summary>
-		/// Return the IP address of the environment in which this agent is located
-		/// </summary>
-		public string EnvironementIPAddress
-		{
-			get { return AgentEnvironement.GetInstance().IPAddress; }
-		}
+        /// <summary>
+        /// Return the IP address of the environment in which this agent is located
+        /// </summary>
+        public string EnvironementIPAddress
+        {
+            get { return AgentEnvironement.GetInstance().IPAddress; }
+        }
 
-		/// <summary>
-		/// The workbench this agent use to do reasoning activities
-		/// </summary>
-		public AgentWorkbench Workbench
-		{
-			get { return workbench; }
-		}
+        /// <summary>
+        /// The workbench this agent use to do reasoning activities
+        /// </summary>
+        public AgentWorkbench Workbench
+        {
+            get { return workbench; }
+        }
 
-		/// <summary>
-		/// The name  of this agent
-		/// </summary>
-		public string Name
-		{
-			get { return name; }
-		}
-		private readonly string name;
+        /// <summary>
+        /// The name  of this agent
+        /// </summary>
+        public string Name
+        {
+            get { return name; }
+        }
 
-		/// <summary>
-		/// Check if this agent is active (in other words, if this agent is doing a reasoning activity)
-		/// </summary>
-		public bool IsActive
-		{
-			//get { DateTime now = DateTime.UtcNow; return now >= WorkScheduleStart && now < WorkScheduleEnd; }
-			get { return reasoner.IsRunning; }
-		}
+        private readonly string name;
 
-		/// <summary>
-		/// The working end time of this agent
-		/// </summary>
-		private DateTime _workScheduleEnd;
-		public DateTime WorkScheduleEnd
-		{
-			get { return _workScheduleEnd; }
-			private set { _workScheduleEnd = value; }
-		}
+        /// <summary>
+        /// Check if this agent is active (in other words, if this agent is doing a reasoning activity)
+        /// </summary>
+        public bool IsActive
+        {
+            get { return reasoner.IsRunning; }
+        }
 
-		/// <summary>
-		/// The working start time of this agent
-		/// </summary>
-		private DateTime _workScheduleStart;
-		public DateTime WorkScheduleStart
-		{
-			get { return _workScheduleStart; }
-			private set { _workScheduleStart = value; }
-		}
+        /// <summary>
+        /// The working end time of this agent
+        /// </summary>
+        public DateTime WorkScheduleEnd
+        {
+            get;
+            private set;
+        }
 
-		/// <summary>
-		/// The role of this agent
-		/// </summary>
-		public string Role
-		{
-			get { return role; }
-			set { role = value; }
-		}
-		private string role;
+        /// <summary>
+        /// The working start time of this agent
+        /// </summary>
+        public DateTime WorkScheduleStart
+        {
+            get;
+            private set;
+        }
 
-		/// <summary>
-		/// Gets a value indicating whether this agent is paused.
-		/// </summary>
-		public bool Paused
-		{
-			get { return _paused; }
-			private set { _paused = value; }
-		}
-		private bool _paused;
+        /// <summary>
+        /// The role of this agent
+        /// </summary>
+        public string Role
+        {
+            get;
+            set;
+        }
 
 
-		#endregion
+        /// <summary>
+        /// Gets a value indicating whether this agent is paused.
+        /// </summary>
+        public bool Paused
+        {
+            get;
+            private set;
+        }
 
-		/// <summary>
-		/// The logger of this agent. It is automatically configured using the environment configuration file. If this
-		/// file is missing, a console logger is automatically set up.
-		/// </summary>
-		private LoggerSet Logger;
+        #endregion
+
+        /// <summary>
+        /// The logger of this agent. It is automatically configured using the environment configuration file. If this
+        /// file is missing, a console logger is automatically set up.
+        /// </summary>
+        public MusaLogger.LoggerSet Logger
+        {
+            get;
+            private set;
+        }
 
         #region Constructors
 
-		/// <summary>
-		/// Create a new agent
-		/// </summary>
-		public Agent () : this ("agent_" + (new Random ().Next (Int32.MaxValue)))
-		{
-		}
+        /// <summary>
+        /// Create a new agent
+        /// </summary>
+        public Agent()
+            : this("agent_" + (new Random().Next(Int32.MaxValue)))
+        {
+        }
 
         /// <summary>
         /// Create a new agent
@@ -256,20 +281,26 @@ namespace AgentLibrary
         /// <param name="agent_name"></param>
         public Agent(string agent_name)
         {
-			pause_requested = false;
-            name = agent_name;
+            if (string.IsNullOrEmpty(agent_name))
+                name = "agent_" + (new Random().Next(Int32.MaxValue));
+            else
+                name = agent_name;
+
+            pause_requested = false;
             ID = Guid.NewGuid();
             roles = new List<AgentRole>();
             workbench = new AgentWorkbench(this);
             reasoner = new AgentReasoner(this);
-			PerceivedEnvironementChanges = new Stack<Tuple<IList, PerceptionType>>();
-			mailBox = new Stack<Tuple<AgentPassport, AgentMessage>> ();// new Dictionary<AgentPassport, AgentMessage>();
-			createdAt = DateTime.Now;
-			resume_reasoning = false;
-			PlansCollection = new Dictionary<Type, IPlanInstance> ();
-			Logger = MusaConfig.GetLoggerSet ();
+            PerceivedEnvironementChanges = new Stack<Tuple<IList, AgentPerception>>();
+            mailBox = new Stack<Tuple<AgentPassport, AgentMessage>>();
+            createdAt = DateTime.Now;
+            resume_reasoning = false;
+            //PlansCollection = new Dictionary<Type, IPlanInstance>();
+            PlansCollection = new PlanLibrary.PlanCollection();
 
-			Busy = false;
+            Logger = MusaConfig.GetLoggerSet();
+
+            Busy = false;
         }
 
         #endregion
@@ -283,7 +314,7 @@ namespace AgentLibrary
         }
 
         #endregion
-        
+
         #region Methods
 
         /// <summary>
@@ -293,24 +324,26 @@ namespace AgentLibrary
         public AgentPassport GetPassport()
         {
             AgentPassport ps = new AgentPassport();
-            ps.AgentName            = Name;
-            ps.AgentRole            = Role;
-            ps.EnvironementAddress  = EnvironementIPAddress;
+            ps.AgentName = Name;
+            ps.AgentRole = Role;
+            ps.EnvironementAddress = EnvironementIPAddress;
             return ps;
         }
 
         /// <summary>
-        /// Notify to this agent a change occurred within the environment this agent is located.
+        /// Notify to this agent a change occurred within the environment this 
+        /// agent is located.
         /// </summary>
         /// <param name="action">The type of change occurred</param>
-        /// <param name="changes">The data that involved in the environment change. Each element of [changes] is a 
-		/// formula to be added to this agent's workbench</param>
-        internal void notifyEnvironementChanges(PerceptionType action, IList changes)
+        /// <param name="changes">The data that involved in the environment 
+        /// change. Each element of [changes] is a formula to be added to this 
+        /// agent's workbench</param>
+        internal void notifyEnvironementChanges(AgentPerception action, IList changes)
         {
-			foreach (var v in changes)
-				Logger.Log (LogLevel.Trace, "[" + name + "] received " + action + " -> " + v);
+            foreach (var v in changes)
+                Logger.Log(LogLevel.Trace, "[" + name + "] received " + action + " -> " + v);
             
-			PerceivedEnvironementChanges.Push (new Tuple<IList, PerceptionType> (changes, action));
+            PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(changes, action));
         }
 
         /// <summary>
@@ -324,236 +357,313 @@ namespace AgentLibrary
             return this;
         }
 
-		/// <summary>
-		/// Pause this agent's execution.
-		/// </summary>
-		public void Pause()
-		{
-			if (current_executing_plan.IsAtomic ())
-			{
-				Logger.Log (LogLevel.Trace, "[" + Name + "] I'm executing an atomic plan. It Will be paused after the plan has finished its execution.");
+        /// <summary>
+        /// Pause this agent's execution.
+        /// </summary>
+        public void Pause()
+        {
+            if (current_executing_plan.IsAtomic())
+            {
+                Logger.Log(MusaLogger.LogLevel.Trace, "[" + Name + "] I'm executing an atomic plan. It Will be paused after the plan has finished its execution.");
 
-				//Request this agent to pause only after the current atomic plan has finished its execution
-				pause_requested = true;
-				return;
-			}
+                //Request this agent to pause only after the current atomic plan 
+                //has finished its execution
+                pause_requested = true;
+                return;
+            }
 
-			//Set the pause state 
-			Paused = true;
+            //Set the pause state 
+            Paused = true;
 
-			//Pause the agent's reasoner
-			reasoner.Pause ();
+            //Pause the agent's reasoner
+            reasoner.Pause();
 
-			//Suspend the current executing plan
-			CurrentExecutingPlan.Pause ();
+            //Suspend the current executing plan
+            CurrentExecutingPlan.Pause();
 
-			Logger.Log (LogLevel.Trace, "["+Name + "] paused");
-		}
+            Logger.Log(LogLevel.Trace, "[" + Name + "] paused");
+        }
 
-		/// <summary>
-		/// Resume this agent's execution.
-		/// </summary>
-		public void Resume()
-		{
-			if (!Paused)
-				return;
+        /// <summary>
+        /// Resume this agent's execution.
+        /// </summary>
+        public void Resume()
+        {
+            if (!Paused)
+                return;
 			
-			Paused = false;
+            Paused = false;
 
-			Logger.Log (LogLevel.Trace, "["+Name + "] resumed");
+            Logger.Log(LogLevel.Trace, "[" + Name + "] resumed");
 
-			//Resume the execution of the suspended plan
-			CurrentExecutingPlan.Resume ();
+            //Resume the execution of the suspended plan
+            CurrentExecutingPlan.Resume();
 
-			if (CurrentExecutingPlan == null)
-				reasoner.Resume ();
-			else 
-			{
-				//resume the reasoning activity only after the current plan execution has finished.
-				resume_reasoning = true;
-			}
-		}
+            if (CurrentExecutingPlan == null)
+                reasoner.Resume();
+            else
+            {
+                //resume the reasoning activity only after the current plan execution has finished.
+                resume_reasoning = true;
+            }
+        }
 
 
-		/// <summary>
-		/// Adds a plan to this agent.
-		/// </summary>
-		/// <returns><c>true</c>, if plan was added, <c>false</c> otherwise.</returns>
-		/// <param name="Plan">The plan model to be added. An instance of this plan is instantiated</param>
-		public void AddPlan(Type Plan)
-		{
-			if (!Plan.BaseType.IsEquivalentTo (typeof(PlanModel)))
-				throw new Exception ("Argument #1 in AddPlan(Type) must be of type PlanModel.");
-			
-			//Create a new plan instance
-			Type planInstanceType = typeof(PlanInstance<>).MakeGenericType (Plan);
-			var plan_instance = Activator.CreateInstance (planInstanceType);
+        /// <summary>
+        /// Adds a plan to this agent.
+        /// </summary>
+        /// <returns><c>true</c>, if plan was added, <c>false</c> otherwise.</returns>
+        /// <param name="Plan">The plan model to be added. An instance of this plan is instantiated</param>
+        public void AddPlan(Type Plan)
+        {
+            //if (!Plan.BaseType.IsEquivalentTo(typeof(IPlanModel))){
+            //Check if the provisioned plan type extends the interface 
+            //IPlanModel
+            if (!(typeof(IPlanModel).IsAssignableFrom(Plan)))
+                throw new Exception("Argument #1 in AddPlan(Type) must be of type PlanModel.");
+            
+            //Create a new plan instance
+            //Type planInstanceType = typeof(PlanInstance<>).MakeGenericType(Plan);
+            //var obj = Activator.CreateInstance(typeof(object));
+            //var plan_instance = Convert.ChangeType(obj, planInstanceType);
+           
 
-			//Register the handler for the event 'RegisterResult'
-			EventInfo register_result_event = planInstanceType.GetEvent ("RegisterResult");
-			MethodInfo delegate_method = GetType ().GetMethod ("onPlanInstanceRegisterResult", BindingFlags.NonPublic|BindingFlags.Instance);
-			Delegate register_plan_results_delegate = Delegate.CreateDelegate (register_result_event.EventHandlerType, this, delegate_method);
-			register_result_event.AddEventHandler (plan_instance, register_plan_results_delegate);
+            // var plan_instance = PlanInstanceFactory.CreateInstance(Plan);
 
-			//Register the handler for the event 'Finished'
-			EventInfo plan_finished_event = planInstanceType.GetEvent ("Finished");
-			MethodInfo plan_finished_delegate_method = GetType ().GetMethod ("onPlanInstanceFinished", BindingFlags.NonPublic|BindingFlags.Instance);
-			Delegate plan_finished_delegate = Delegate.CreateDelegate (plan_finished_event.EventHandlerType, this, plan_finished_delegate_method);
-			plan_finished_event.AddEventHandler (plan_instance, plan_finished_delegate);
 
-			//Attach the plan's logger to this agent's logger
-			PropertyInfo plan_logger = planInstanceType.GetProperty ("Logger", BindingFlags.NonPublic|BindingFlags.Instance);
-			plan_logger.SetValue (plan_instance, Logger);
+            //Register the handler for the event 'RegisterResult'
+            //EventInfo register_result_event = planInstanceType.GetEvent("RegisterResult");
+            MethodInfo RegisterResultHandler = GetType().GetMethod("onPlanInstanceRegisterResult", BindingFlags.NonPublic | BindingFlags.Instance);
+            MethodInfo PlanFinishedHandler = GetType().GetMethod("onPlanInstanceFinished", BindingFlags.NonPublic | BindingFlags.Instance);
+            var plan_instance = PlanInstanceFactory.CreateInstance(Plan, this, RegisterResultHandler, PlanFinishedHandler, Logger);
 
-			//Add the plan to the agent's plan collection
-			PlansCollection.Add (Plan, plan_instance as IPlanInstance);
-		}
 
-		#region Agent's plans event handlers
 
-		/// <summary>
-		/// Invoked when a plan executed by this agent terminates its execution.
-		/// </summary>
-		/// <param name="sender">The executed plan.</param>
-		/// <param name="args">Arguments.</param>
-		private void onPlanInstanceFinished(object sender, EventArgs args)
-		{
-			Logger.Log (LogLevel.Trace, "[" + Name + "] plan " + (sender as IPlanInstance).GetName() + " finished its execution.");
 
-			//Set the value of CurrentExecutingPlan to null
-			CurrentExecutingPlan = null;
+            /*Delegate register_plan_results_delegate = Delegate.CreateDelegate(register_result_event.EventHandlerType, this, delegate_method);
+            register_result_event.AddEventHandler(plan_instance, register_plan_results_delegate);*/
 
-			//Set the agent busy state to false
-			Busy = false;
+            //Register the handler for the event 'Finished'
+            /*EventInfo plan_finished_event = planInstanceType.GetEvent("Finished");
+            MethodInfo plan_finished_delegate_method = GetType().GetMethod("onPlanInstanceFinished", BindingFlags.NonPublic | BindingFlags.Instance);
+            Delegate plan_finished_delegate = Delegate.CreateDelegate(plan_finished_event.EventHandlerType, this, plan_finished_delegate_method);
+            plan_finished_event.AddEventHandler(plan_instance, plan_finished_delegate);*/
 
-			//Check if a pause has been requested
-			if(pause_requested)
-			{
-				//Set the pause state 
-				Paused = true;
+            //Attach the plan's logger to this agent's logger
+            /*PropertyInfo plan_logger = planInstanceType.GetProperty("Logger", BindingFlags.NonPublic | BindingFlags.Instance);
+            plan_logger.SetValue(plan_instance, Logger);*/
 
-				pause_requested = false;
+            //Add the plan to the agent's plan collection
+            PlansCollection.Add(Plan, plan_instance as IPlanInstance);
+        }
 
-				//Pause the agent's reasoner
-				reasoner.Pause ();
+        /// <summary>
+        /// Adds the plan.
+        /// </summary>
+        /// <param name="assembly">The assembly.</param>
+        /// <param name="PlanName">Plan name.</param>
+        public void AddPlan(Assembly assembly, string PlanName)
+        {
+            if (assembly.IsDefined(assembly.GetType(PlanName)))
+                return;
 
-				return;
-			}
+            Type Plan = assembly.GetType(PlanName);
 
-			if (resume_reasoning) 
-			{
-				reasoner.Resume ();
-				resume_reasoning = false;
-			}
-		}
+            if (!Plan.BaseType.IsEquivalentTo(typeof(IPlanModel)))
+                throw new Exception("In AddPlan(Assembly, string): the specified" +
+                    "plan must be of type PlanModel.");
 
-		/// <summary>
-		/// Invoked when a plan requests to register a result.
-		/// </summary>
-		/// <param name="result">Result.</param>
-		private void onPlanInstanceRegisterResult(string result)
-		{
-			Formula resultFormula = FormulaParser.Parse(result);;
+            //Create a new plan instance
+            /*
+            Type planInstanceType = typeof(BasePlanInstance<>).MakeGenericType(Plan);
+            var plan_instance = Activator.CreateInstance(planInstanceType);
 
-			if(resultFormula != null)
-			{
-				Workbench.AddStatement(resultFormula);
+            //Register the handler for the event 'RegisterResult'
+            EventInfo register_result_event = planInstanceType.GetEvent("RegisterResult");
+            MethodInfo delegate_method = GetType().GetMethod("onPlanInstanceRegisterResult", BindingFlags.NonPublic | BindingFlags.Instance);
+            Delegate register_plan_results_delegate = Delegate.CreateDelegate(register_result_event.EventHandlerType, this, delegate_method);
+            register_result_event.AddEventHandler(plan_instance, register_plan_results_delegate);
 
-				//TODO log register result
-				Logger.Log (LogLevel.Trace, "["+Name+"] registered result: "+result);
-			}
-		}
+            //Register the handler for the event 'Finished'
+            EventInfo plan_finished_event = planInstanceType.GetEvent("Finished");
+            MethodInfo plan_finished_delegate_method = GetType().GetMethod("onPlanInstanceFinished", BindingFlags.NonPublic | BindingFlags.Instance);
+            Delegate plan_finished_delegate = Delegate.CreateDelegate(plan_finished_event.EventHandlerType, this, plan_finished_delegate_method);
+            plan_finished_event.AddEventHandler(plan_instance, plan_finished_delegate);
 
-		#endregion Agent's plans event handlers
+            //Attach the plan's logger to this agent's logger
+            PropertyInfo plan_logger = planInstanceType.GetProperty("Logger", BindingFlags.NonPublic | BindingFlags.Instance);
+            plan_logger.SetValue(plan_instance, Logger);
+*/
+            MethodInfo RegisterResultHandler = GetType().GetMethod("onPlanInstanceRegisterResult", BindingFlags.NonPublic | BindingFlags.Instance);
+            MethodInfo PlanFinishedHandler = GetType().GetMethod("onPlanInstanceFinished", BindingFlags.NonPublic | BindingFlags.Instance);
+            var plan_instance = PlanInstanceFactory.CreateInstance(Plan, this, RegisterResultHandler, PlanFinishedHandler, Logger);
 
-		/// <summary>
-		/// Executes a plan.
-		/// </summary>
-		/// <param name="Plan">Plan.</param>
-		/// <param name="args">Arguments.</param>
-		internal void ExecutePlan(Type Plan, Dictionary<string, object> args = null)
-		{
-			if (Busy) 
-			{
-				throw new Exception ("Agent [" + Name + "] is currently executing plan " + CurrentExecutingPlan);
-			}
+
+            //Add the plan to the agent's plan collection
+            PlansCollection.Add(Plan, plan_instance as IPlanInstance);
+        }
+
+
+        #region Agent's plans event handlers
+
+        /// <summary>
+        /// Invoked when a plan executed by this agent terminates its execution.
+        /// </summary>
+        /// <param name="sender">The executed plan.</param>
+        /// <param name="args">Arguments.</param>
+        private void onPlanInstanceFinished(object sender, EventArgs args)
+        {
+            Logger.Log(LogLevel.Trace, "[" + Name + "] plan " + (sender as IPlanInstance).GetName() + " finished its execution.");
+
+            //Set the value of CurrentExecutingPlan to null
+            CurrentExecutingPlan = null;
+
+            //Set the agent busy state to false
+            Busy = false;
+
+            //Check if a pause has been requested
+            if (pause_requested)
+            {
+                //Set the pause state 
+                Paused = true;
+
+                pause_requested = false;
+
+                //Pause the agent's reasoner
+                reasoner.Pause();
+
+                return;
+            }
+
+            if (resume_reasoning)
+            {
+                reasoner.Resume();
+                resume_reasoning = false;
+            }
+        }
+
+        /// <summary>
+        /// Invoked when a plan requests to register a result.
+        /// </summary>
+        /// <param name="result">Result.</param>
+        private void onPlanInstanceRegisterResult(string result)
+        {
+            Formula resultFormula = FormulaParser.Parse(result);
+            ;
+
+            if (resultFormula != null)
+            {
+                Workbench.AddStatement(resultFormula);
+
+                //TODO log register result
+                Logger.Log(LogLevel.Trace, "[" + Name + "] registered result: " + result);
+            }
+        }
+
+        #endregion Agent's plans event handlers
+
+        /// <summary>
+        /// Executes a plan.
+        /// </summary>
+        /// <param name="Plan">Plan.</param>
+        /// <param name="args">Arguments.</param>
+        internal void ExecutePlan(Type Plan, AgentEventArgs args = null)
+        {
+            if (Busy)
+            {
+                throw new Exception("Agent [" + Name + "] is currently executing plan " + CurrentExecutingPlan);
+            }
 				
-			//If Plan is not of type PlanModel, then throw an exception
-			if (!Plan.BaseType.IsEquivalentTo (typeof(PlanModel)))
-				throw new Exception ("Argument #1 in ExecutePlan(Type) must be of type PlanModel.");
+            //If Plan is not of type PlanModel, then throw an exception
+            //if (!Plan.BaseType.IsEquivalentTo(typeof(IPlanModel)))
+            if (!(typeof(IPlanModel).IsAssignableFrom(Plan)))
+                throw new Exception("Argument #1 in ExecutePlan(Type) must be of type PlanModel.");
 			
-			Type planInstanceType 	= typeof(PlanInstance<>).MakeGenericType (Plan);
-			IPlanInstance the_plan 	= null;
+            /*Type planInstanceType = typeof(BasePlanInstance<>).MakeGenericType(Plan);
+            IPlanInstance the_plan = null;*/
+            Type planInstanceType = PlanInstanceFactory.GetPlanInstanceFor(Plan);
+            IPlanInstance the_plan = null;
 
-			//Search for the input plan
-			PlansCollection.TryGetValue(Plan, out the_plan );
+            //Search for the input plan
+            PlansCollection.TryGetValue(Plan, out the_plan);
 
-			//If the input plan has not been found within the agent's plans collection, throw an exception
-			if (the_plan == null)
-				throw new Exception ("Plan '" + Plan.Name + "' not found in agent [" + Name + "] plans collection.");
+            //If the input plan has not been found within the agent's plans collection, throw an exception
+            if (the_plan == null)
+                throw new Exception("Plan '" + Plan.Name + "' not found in agent [" + Name + "] plans collection.");
 
-			//Get the plan's Execute() method
-			MethodInfo execute_method = planInstanceType.GetMethod ("Execute", BindingFlags.Public | BindingFlags.Instance);
+            //Get the plan's Execute() method
+            MethodInfo execute_method = planInstanceType.GetMethod("Execute", BindingFlags.Public | BindingFlags.Instance);
 
-			//Set the agent to busy
-			Busy = true;
+            //Set the agent to busy
+            Busy = true;
 
-			//Set the value for CurrentExecutingPlan 
-			CurrentExecutingPlan = the_plan;
+            //Set the value for CurrentExecutingPlan 
+            CurrentExecutingPlan = the_plan;
 
-			//Execute the plan
-			execute_method.Invoke (the_plan, new object[]{ args });
+            //Execute the plan
+            execute_method.Invoke(the_plan, new object[]{ args });
 
-			//TODO [ALTA PRIORITÀ] migliorare il sistema di bloccaggio dell'agente
-			//Lock the agent's reasoning life cycle until the invoked plan terminates its execution
-			while (Busy);
-		}
+            //TODO [ALTA PRIORITÀ] migliorare il sistema di bloccaggio dell'agente
+            //Lock the agent's reasoning life cycle until the invoked plan terminates its execution
+            while (Busy);
+        }
 
-		/// <summary>
-		/// Tell this agent to achieve a goal by executing a specified plan
-		/// </summary>
-		public void AchieveGoal(Type Plan, Dictionary<string,object> Args = null)
-		{
-			if (Plan == null) 
-				throw new ArgumentNullException ("Plan", "Argument #1 'Plan' cannot be null.");
+        /// <summary>
+        /// Tell this agent to achieve a goal by executing a specified plan
+        /// </summary>
+        public void AchieveGoal(Type Plan, AgentLibrary.AgentEventArgs Args = null)
+        {
+            if (Plan == null)
+                throw new ArgumentNullException("Plan", "Argument #1 'Plan' cannot be null.");
 
-			//Set the achievement of the plan [Plan] as an agent's perception
-			PerceivedEnvironementChanges.Push (new Tuple<IList, PerceptionType> (new List<Type> (){ Plan }, PerceptionType.Achieve));
+            //Set the achievement of the plan [Plan] as an agent's perception
+            PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(new List<Type>(){ Plan }, AgentPerception.Achieve));
 
-			//Set the parameters to be used when the plan [Plan] is invoked
-			if (Args != null)
-				reasoner.EventsArgs.Add (new Tuple<string, PerceptionType> (Plan.Name, PerceptionType.Achieve), Args);
-		}
+            //Set the parameters to be used when the plan [Plan] is invoked
+            if (Args != null)
+                reasoner.EventsArgs.Add(new AgentEventKey(Plan.Name, AgentPerception.Achieve), Args);
+        }
 
-		/// <summary>
-		/// Adds an event.
-		/// </summary>
-		/// <param name="formula">The formula to reason on.</param>
-		/// <param name="perception">The perception this event reacts to.</param>
-		/// <param name="Plan">The plan to execute.</param>
-		/// <param name="Args">The plan to execute.</param>
-		public void AddEvent(string formula, PerceptionType perception, Type Plan, Dictionary<string,object> Args = null)
-		{
-			reasoner.AddEvent (formula, perception, Plan, Args);
-		}
+        /// <summary>
+        /// Adds an event.
+        /// </summary>
+        /// <param name="formula">The formula to reason on.</param>
+        /// <param name="perception">The perception this event reacts to.</param>
+        /// <param name="Plan">The plan to be invoked when the event is
+        /// triggered.</param>
+        /// <param name="Args">The argument to be passed to the invoked plan
+        /// when the event is triggered.</param>
+        public void AddEvent(string formula, AgentPerception perception, Type Plan, AgentLibrary.AgentEventArgs Args = null)
+        {
+            reasoner.AddEvent(formula, perception, Plan, Args);
+        }
 
-		/// <summary>
-		/// Adds the beliefs to this agent's workbench. Each formula is added as a unique agent perception.
-		/// </summary>
-		public void AddBelief(params AtomicFormula[] formula)
-		{
-			foreach (AtomicFormula ff in formula) 
-				PerceivedEnvironementChanges.Push (new Tuple<IList, PerceptionType> (new List<AtomicFormula> (){ ff }, PerceptionType.AddBelief));
-		}
+        /// <summary>
+        /// Adds an event.
+        /// </summary>
+        /// <param name="ev">The event to be added</param>
+        public void AddEvent(AgentEvent ev)
+        {
+            reasoner.AddEvent(ev.Formula, ev.Perception, ev.Plan, ev.Args);
+        }
 
-		/// <summary>
-		/// Adds a belief to this agent's workbench.
-		/// </summary>
-		/// <param name="formula">Formula.</param>
-		public void AddBelief(AtomicFormula formula)
-		{
-			PerceivedEnvironementChanges.Push (new Tuple<IList, PerceptionType> (new List<AtomicFormula> (){ formula }, PerceptionType.AddBelief));
-		}
+        /// <summary>
+        /// Adds the beliefs to this agent's workbench. Each formula is added as a unique agent perception.
+        /// </summary>
+        public void AddBelief(params AtomicFormula[] formula)
+        {
+            foreach (AtomicFormula ff in formula)
+                PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(new List<AtomicFormula>(){ ff }, AgentPerception.AddBelief));
+        }
+
+        /// <summary>
+        /// Adds a belief to this agent's workbench.
+        /// </summary>
+        /// <param name="formula">Formula.</param>
+        public void AddBelief(AtomicFormula formula)
+        {
+            PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(new List<AtomicFormula>(){ formula }, AgentPerception.AddBelief));
+        }
 
 
         #endregion

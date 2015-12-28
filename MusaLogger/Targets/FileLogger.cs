@@ -56,7 +56,7 @@ namespace MusaLogger
 			LogManager.Configuration = Configuration;
 		}
 
-		public override void Log (LogLevel level, string message)
+        public override void Log (int level, string message)
 		{
 			if (!configured) {
 				//Configure at the first log, since FileName and Layout are not avaible until the constructor 

@@ -8,7 +8,7 @@ namespace MusaLogger
 	/// </summary>
 	public class LoggerSet
 	{
-		public List<Logger> loggers 
+		public List<Logger> Loggers 
 		{
 			get;
 			private set;
@@ -21,15 +21,20 @@ namespace MusaLogger
 		/// configuration.</param>
 		public LoggerSet(List<Logger> loggers)
 		{
-			this.loggers = loggers.Where(x => x != null).ToList();
+            Loggers = loggers.Where(x => x != null).ToList();
 		}
+
+		/*public LoggerSet()
+		{
+			loggers = new List<Logger> ();
+		}*/
 
 		/// <summary>
 		/// Log the specified message using all the registered loggers.
 		/// </summary>
-		public void Log(LogLevel level, string message)
+        public void Log(int level, string message)
 		{
-			foreach (Logger a in loggers) 
+			foreach (Logger a in Loggers) 
 			{
 				if (a != null)
 				{
@@ -45,7 +50,7 @@ namespace MusaLogger
 		/// </summary>
 		public List<Logger> GetLoggers()
 		{
-			return loggers;
+			return Loggers;
 		}
 
 	}

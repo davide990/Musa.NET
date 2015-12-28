@@ -1,12 +1,30 @@
-﻿/**
-         __  __                                     _   
-        |  \/  |                                   | |  
-        | \  / | _   _  ___   __ _     _ __    ___ | |_ 
-        | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
-        | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
-        |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+﻿//          __  __                                     _   
+//         |  \/  |                                   | |  
+//         | \  / | _   _  ___   __ _     _ __    ___ | |_ 
+//         | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
+//         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
+//         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+//
+//  AgentReasoner.cs
+//
+//  Author:
+//       Davide Guastella <davide.guastella90@gmail.com>
+//
+//  Copyright (c) 2015 Davide Guastella
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-*/
 using System.Collections.Generic;
 using System.Collections;
 using System.Threading;
@@ -14,29 +32,15 @@ using System;
 using AgentLibrary.Networking;
 using FormulaLibrary.ANTLR;
 using FormulaLibrary;
-using PlanLibrary;
 using MusaLogger;
 using MusaConfiguration;
+using MusaCommon;
 
 namespace AgentLibrary
 {
-    /// <summary>
-    /// A convinient enum to mark the changes that can occur within the environment
-    /// </summary>
-    public enum PerceptionType
-    {
-        Null                = 0x0,              //No changes occurred
-        AddBelief           = 0x1,              //A belief has been added
-        RemoveBelief        = 0x2,              //A belief has been removed
-        UpdateBeliefValue   = 0x3,              //A belief's value must be updated
-        SetBeliefValue      = 0x4,              //A belief's value must be set
-        UnSetBeliefValue    = 0x5,              //A belief's value must be unset
-		Achieve				= 0x6,
-		Test				= 0x7
-    }
-
     public sealed class AgentReasoner
     {
+		//TODO questi campi andranno rimossi in futuro
         private int currentReasoningCycle = 0;
 		private readonly int ReasoningUpdateTime = 1500;
 
@@ -46,10 +50,14 @@ namespace AgentLibrary
         private readonly Agent parentAgent;
 
 		/// <summary>
-		/// The events catalogue this agent reacts to. The key is a couple Formula-Perception type, while the value is a
-		/// PlanModel that indicates the plan to execute.
+		/// The collection of events this agent reacts to. The key of this 
+        /// collection is an event key, made of a formula-perception tuple that
+        /// is needed to trigger an event. The value (Type) is the class type
+        /// of the plan to be invoked when an event is triggered.
+        /// This collection represents the knowledge of the agent to react on
+        /// specific perception.
 		/// </summary>
-		public Dictionary<Tuple<string, PerceptionType>, Type> EventsCatalogue
+        public Dictionary<AgentEventKey, Type> EventsCatalogue
 		{
 			get { return eventsCatalogue; }
 			private set 
@@ -60,13 +68,14 @@ namespace AgentLibrary
 				}
 			}
 		}
-		private Dictionary<Tuple<string, PerceptionType>, Type> eventsCatalogue;
+        private Dictionary<AgentEventKey, Type> eventsCatalogue;
 		private object events_catalogue_lock;
 
 		/// <summary>
-		/// The arguments to be passed to plans triggered by events.
+        /// The collection of arguments that have to be passed to events when 
+        /// these are triggered.
 		/// </summary>
-		public Dictionary<Tuple<string, PerceptionType>, Dictionary<string,object>> EventsArgs
+        public Dictionary<AgentEventKey, AgentEventArgs> EventsArgs
 		{
 			get { return events_args; }
 			private set 
@@ -77,24 +86,29 @@ namespace AgentLibrary
 				}
 			}
 		}
-		private Dictionary<Tuple<string, PerceptionType>, Dictionary<string,object>> events_args;
+        private Dictionary<AgentEventKey, AgentEventArgs> events_args;
 		private object events_args_lock;
 
 		/// <summary>
-		/// The stack containing the events to be triggered during the reasoning activity
+        /// This collection contains the events that are perceived during the 
+        /// reasoning activity of the agent. As the agent has knowledge of the 
+        /// events to which it should react to, when a certain perception (of 
+        /// which he is aware) occurs, the corresponding event is added to this 
+        /// collection, and therefore it's triggered during the reasoning cycle 
+        /// of the agent.
 		/// </summary>
-		public Stack<Tuple<string, PerceptionType, Type>> Events 
+		private Stack<Tuple<string, AgentPerception, Type>> PerceivedEvents 
 		{
-			get { return events; }
-			private set 
+			get { return perceived_events; }
+			set 
 			{
 				lock (events_lock) 
 				{
-					events = value; 
+					perceived_events = value; 
 				}
 			}
 		}
-		private Stack<Tuple<string, PerceptionType, Type>> events;
+        private Stack<Tuple<string, AgentPerception, Type>> perceived_events;
 		private object events_lock;
 
 		/// <summary>
@@ -139,22 +153,25 @@ namespace AgentLibrary
 		/// </summary>
 		private System.Threading.Timer reasoning_timer;
 
-		LoggerSet logger;
+		/// <summary>
+		/// The logger set this reasoner uses to log its activities.
+		/// </summary>
+		private LoggerSet Logger;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AgentLibrary.AgentReasoner"/> class.
 		/// </summary>
 		/// <param name="agent">The <see cref="AgentLibrary.Agent"/> this reasoner is related.</param>
-        public AgentReasoner(Agent agent)
+		public AgentReasoner (Agent agent)
         {
 			events_lock 	= new object ();
 			events_catalogue_lock = new object ();
 			events_args_lock = new object ();
 			is_running_lock = new object ();
 
-			EventsCatalogue = new Dictionary<Tuple<string, PerceptionType>, Type> ();
-			Events = new Stack<Tuple<string, PerceptionType, Type>> ();
-			EventsArgs = new Dictionary<Tuple<string, PerceptionType>, Dictionary<string, object>> ();
+            EventsCatalogue = new Dictionary<AgentEventKey, Type> ();
+			PerceivedEvents = new Stack<Tuple<string, AgentPerception, Type>> ();
+            EventsArgs = new Dictionary<AgentEventKey, AgentEventArgs> ();
 
 			Paused = false;
 			pause_requested = false;
@@ -165,18 +182,18 @@ namespace AgentLibrary
 			reasoning_timer = new System.Threading.Timer (reasoning_method_callback, new object(), ReasoningUpdateTime, ReasoningUpdateTime);
 
 			//Get the default logger set from the environment configuration
-			logger = MusaConfig.GetLoggerSet();
+			Logger = MusaConfig.GetLoggerSet();
         }
 
         internal void startReasoning()
         {
-			logger.Log (LogLevel.Trace, parentAgent.Name + " starts reasoning");
+			Logger.Log (LogLevel.Trace, parentAgent.Name + " starts reasoning");
 			IsRunning = true;
         }
 
         public void stopReasoning()
         {
-			logger.Log (LogLevel.Trace, parentAgent.Name + " stops reasoning");
+			Logger.Log (LogLevel.Trace, parentAgent.Name + " stops reasoning");
 			IsRunning = false;
 
         }
@@ -186,7 +203,7 @@ namespace AgentLibrary
 		/// </summary>
 		public void Pause()
 		{
-			logger.Log (LogLevel.Trace, parentAgent.Name + " paused");
+			Logger.Log (LogLevel.Trace, parentAgent.Name + " paused");
 			pause_requested = true;
 		}
 
@@ -195,7 +212,7 @@ namespace AgentLibrary
 		/// </summary>
         public void Resume()
         {
-			logger.Log (LogLevel.Trace, parentAgent.Name + " resumed");
+			Logger.Log (LogLevel.Trace, parentAgent.Name + " resumed");
 
 			//Set the Paused value to false
 			Paused = false;
@@ -213,12 +230,12 @@ namespace AgentLibrary
 			//wait until this reasoning cycle has finished
 			reasoning_timer.Change (Timeout.Infinite, Timeout.Infinite);
 
-			logger.Log (LogLevel.Trace, parentAgent.Name + ": reasoning cycle #"+currentReasoningCycle++);
+			Logger.Log (LogLevel.Trace, parentAgent.Name + ": reasoning cycle #"+currentReasoningCycle++);
             
 			//Check the agent's mail box and update its workbench according to the last received message
             checkMailBox();
 
-			logger.Log (LogLevel.Trace, "Checking environment changes...");
+			Logger.Log (LogLevel.Trace, "Checking environment changes...");
 
 			Thread.Sleep (500);
 
@@ -230,7 +247,7 @@ namespace AgentLibrary
 			//Trigger potential events produced by this agent's environment perception
 			triggerEvent ();
 
-			logger.Log (LogLevel.Trace, "######### done reasoning...");
+			Logger.Log (LogLevel.Trace, "######### done reasoning...");
 
             Thread.Sleep(ReasoningUpdateTime);
 
@@ -265,73 +282,69 @@ namespace AgentLibrary
 
 			//TODO [importante] bisogna capire qui se un evento è interno o esterno
 
-
-
 			//process the message
 			switch (msg.InfoType)
 			{
 			case InformationType.Tell:
-				logger.Log (LogLevel.Trace, "[" + parentAgent.Name + "] perceiving TELL: " + msg);
+				Logger.Log (LogLevel.Trace, "[" + parentAgent.Name + "] perceiving TELL: " + msg);
 				parentAgent.Workbench.AddStatement (FormulaParser.Parse (msg.Message as string));
 				break;
 
 			case InformationType.Untell:
-				logger.Log (LogLevel.Trace, "[" + parentAgent.Name + "] perceiving UNTELL: " + msg);
+				Logger.Log (LogLevel.Trace, "[" + parentAgent.Name + "] perceiving UNTELL: " + msg);
 				parentAgent.Workbench.RemoveStatement (FormulaParser.Parse (msg.Message as string));
 				break;
 			
 			case InformationType.Achieve:
-                    //!!!
+                    //TODO IMPLEMENTAMI
 
 				break;
 			}
         }
 
         /// <summary>
-        /// Perceive the environment changes and updates the workbench of the parent agent
+        /// Perceive the environment changes and updates the workbench of the 
+        /// parent agent
         /// </summary>
         private void perceive()
         {
 			if (parentAgent.PerceivedEnvironementChanges.Count <= 0)
                 return;
 
-			Tuple<IList, PerceptionType> p;
-
-			p = parentAgent.PerceivedEnvironementChanges.Pop ();
-			IList changes_list = p.Item1;
-			PerceptionType perception_type = p.Item2;
+            //Get the last change within the environment
+			Tuple<IList, AgentPerception> p = parentAgent.PerceivedEnvironementChanges.Pop ();
+			IList changes_list              = p.Item1;
+			AgentPerception perception_type = p.Item2;
 
 			switch (perception_type) 
 			{
-			case PerceptionType.Achieve:
+			case AgentPerception.Achieve:
 				Type plan_to_execute = changes_list [0] as Type;
-
-				Dictionary<string,object> args = null;
-				EventsArgs.TryGetValue (new Tuple<string, PerceptionType> (plan_to_execute.Name, perception_type), out args);
-
+				AgentEventArgs args = null;
+				EventsArgs.TryGetValue (new AgentEventKey (plan_to_execute.Name, perception_type), out args);
 				parentAgent.ExecutePlan (plan_to_execute, args);
 				break;
 
-			case PerceptionType.AddBelief:
+			case AgentPerception.AddBelief:
 				parentAgent.Workbench.AddStatement (changes_list);
 				checkExternalEvents(changes_list, perception_type);
 				break;
 
-			case PerceptionType.RemoveBelief:
+			case AgentPerception.RemoveBelief:
 				parentAgent.Workbench.RemoveStatement (changes_list);
 				checkExternalEvents(changes_list, perception_type);
 				break;
 
-			case PerceptionType.SetBeliefValue:
+			case AgentPerception.SetBeliefValue:
 				break;
 
-			case PerceptionType.UnSetBeliefValue:
+			case AgentPerception.UnSetBeliefValue:
 				break;
 
-			case PerceptionType.UpdateBeliefValue:
+			case AgentPerception.UpdateBeliefValue:
 				break;
 
-			case PerceptionType.Null:
+			case AgentPerception.Null:
 				break;
 			}
         }
@@ -342,7 +355,7 @@ namespace AgentLibrary
 		/// 
 		/// The perceived changes in the environment could trigger (external) events.
 		/// </summary>
-		private void checkExternalEvents(IList changes_list, PerceptionType perception_type)
+		private void checkExternalEvents(IList changes_list, AgentPerception perception_type)
 		{
 			Type plan_to_execute = null;
 
@@ -350,11 +363,11 @@ namespace AgentLibrary
 			foreach (AtomicFormula formula in changes_list) 
 			{
 				//Check if an handler for the perceived change exists.
-				EventsCatalogue.TryGetValue (new Tuple<string, PerceptionType> (formula.ToString (), perception_type), out plan_to_execute);
+                EventsCatalogue.TryGetValue (new AgentEventKey (formula.ToString (), perception_type), out plan_to_execute);
 
 				//If exists, an external event is triggered, and a specific plan is triggered.
 				if (plan_to_execute != null) 
-					Events.Push (new Tuple<string, PerceptionType, Type> (formula.ToString (), perception_type, plan_to_execute));
+					PerceivedEvents.Push (new Tuple<string, AgentPerception, Type> (formula.ToString (), perception_type, plan_to_execute));
 
 				//set plan_to_execute to null for the next iteration
 				plan_to_execute = null;
@@ -362,43 +375,54 @@ namespace AgentLibrary
 		}
 
         /// <summary>
-		/// Trigger the top event within the events stack. Events may be triggered by the agent's perception of changes
-		/// within the environment it's located. 
+        /// Trigger the event on top of the perceived event stack.
         /// </summary>
 		private void triggerEvent()
         {
 			//Do nothing if the events stack is empty
-			if (Events.Count <= 0)
+			if (PerceivedEvents.Count <= 0)
 				return;
 
 			//Get the top event, and its info
-			Tuple<string, PerceptionType, Type> eventTuple = Events.Pop ();
+			Tuple<string, AgentPerception, Type> eventTuple = PerceivedEvents.Pop ();
 
 			string formula 					= eventTuple.Item1;
-			PerceptionType perception_type 	= eventTuple.Item2;
+			AgentPerception perception_type 	= eventTuple.Item2;
 			Type plan_to_execute 			= eventTuple.Item3;
 
 			//Try get values related to this event
-			Dictionary<string,object> args = null;
-			EventsArgs.TryGetValue (new Tuple<string, PerceptionType> (formula, perception_type), out args);
+            AgentEventArgs args = null;
+            EventsArgs.TryGetValue (new AgentEventKey (formula, perception_type), out args);
 
 			//Execute the plan (if exists)
 			parentAgent.ExecutePlan (plan_to_execute, args);
         }
 
+        /// <summary>
+        /// Adds an event. The event added becomes part of the agent's 
+        /// knowledge.
+        /// </summary>
+        /// <param name="ev">The event to be added.</param>
+        public void AddEvent(AgentEvent ev)
+        {
+            AddEvent (ev.Formula, ev.Perception, ev.Plan, ev.Args);
+        }
+
 		/// <summary>
-		/// Adds an event.
+        /// Adds an event. The event added becomes part of the agent's 
+        /// knowledge.
 		/// </summary>
-		/// <param name="formula">The formula to reason on.</param>
+		/// <param name="formula">The formula.</param>
 		/// <param name="perception">The perception this event reacts to.</param>
 		/// <param name="Plan">The plan to execute.</param>
-		public void AddEvent(string formula, PerceptionType perception, Type Plan, Dictionary<string,object> Args = null)
+        public void AddEvent(string formula, AgentPerception perception, Type Plan, AgentEventArgs Args = null)
 		{
 			//If Plan is not of type PlanModel, then throw an exception
-			if (!Plan.BaseType.IsEquivalentTo (typeof(PlanModel)))
+            //if (!Plan.BaseType.IsEquivalentTo (typeof(IPlanModel)))
+            if (!(typeof(IPlanModel).IsAssignableFrom(Plan)))
 				throw new Exception ("Argument #3 in AddEvent(...) must be of type PlanModel.");
 			
-			Tuple<string,PerceptionType> the_key = new Tuple<string, PerceptionType> (formula, perception);
+            AgentEventKey the_key = new AgentEventKey (formula, perception);
 
 			//Check if the event is already contained within the agent's event catalogue
 			if (EventsCatalogue.ContainsKey (the_key))

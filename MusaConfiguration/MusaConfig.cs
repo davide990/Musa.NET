@@ -3,6 +3,7 @@ using System.Xml.Serialization;
 using System.IO;
 using System.Collections.Generic;
 using MusaLogger;
+using System.Reflection;
 
 namespace MusaConfiguration
 {
@@ -31,9 +32,40 @@ namespace MusaConfiguration
 		[XmlArrayItem("MongoDBLogger", typeof(MongoDBLogger))]
 		[XmlArrayItem("WCFLogger", typeof(WCFLogger))]
 		public List<Logger> Loggers { get; set;	}
+
+		[XmlArray("Agents")]
+		[XmlArrayItem("Agent", typeof(AgentEntry))]
+		public List<AgentEntry> Agents { get; set; }
+
+
+        /// <summary>
+        /// Gets or sets the plan libraries. Each plan library is a full path to
+        /// a dll containing plans
+        /// </summary>
+        /// <value>The plan libraries.</value>
+        [XmlArray("PlanLibraries")]
+        [XmlArrayItem("PlanLibrary", typeof(string))]
+        public List<string> PlanLibraries { get; set; }
+
 		#endregion XML elements
 
 		#region Properties
+
+        [XmlIgnore()]
+        public List<Type> DefinedPlans
+        {
+            get
+            {
+                var list = new List<Type>();
+
+                foreach(string assembly in PlanLibraries)
+                {
+                    Assembly planLibrary = Assembly.LoadFile(assembly);    
+                    list.AddRange(planLibrary.DefinedTypes);
+                }
+                return list;
+            }
+        }
 
 		/// <summary>
 		/// Gets or sets the name of the MUSA configuration file this object is related to.
@@ -155,6 +187,9 @@ namespace MusaConfiguration
 
 		public MusaConfig()
 		{
+			Loggers = new List<Logger> ();
+			Agents = new List<AgentEntry> ();
+
 			MaxNumAgent = "100";
 			MusaAddress = "127.0.0.1";
 			MusaAddressPort = 8089;
@@ -172,7 +207,7 @@ namespace MusaConfiguration
 			if (loggerSet != null)
 				return loggerSet;
 
-			//If no logger has been found, create a "default" console logger
+			//If no logger has been found, create a default console logger
 			if (instance.Loggers.Count <= 0)
 				instance.Loggers.Add (new ConsoleLogger ());
 
@@ -237,6 +272,13 @@ namespace MusaConfiguration
 
 			// Close the serializer
 			writer.Close();
+		}
+
+
+		private void SaveAgentEnvironment()
+		{
+			//...
+
 		}
 
 		public override string ToString ()

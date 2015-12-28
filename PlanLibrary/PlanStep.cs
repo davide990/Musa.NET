@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using MusaCommon;
 
 namespace PlanLibrary
 {
@@ -38,7 +39,7 @@ namespace PlanLibrary
 		}
 		private MethodInfo the_method;
 
-		public delegate void onExecuteStep (PlanStep the_step, Dictionary<string, object> args);
+        public delegate void onExecuteStep (PlanStep the_step, IAgentEventArgs args);
 		/// <summary>
 		/// Occurs when this plan must be executed.
 		/// </summary>
@@ -57,7 +58,7 @@ namespace PlanLibrary
 		/// Then, the plan instance check if the plan is in pause or not, and if not, proceed executing the method
 		/// InvokePlanStep(...) that execute the plan step.
 		/// </summary>
-		internal void Execute(Dictionary<string, object> args = null)
+        internal void Execute(IAgentEventArgs args = null)
 		{
 			if (ExecuteStep != null)
 				ExecuteStep (this, args);
@@ -68,7 +69,7 @@ namespace PlanLibrary
 
 		}
 
-		internal void InvokePlanStep(Dictionary<string, object> args = null)
+        internal void InvokePlanStep(IAgentEventArgs args = null)
 		{
 			if (the_method == null)
 				throw new Exception ("In plan " + Parent.Name + ": invalid plan step. May be the method is not decorated with the attribute [PlanStep]?");
@@ -91,7 +92,7 @@ namespace PlanLibrary
 				{
 					//If the passed args are null, invoke the method with an empty dictionary
 					//the_method.Invoke (Parent, new object[]{ new Dictionary<string, object> () });
-					InvokePlanStepMethod (new object[]{ new Dictionary<string, object> () });
+                    InvokePlanStepMethod (new object[]{ new object() as IAgentEventArgs });
 				}
 			} 
 			else 

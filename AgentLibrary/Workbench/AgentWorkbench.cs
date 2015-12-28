@@ -147,33 +147,6 @@ namespace AgentLibrary
         }
 
         /// <summary>
-        /// Given a generic formula, return its inner atomic formulas.
-        /// </summary>
-        private List<AtomicFormula> UnrollFormula(Formula f)
-        {
-            List<AtomicFormula> ff = new List<AtomicFormula>();
-
-            if (f is AndFormula)
-            {
-                ff.AddRange(UnrollFormula((f as AndFormula).Left));
-                ff.AddRange(UnrollFormula((f as AndFormula).Right));
-            }
-            else if (f is OrFormula)
-            {
-                ff.AddRange(UnrollFormula((f as OrFormula).Left));
-                ff.AddRange(UnrollFormula((f as OrFormula).Right));
-            }
-            else if (f is NotFormula)
-            {
-                ff.AddRange(UnrollFormula((f as NotFormula).Formula));
-            }
-            else
-                ff.Add(f as AtomicFormula);
-
-            return ff;
-        }
-
-        /// <summary>
         /// Add a statement to this workbench.
         /// </summary>
         public void AddStatement(IList f)
@@ -185,7 +158,7 @@ namespace AgentLibrary
         public void AddStatement(params Formula[] f)
         {
             foreach(Formula ff in f)
-                AddStatement(UnrollFormula(ff));
+				AddStatement(FormulaUtils.UnrollFormula(ff));
         }
 
         /// <summary>
@@ -238,7 +211,7 @@ namespace AgentLibrary
         public void RemoveStatement(params Formula[] f)
         {
             foreach (Formula ff in f)
-                RemoveStatement(UnrollFormula(ff));
+				RemoveStatement(FormulaUtils.UnrollFormula(ff));
         }
 
         /// <summary>

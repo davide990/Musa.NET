@@ -39,7 +39,7 @@ namespace MusaLogger
 			LogManager.Configuration = Configuration;
 		}	
 
-		public override void Log (LogLevel level, string message)
+        public override void Log (int level, string message)
 		{
 			if (!configured) 
 			{

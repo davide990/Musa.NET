@@ -6,10 +6,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 using MusaLogger;
+using MusaCommon;
 
 namespace PlanLibrary
 {
-	public interface IPlanInstance
+	/*public interface IPlanInstance
 	{
 		/// <summary>
 		/// Gets the name of this plan.
@@ -30,13 +31,46 @@ namespace PlanLibrary
 		/// Determines whether this plan is atomic.
 		/// </summary>
 		bool IsAtomic();
-	}
+	}*/
+
+    public static class PlanInstanceFactory
+    {
+        public static IPlanInstance CreateInstance(Type PlanModel, object agent_class, MethodInfo RegisterResultDelegate, MethodInfo PlanFinishedDelegate, LoggerSet Logger)
+        {
+            Type planInstanceType = typeof(PlanInstance<>).MakeGenericType(PlanModel);
+            var plan_instance = Activator.CreateInstance(planInstanceType);
+
+            //Handler for RegisterResult
+            EventInfo register_result_event = planInstanceType.GetEvent("RegisterResult");
+            Delegate register_plan_results_delegate = Delegate.CreateDelegate(register_result_event.EventHandlerType, agent_class, RegisterResultDelegate);
+            register_result_event.AddEventHandler(plan_instance, register_plan_results_delegate);
+
+            //Handler for PlanFinished
+            EventInfo plan_finished_event = planInstanceType.GetEvent("Finished");
+            Delegate plan_finished_delegate = Delegate.CreateDelegate(plan_finished_event.EventHandlerType, agent_class, PlanFinishedDelegate);
+            plan_finished_event.AddEventHandler(plan_instance, plan_finished_delegate);
+
+            //Set logger
+            PropertyInfo plan_logger = planInstanceType.GetProperty("Logger", BindingFlags.NonPublic | BindingFlags.Instance);
+            plan_logger.SetValue(plan_instance, Logger);
+
+
+            return plan_instance as IPlanInstance;
+        }
+
+        public static Type GetPlanInstanceFor(Type planModel)
+        {
+            return typeof(PlanInstance<>).MakeGenericType(planModel);
+        }
+
+    }
 
 	/// <summary>
 	/// Plan instance.
 	/// </summary>
-	public class PlanInstance<T> : IPlanInstance where T : PlanModel
+    public class PlanInstance<T> : BasePlanInstance<T> where T : PlanModel //: IPlanInstance where T : PlanModel
 	{
+        
 		#region Fields/Properties
 
 		/// <summary>
@@ -118,7 +152,7 @@ namespace PlanLibrary
 		/// Used to register results into agent's workbenches
 		/// </summary>
 		public event onRegisterResult RegisterResult;
-
+        
 
 		#region Constructor and initialization methods
 
@@ -146,10 +180,11 @@ namespace PlanLibrary
 				
 			//Initialize the ManualResetEvent object
 			_busy = new ManualResetEvent (true);
+
 		}
 
 
-		private void Log (LogLevel level, string message)
+        private void Log (int level, string message)
 		{
 			Logger.Log (level, message);
 		}
@@ -163,7 +198,7 @@ namespace PlanLibrary
 			if(RegisterResult != null) 
 			{
 				//TODO log result to logger
-				RegisterResult (result);
+                RegisterResult (result);
 			}
 			else
 				throw new Exception("No agent is registered to catch this plan's results.");
@@ -215,7 +250,9 @@ namespace PlanLibrary
 				throw new Exception ("In plan " + Name + ": invalid entry point method.");
 
 			//Takes the plan's arguments
-			Dictionary<string, object> args = e.Argument as Dictionary<string, object>;
+			//Dictionary<string, object> args = e.Argument as Dictionary<string, object>;
+
+            IAgentEventArgs args = e.Argument as IAgentEventArgs;
 
 			//If the plan step method has parameters
 			if (EntryPointMethod.GetParameters ().Length > 0)
@@ -224,8 +261,9 @@ namespace PlanLibrary
 				if (args != null) 
 				{
 					//Check if the parameter is of type Dictionary<string,object>
-					if (!EntryPointMethod.GetParameters () [0].ParameterType.IsEquivalentTo (typeof(Dictionary<string,object>)))
-						throw new Exception ("In plan step" + Name + ": plan steps supports only a maximum of 1 parameter of type Dictionary<string,object>.");
+                    //if (!EntryPointMethod.GetParameters () [0].ParameterType.IsEquivalentTo (typeof(IAgentEventArgs)))
+                    if (!(typeof(IAgentEventArgs).IsAssignableFrom(EntryPointMethod.GetParameters () [0].ParameterType)))
+                        throw new Exception ("In plan step" + Name + ": plan steps supports only a maximum of 1 parameter of type IAgentEventArgs.");
 
 					//Invoke the method
 					InvokePlan (new object[]{ args });
@@ -233,7 +271,7 @@ namespace PlanLibrary
 				else 
 				{
 					//If the passed args are null, invoke the method with an empty dictionary
-					InvokePlan (new object[]{ new Dictionary<string, object> () });
+                    InvokePlan (new object[]{ new object() as IAgentEventArgs });
 				}
 			} 
 			else 
@@ -255,7 +293,7 @@ namespace PlanLibrary
 		/// </summary>
 		/// <param name="step_name">The plan step to be executed.</param>
 		/// <param name="args">The arguments passed to the plan step (optional).</param>
-		private void onExecuteStep (PlanStep the_step, Dictionary<string, object> args = null)
+        private void onExecuteStep (PlanStep the_step, IAgentEventArgs args = null)
 		{
 			//If the plan is in pause, wait until it is resumed
 			_busy.WaitOne ();
@@ -267,7 +305,7 @@ namespace PlanLibrary
 		/// <summary>
 		/// Execute this plan.
 		/// </summary>
-		public void Execute(Dictionary<string,object> args = null)
+        public override void Execute(IAgentEventArgs args = null)
 		{
 			if(background_worker == null)
 				initializeBackgroundWorker ();
@@ -287,7 +325,7 @@ namespace PlanLibrary
 		/// <summary>
 		/// Pause this plan's execution.
 		/// </summary>
-		public void Pause()
+        public override void Pause()
 		{
 			Console.WriteLine (Name + " paused");
 			_busy.Reset ();
@@ -296,7 +334,7 @@ namespace PlanLibrary
 		/// <summary>
 		/// Resume this plan's execution.
 		/// </summary>
-		public void Resume()
+        public override void Resume()
 		{
 			Console.WriteLine (Name + " resumed");
 			_busy.Set();
@@ -331,7 +369,7 @@ namespace PlanLibrary
 				if (e is TargetInvocationException)
 					Console.WriteLine ("An exception has been throwed by the invoked plan '" + Name + "'.\nMessage: " + e.InnerException.ToString ());
 				else
-					Console.WriteLine (e.ToString ());
+                    Console.WriteLine ("Error while executing plan " + Name + "\n" + e.ToString ());
 			}
 		}
 
@@ -346,12 +384,12 @@ namespace PlanLibrary
 
 		#region IPlanInstance inherithed methods
 
-		public string GetName()
+        public override string GetName()
 		{
 			return Name;
 		}
 
-		public bool IsAtomic()
+		public override bool IsAtomic()
 		{
 			return plan_model.IsAtomic;
 		}

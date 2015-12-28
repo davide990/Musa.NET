@@ -66,6 +66,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Terms\Term.cs" />
     <Compile Include="Terms\VariableTerm.cs" />
+    <Compile Include="FormulaUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ANTLR\formula_grammar.g" />

@@ -3,11 +3,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E05E465D-3BBD-4708-B00E-8001089DE01B}</ProjectGuid>
+    <ProjectGuid>{3B8C5698-817C-4C05-87BF-2340C699CC1F}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>MusaConfiguration</RootNamespace>
-    <AssemblyName>MusaConfiguration</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <RootNamespace>MusaCommon</RootNamespace>
+    <AssemblyName>MusaCommon</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,23 +29,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MusaConfig.cs" />
-    <Compile Include="AgentConfig\AgentEntry.cs" />
-    <Compile Include="AgentConfig\EventEntry.cs" />
-    <Compile Include="AgentConfig\EventArgEntry.cs" />
+    <Compile Include="IPlanInstance.cs" />
+    <Compile Include="IPlanModel.cs" />
+    <Compile Include="IMusaConfig.cs" />
+    <Compile Include="IAgentEventArgs.cs" />
+    <Compile Include="BasePlanInstance.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <ProjectReference Include="..\MusaLogger\MusaLogger.csproj">
-      <Project>{5CF5FB93-94DC-4A88-BCB1-95F2AD757F01}</Project>
-      <Name>MusaLogger</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="AgentConfig\" />
-  </ItemGroup>
 </Project>

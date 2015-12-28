@@ -99,7 +99,7 @@ namespace MusaLogger
 		/// <summary>
 		/// Log the specified message.
 		/// </summary>
-		public override void Log (LogLevel level, string message)
+        public override void Log (int level, string message)
 		{
 			if (!configured) 
 			{

@@ -91,5 +91,9 @@
       <Project>{ECB83DD7-A309-47E2-B399-AFE88079DAB2}</Project>
       <Name>MusaWCFLogger</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MusaCommon\MusaCommon.csproj">
+      <Project>{3B8C5698-817C-4C05-87BF-2340C699CC1F}</Project>
+      <Name>MusaCommon</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
