@@ -44,7 +44,9 @@ namespace MusaCommon
         /// </summary>
         void Resume();
 
-
+        /// <summary>
+        /// Execute this plan.
+        /// </summary>
         void Execute(IAgentEventArgs args = null);
 
         /// <summary>
@@ -52,28 +54,5 @@ namespace MusaCommon
         /// </summary>
         bool IsAtomic();
     }
-    /*
-    public interface IPlanInstance<T> : IPlanInstance//where T : IPlanModel
-    {
-        /// <summary>
-        /// Gets the name of this plan.
-        /// </summary>
-        string GetName();
-
-        /// <summary>
-        /// Pause this plan instance.
-        /// </summary>
-        void Pause();
-
-        /// <summary>
-        /// Resume this plan instance.
-        /// </summary>
-        void Resume();
-
-        /// <summary>
-        /// Determines whether this plan is atomic.
-        /// </summary>
-        bool IsAtomic();
-    }*/
 }
 

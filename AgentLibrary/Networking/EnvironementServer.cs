@@ -5,8 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Net.Sockets;
+using MusaLogger;
 
-namespace AgentLibrary.Networking
+namespace AgentLibrary
 {
     /// <summary>
     /// This object handles the communications betweeen agents and environement.
@@ -26,12 +27,19 @@ namespace AgentLibrary.Networking
         /// </summary>
         public AgentEnvironement Environment
         {
-            get { return env; }
-            private set { env = value; }
+            get;// { return env; }
+            private set;// { env = value; }
         }
-        AgentEnvironement env;
+        //AgentEnvironement env;
         
 		private bool HostOpened;
+
+
+        public LoggerSet Logger
+        {
+            get;
+            private set;
+        }
 
         #endregion
         
@@ -50,7 +58,16 @@ namespace AgentLibrary.Networking
             Environment = env;
 			HostOpened = false;
         }
-        
+
+        /// <summary>
+        /// Attachs a logger to this class.
+        /// </summary>
+        /// <param name="Logger">Logger.</param>
+        public void AttachLogger(LoggerSet Logger)
+        {
+            this.Logger = Logger;
+        }
+
 
         /// <summary>
         /// sender agent is trusted? if not return false
@@ -75,8 +92,9 @@ namespace AgentLibrary.Networking
         /// <summary>
         /// Setup and start the networking service for this environment
         /// </summary>
-        /// <param name="address">the IP address of the machine in which this environment is located</param>
         /// <param name="port">the port used by this environment</param>
+        /// <param name="local_ip_address">the IP address of the machine in 
+        /// which this environment is located</param>
         public void StartNetworking(string port, string local_ip_address = "localhost")
         {
             Uri address = new Uri("http://" + local_ip_address + ":" + port);
@@ -93,9 +111,11 @@ namespace AgentLibrary.Networking
 			}
 			catch(SocketException ex)
 			{
-				//Log SocketException
-				Console.WriteLine ("Cannot setup networking for MUSA.net");
+                Logger.Log(LogLevel.Error, "Cannot setup networking for MUSA.net.\n Error: " + ex);
+                return;
 			}
+
+            Logger.Log(LogLevel.Trace, "Networking setup done. Address: " + address);
 
             // Once networking service is active, raise an event
             if (onNetworkServiceStart != null)

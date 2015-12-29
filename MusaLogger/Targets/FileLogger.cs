@@ -46,7 +46,9 @@ namespace MusaLogger
 			fileTarget.FileName = FileName;
 			fileTarget.Layout = Layout;
 
-			var rule2 = new LoggingRule (LoggerName, GetLogLevel(LogLevel.Debug), fileTarget);
+			//var rule2 = new LoggingRule (LoggerName, GetLogLevel(LogLevel.Debug), fileTarget);
+            var rule2 = new LoggingRule(LoggerName, GetLogLevel(MinimumLogLevel), fileTarget);
+
 
 			Configuration.AddTarget (fileTarget);
 			Configuration.LoggingRules.Add (rule2);

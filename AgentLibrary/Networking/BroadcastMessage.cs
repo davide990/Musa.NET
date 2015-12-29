@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace AgentLibrary.Networking
+namespace AgentLibrary
 {
     [DataContract(Name = "MessageScope")]
     public enum MessageScope
@@ -25,29 +25,29 @@ namespace AgentLibrary.Networking
     [DataContract]
     public class EnvironementData
     {
-        string address_ip;
+        /*string address_ip;
         string address_port;
-        string env_name;
+        string env_name;*/
 
         [DataMember]
         public string AddressIP
         {
-            get { return address_ip; }
-            set { address_ip = value; }
+            get;// { return address_ip; }
+            set;// { address_ip = value; }
         }
 
         [DataMember]
         public string AddressPort
         {
-            get { return address_port; }
-            set { address_port = value; }
+            get;// { return address_port; }
+            set;// { address_port = value; }
         }
 
         [DataMember]
         public string EnvironmentName
         {
-            get { return env_name; }
-            set { env_name = value; }
+            get;// { return env_name; }
+            set;// { env_name = value; }
         }
 
         public override string ToString()
@@ -59,21 +59,21 @@ namespace AgentLibrary.Networking
     [DataContract]
     public class BroadcastMessage
     {
-        private MessageScope scope;
-        private object message;
+        /*private MessageScope scope;
+        private object message;*/
 
         [DataMember]
         public object Message
         {
-            get { return message; }
-            set { message = value; }
+            get;// { return message; }
+            set;// { message = value; }
         }
 
         [DataMember]
         public MessageScope MessageScope
         {
-            get { return scope; }
-            set { scope = value; }
+            get;// { return scope; }
+            set;// { scope = value; }
         }
     }
 }

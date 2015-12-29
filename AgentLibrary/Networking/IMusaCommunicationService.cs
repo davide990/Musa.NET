@@ -2,7 +2,7 @@
 using System.ServiceModel;
 using System.ServiceModel.Web;
 
-namespace AgentLibrary.Networking
+namespace AgentLibrary
 {
     /// <summary>
     /// An interface that define the communication protocol between agents and environements

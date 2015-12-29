@@ -1,4 +1,4 @@
-﻿using AgentLibrary.Networking;
+﻿using AgentLibrary;
 using FormulaLibrary;
 using System;
 using System.Collections.Generic;
@@ -164,11 +164,13 @@ namespace AgentLibrary
             switch (e.Action)
             {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                    logger.Log(LogLevel.Trace, "Added agent(s): " + e.NewItems);
+                    foreach(var newItem in e.NewItems)
+                        logger.Log(LogLevel.Debug, "Added agent: " + newItem);    
                     break;
 
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-                    logger.Log(LogLevel.Trace, "Removed agent(s): " + e.NewItems);
+                    foreach(var newItem in e.NewItems)
+                        logger.Log(LogLevel.Debug, "Removed agent: " + newItem);    
                     break;
             }
         }

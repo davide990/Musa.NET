@@ -49,7 +49,7 @@ namespace AgentTest
 				//env.DeleteStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
 
 			};
-			wk.RunWorkerAsync ();
+			//wk.RunWorkerAsync ();
 
 			a.AddPlan (typeof(PlanExample));
 			a.AddPlan (typeof(PlanExample2));
@@ -57,12 +57,17 @@ namespace AgentTest
 
             var argss = new AgentEventArgs { { "nome", "davide" } };
                 
-            a.AddEvent ("f(x)", AgentPerception.AddBelief, typeof(PlanExample2));
+            a.AddEvent ("f(x)", AgentPerception.AddBelief, typeof(PlanExample2), argss);
+
+
             //a.AddEvent ("f(x)", AgentPerception.RemoveBelief, typeof(PlanExample2));
             env.RegisterAgent (a);
 
 			//env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
 			//a.AchieveGoal (typeof(PlanExample2));
+            Thread.Sleep(3000);
+            a.AchieveGoal(typeof(PlanForEvent), argss);
+
 
             //env.Serialize().Save("/home/davide/ehyehy.xml");
 

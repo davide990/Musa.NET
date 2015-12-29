@@ -1,4 +1,31 @@
-﻿using System;
+﻿//          __  __                                     _   
+//         |  \/  |                                   | |  
+//         | \  / | _   _  ___   __ _     _ __    ___ | |_ 
+//         | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
+//         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
+//         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+//
+//  PlanInstance.cs
+//
+//  Author:
+//       Davide Guastella <davide.guastella90@gmail.com>
+//
+//  Copyright (c) 2015 Davide Guastella
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+using System;
 using System.Reflection;
 using FormulaLibrary;
 using FormulaLibrary.ANTLR;
@@ -10,67 +37,11 @@ using MusaCommon;
 
 namespace PlanLibrary
 {
-	/*public interface IPlanInstance
-	{
-		/// <summary>
-		/// Gets the name of this plan.
-		/// </summary>
-		string GetName();
-
-		/// <summary>
-		/// Pause this plan instance.
-		/// </summary>
-		void Pause();
-
-		/// <summary>
-		/// Resume this plan instance.
-		/// </summary>
-		void Resume();
-
-		/// <summary>
-		/// Determines whether this plan is atomic.
-		/// </summary>
-		bool IsAtomic();
-	}*/
-
-    public static class PlanInstanceFactory
-    {
-        public static IPlanInstance CreateInstance(Type PlanModel, object agent_class, MethodInfo RegisterResultDelegate, MethodInfo PlanFinishedDelegate, LoggerSet Logger)
-        {
-            Type planInstanceType = typeof(PlanInstance<>).MakeGenericType(PlanModel);
-            var plan_instance = Activator.CreateInstance(planInstanceType);
-
-            //Handler for RegisterResult
-            EventInfo register_result_event = planInstanceType.GetEvent("RegisterResult");
-            Delegate register_plan_results_delegate = Delegate.CreateDelegate(register_result_event.EventHandlerType, agent_class, RegisterResultDelegate);
-            register_result_event.AddEventHandler(plan_instance, register_plan_results_delegate);
-
-            //Handler for PlanFinished
-            EventInfo plan_finished_event = planInstanceType.GetEvent("Finished");
-            Delegate plan_finished_delegate = Delegate.CreateDelegate(plan_finished_event.EventHandlerType, agent_class, PlanFinishedDelegate);
-            plan_finished_event.AddEventHandler(plan_instance, plan_finished_delegate);
-
-            //Set logger
-            PropertyInfo plan_logger = planInstanceType.GetProperty("Logger", BindingFlags.NonPublic | BindingFlags.Instance);
-            plan_logger.SetValue(plan_instance, Logger);
-
-
-            return plan_instance as IPlanInstance;
-        }
-
-        public static Type GetPlanInstanceFor(Type planModel)
-        {
-            return typeof(PlanInstance<>).MakeGenericType(planModel);
-        }
-
-    }
-
 	/// <summary>
 	/// Plan instance.
 	/// </summary>
-    public class PlanInstance<T> : BasePlanInstance<T> where T : PlanModel //: IPlanInstance where T : PlanModel
+    public class PlanInstance<T> : IPlanInstance where T : PlanModel
 	{
-        
 		#region Fields/Properties
 
 		/// <summary>
@@ -146,13 +117,16 @@ namespace PlanLibrary
 
 		#endregion Fields/Properties
 
+        #region Events
 
-		public delegate void onRegisterResult(string result);
-		/// <summary>
-		/// Used to register results into agent's workbenches
-		/// </summary>
-		public event onRegisterResult RegisterResult;
-        
+        public delegate void onRegisterResult(string result);
+        /// <summary>
+        /// This event is invoked when from within the plan a result is 
+        /// required to be registered into the parent agent's workbench. 
+        /// </summary>
+        public event onRegisterResult RegisterResult;
+
+        #endregion Events
 
 		#region Constructor and initialization methods
 
@@ -196,10 +170,7 @@ namespace PlanLibrary
 		private void OnRegisterResult (string result)
 		{
 			if(RegisterResult != null) 
-			{
-				//TODO log result to logger
                 RegisterResult (result);
-			}
 			else
 				throw new Exception("No agent is registered to catch this plan's results.");
 		}
@@ -230,7 +201,7 @@ namespace PlanLibrary
 
 		void onBackgroundWorker_WorkCompleted (object sender, RunWorkerCompletedEventArgs e)
 		{
-			//TODO log plan execution completed
+            Logger.Log(LogLevel.Trace, "[PLAN " + Name + "] Execution terminated.");
 
 			if (Finished != null)
 				Finished (this, null);
@@ -250,8 +221,6 @@ namespace PlanLibrary
 				throw new Exception ("In plan " + Name + ": invalid entry point method.");
 
 			//Takes the plan's arguments
-			//Dictionary<string, object> args = e.Argument as Dictionary<string, object>;
-
             IAgentEventArgs args = e.Argument as IAgentEventArgs;
 
 			//If the plan step method has parameters
@@ -260,9 +229,9 @@ namespace PlanLibrary
 				//If passed args are not null
 				if (args != null) 
 				{
-					//Check if the parameter is of type Dictionary<string,object>
-                    //if (!EntryPointMethod.GetParameters () [0].ParameterType.IsEquivalentTo (typeof(IAgentEventArgs)))
-                    if (!(typeof(IAgentEventArgs).IsAssignableFrom(EntryPointMethod.GetParameters () [0].ParameterType)))
+                    //Check if the parameter is of type IAgentEventArgs
+                    var EntryPointMethodArgType = EntryPointMethod.GetParameters()[0].ParameterType;
+                    if (!(typeof(IAgentEventArgs).IsAssignableFrom(EntryPointMethodArgType)))
                         throw new Exception ("In plan step" + Name + ": plan steps supports only a maximum of 1 parameter of type IAgentEventArgs.");
 
 					//Invoke the method
@@ -291,7 +260,7 @@ namespace PlanLibrary
 		/// plan is in pause or not. If in pause, wait for the execution to be resumed, then proceed executing the plan
 		/// step.
 		/// </summary>
-		/// <param name="step_name">The plan step to be executed.</param>
+        /// <param name="the_step">The plan step to be executed.</param>
 		/// <param name="args">The arguments passed to the plan step (optional).</param>
         private void onExecuteStep (PlanStep the_step, IAgentEventArgs args = null)
 		{
@@ -305,16 +274,14 @@ namespace PlanLibrary
 		/// <summary>
 		/// Execute this plan.
 		/// </summary>
-        public override void Execute(IAgentEventArgs args = null)
+        public void Execute(IAgentEventArgs args = null)
 		{
 			if(background_worker == null)
 				initializeBackgroundWorker ();
 
 			//If the plan is not already in execution, execute it
 			if (!background_worker.IsBusy) 
-			{
 				background_worker.RunWorkerAsync (args);
-			}
 			else
 			{
 				//TODO decidere se generare una eccezione o non fare nulla
@@ -325,7 +292,7 @@ namespace PlanLibrary
 		/// <summary>
 		/// Pause this plan's execution.
 		/// </summary>
-        public override void Pause()
+        public void Pause()
 		{
 			Console.WriteLine (Name + " paused");
 			_busy.Reset ();
@@ -334,7 +301,7 @@ namespace PlanLibrary
 		/// <summary>
 		/// Resume this plan's execution.
 		/// </summary>
-        public override void Resume()
+        public void Resume()
 		{
 			Console.WriteLine (Name + " resumed");
 			_busy.Set();
@@ -384,12 +351,12 @@ namespace PlanLibrary
 
 		#region IPlanInstance inherithed methods
 
-        public override string GetName()
+        public string GetName()
 		{
 			return Name;
 		}
 
-		public override bool IsAtomic()
+		public bool IsAtomic()
 		{
 			return plan_model.IsAtomic;
 		}

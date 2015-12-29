@@ -29,7 +29,7 @@ namespace MusaLogger
 			wcfTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
 
 			// Define rules
-			var rule1 = new LoggingRule(GetType().Name, GetLogLevel(LogLevel.Debug), wcfTarget);
+            var rule1 = new LoggingRule(GetType().Name, GetLogLevel(MinimumLogLevel), wcfTarget);
 
 			Configuration.LoggingRules.Add(rule1);
 			Configuration.AddTarget(LoggerName, wcfTarget);

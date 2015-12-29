@@ -3,13 +3,13 @@
   <MaxNumAgent>100</MaxNumAgent>
   <MusaAddressPort>0</MusaAddressPort>
   <NetworkingEnabled>false</NetworkingEnabled>
-  <MinimumLogLevel>0</MinimumLogLevel>
+  <MinimumLogLevel>1</MinimumLogLevel>
   <Logging>
-    <ConsoleLogger MinimumLogLevel="0" Enabled="true" />
-    <WCFLogger MinimumLogLevel="0" Enabled="true" EndpointAddress="http://localhost:8089/" />
-    <FileLogger MinimumLogLevel="0" Enabled="true" FileName="/home/davide/log.txt" Layout="${longdate}	${level:uppercase=true}	FileLogger	${message}" />
+    <ConsoleLogger MinimumLogLevel="1" Enabled="true" />
+    <!--<WCFLogger MinimumLogLevel="1" Enabled="true" EndpointAddress="http://localhost:8089/" />
+    <FileLogger MinimumLogLevel="1" Enabled="true" FileName="/home/davide/log.txt" Layout="${longdate}	${level:uppercase=true}	FileLogger	${message}" />-->
   </Logging>
-  <Agents>
+  <!--<Agents>
     <Agent Name="agent_1">
       <Plans>
         <Plan>PlanExample</Plan>
@@ -28,5 +28,5 @@
         </Event>
       </Events>
     </Agent>
-  </Agents>
+  </Agents>-->
 </MusaConfiguration>

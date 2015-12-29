@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace AgentLibrary.Networking
+namespace AgentLibrary
 {
     /// <summary>
     /// As stated on Jason .send internal action documentation: "the illocutionary force of the message (tell, achieve, ...)"

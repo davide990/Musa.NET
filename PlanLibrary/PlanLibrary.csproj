@@ -42,6 +42,7 @@
     <Compile Include="Attributes\EventAttribute.cs" />
     <Compile Include="Attributes\PlanAttribute.cs" />
     <Compile Include="Attributes\PlanStepAttribute.cs" />
+    <Compile Include="PlanFacade.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

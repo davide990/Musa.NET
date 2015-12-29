@@ -1,16 +1,34 @@
-﻿/**
-         __  __                                     _   
-        |  \/  |                                   | |  
-        | \  / | _   _  ___   __ _     _ __    ___ | |_ 
-        | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
-        | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
-        |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+﻿//          __  __                                     _   
+//         |  \/  |                                   | |  
+//         | \  / | _   _  ___   __ _     _ __    ___ | |_ 
+//         | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
+//         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
+//         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+//
+//  Agent.cs
+//
+//  Author:
+//       Davide Guastella <davide.guastella90@gmail.com>
+//
+//  Copyright (c) 2015 Davide Guastella
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-*/
 using System;
 using System.Collections.Generic;
 using System.Collections;
-using AgentLibrary.Networking;
+using AgentLibrary;
 using System.Reflection;
 using FormulaLibrary;
 using FormulaLibrary.ANTLR;
@@ -118,8 +136,7 @@ namespace AgentLibrary
         /// <summary>
         /// The plans collection.
         /// </summary>
-        //private Dictionary<Type, IPlanInstance> PlansCollection;
-        private PlanLibrary.PlanCollection PlansCollection;
+        private PlanCollection PlansCollection;
 
         /// <summary>
         /// Gets the events.
@@ -259,10 +276,30 @@ namespace AgentLibrary
         /// The logger of this agent. It is automatically configured using the environment configuration file. If this
         /// file is missing, a console logger is automatically set up.
         /// </summary>
-        public MusaLogger.LoggerSet Logger
+        public LoggerSet Logger
         {
             get;
             private set;
+        }
+
+        /// <summary>
+        /// The "pointer" to the method invoked when a plan of this agent 
+        /// requires to register a result.
+        /// </summary>
+        private MethodInfo RegisterResultHandler
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// The "pointer" to the method invoked when a plan of this agent 
+        /// terminates its execution
+        /// </summary>
+        private MethodInfo PlanFinishedHandler
+        {
+            get;
+            set;
         }
 
         #region Constructors
@@ -295,10 +332,12 @@ namespace AgentLibrary
             mailBox = new Stack<Tuple<AgentPassport, AgentMessage>>();
             createdAt = DateTime.Now;
             resume_reasoning = false;
-            //PlansCollection = new Dictionary<Type, IPlanInstance>();
-            PlansCollection = new PlanLibrary.PlanCollection();
-
+            PlansCollection = new PlanCollection();
             Logger = MusaConfig.GetLoggerSet();
+
+
+            RegisterResultHandler = GetType().GetMethod("onPlanInstanceRegisterResult", BindingFlags.NonPublic | BindingFlags.Instance);
+            PlanFinishedHandler = GetType().GetMethod("onPlanInstanceFinished", BindingFlags.NonPublic | BindingFlags.Instance);
 
             Busy = false;
         }
@@ -413,48 +452,22 @@ namespace AgentLibrary
         /// Adds a plan to this agent.
         /// </summary>
         /// <returns><c>true</c>, if plan was added, <c>false</c> otherwise.</returns>
-        /// <param name="Plan">The plan model to be added. An instance of this plan is instantiated</param>
-        public void AddPlan(Type Plan)
+        /// <param name="PlanModel">The plan model to be added. An instance of this plan is instantiated</param>
+        public void AddPlan(Type PlanModel)
         {
             //if (!Plan.BaseType.IsEquivalentTo(typeof(IPlanModel))){
             //Check if the provisioned plan type extends the interface 
             //IPlanModel
-            if (!(typeof(IPlanModel).IsAssignableFrom(Plan)))
-                throw new Exception("Argument #1 in AddPlan(Type) must be of type PlanModel.");
+            if (!(typeof(IPlanModel).IsAssignableFrom(PlanModel)))
+                throw new Exception("Argument #1 in AddPlan(Type) must implement IPlanModel.");
             
             //Create a new plan instance
-            //Type planInstanceType = typeof(PlanInstance<>).MakeGenericType(Plan);
-            //var obj = Activator.CreateInstance(typeof(object));
-            //var plan_instance = Convert.ChangeType(obj, planInstanceType);
-           
-
-            // var plan_instance = PlanInstanceFactory.CreateInstance(Plan);
-
-
-            //Register the handler for the event 'RegisterResult'
-            //EventInfo register_result_event = planInstanceType.GetEvent("RegisterResult");
-            MethodInfo RegisterResultHandler = GetType().GetMethod("onPlanInstanceRegisterResult", BindingFlags.NonPublic | BindingFlags.Instance);
-            MethodInfo PlanFinishedHandler = GetType().GetMethod("onPlanInstanceFinished", BindingFlags.NonPublic | BindingFlags.Instance);
-            var plan_instance = PlanInstanceFactory.CreateInstance(Plan, this, RegisterResultHandler, PlanFinishedHandler, Logger);
-
-
-
-
-            /*Delegate register_plan_results_delegate = Delegate.CreateDelegate(register_result_event.EventHandlerType, this, delegate_method);
-            register_result_event.AddEventHandler(plan_instance, register_plan_results_delegate);*/
-
-            //Register the handler for the event 'Finished'
-            /*EventInfo plan_finished_event = planInstanceType.GetEvent("Finished");
-            MethodInfo plan_finished_delegate_method = GetType().GetMethod("onPlanInstanceFinished", BindingFlags.NonPublic | BindingFlags.Instance);
-            Delegate plan_finished_delegate = Delegate.CreateDelegate(plan_finished_event.EventHandlerType, this, plan_finished_delegate_method);
-            plan_finished_event.AddEventHandler(plan_instance, plan_finished_delegate);*/
-
-            //Attach the plan's logger to this agent's logger
-            /*PropertyInfo plan_logger = planInstanceType.GetProperty("Logger", BindingFlags.NonPublic | BindingFlags.Instance);
-            plan_logger.SetValue(plan_instance, Logger);*/
+            /*MethodInfo RegisterResultHandler = GetType().GetMethod("onPlanInstanceRegisterResult", BindingFlags.NonPublic | BindingFlags.Instance);
+            MethodInfo PlanFinishedHandler = GetType().GetMethod("onPlanInstanceFinished", BindingFlags.NonPublic | BindingFlags.Instance);*/
+            var plan_instance = PlanFacade.CreateInstance(PlanModel, this, RegisterResultHandler, PlanFinishedHandler, Logger);
 
             //Add the plan to the agent's plan collection
-            PlansCollection.Add(Plan, plan_instance as IPlanInstance);
+            PlansCollection.Add(PlanModel, plan_instance);
         }
 
         /// <summary>
@@ -471,36 +484,13 @@ namespace AgentLibrary
 
             if (!Plan.BaseType.IsEquivalentTo(typeof(IPlanModel)))
                 throw new Exception("In AddPlan(Assembly, string): the specified" +
-                    "plan must be of type PlanModel.");
+                                    "plan '"+PlanName+"' must implement IPlanModel.");
 
             //Create a new plan instance
-            /*
-            Type planInstanceType = typeof(BasePlanInstance<>).MakeGenericType(Plan);
-            var plan_instance = Activator.CreateInstance(planInstanceType);
-
-            //Register the handler for the event 'RegisterResult'
-            EventInfo register_result_event = planInstanceType.GetEvent("RegisterResult");
-            MethodInfo delegate_method = GetType().GetMethod("onPlanInstanceRegisterResult", BindingFlags.NonPublic | BindingFlags.Instance);
-            Delegate register_plan_results_delegate = Delegate.CreateDelegate(register_result_event.EventHandlerType, this, delegate_method);
-            register_result_event.AddEventHandler(plan_instance, register_plan_results_delegate);
-
-            //Register the handler for the event 'Finished'
-            EventInfo plan_finished_event = planInstanceType.GetEvent("Finished");
-            MethodInfo plan_finished_delegate_method = GetType().GetMethod("onPlanInstanceFinished", BindingFlags.NonPublic | BindingFlags.Instance);
-            Delegate plan_finished_delegate = Delegate.CreateDelegate(plan_finished_event.EventHandlerType, this, plan_finished_delegate_method);
-            plan_finished_event.AddEventHandler(plan_instance, plan_finished_delegate);
-
-            //Attach the plan's logger to this agent's logger
-            PropertyInfo plan_logger = planInstanceType.GetProperty("Logger", BindingFlags.NonPublic | BindingFlags.Instance);
-            plan_logger.SetValue(plan_instance, Logger);
-*/
-            MethodInfo RegisterResultHandler = GetType().GetMethod("onPlanInstanceRegisterResult", BindingFlags.NonPublic | BindingFlags.Instance);
-            MethodInfo PlanFinishedHandler = GetType().GetMethod("onPlanInstanceFinished", BindingFlags.NonPublic | BindingFlags.Instance);
-            var plan_instance = PlanInstanceFactory.CreateInstance(Plan, this, RegisterResultHandler, PlanFinishedHandler, Logger);
-
+            var plan_instance = PlanFacade.CreateInstance(Plan, this, RegisterResultHandler, PlanFinishedHandler, Logger);
 
             //Add the plan to the agent's plan collection
-            PlansCollection.Add(Plan, plan_instance as IPlanInstance);
+            PlansCollection.Add(Plan, plan_instance);
         }
 
 
@@ -549,7 +539,7 @@ namespace AgentLibrary
         private void onPlanInstanceRegisterResult(string result)
         {
             Formula resultFormula = FormulaParser.Parse(result);
-            ;
+
 
             if (resultFormula != null)
             {
@@ -565,34 +555,28 @@ namespace AgentLibrary
         /// <summary>
         /// Executes a plan.
         /// </summary>
-        /// <param name="Plan">Plan.</param>
+        /// <param name="PlanModel">Plan.</param>
         /// <param name="args">Arguments.</param>
-        internal void ExecutePlan(Type Plan, AgentEventArgs args = null)
+        internal void ExecutePlan(Type PlanModel, IAgentEventArgs args = null)
         {
             if (Busy)
-            {
                 throw new Exception("Agent [" + Name + "] is currently executing plan " + CurrentExecutingPlan);
-            }
-				
-            //If Plan is not of type PlanModel, then throw an exception
-            //if (!Plan.BaseType.IsEquivalentTo(typeof(IPlanModel)))
-            if (!(typeof(IPlanModel).IsAssignableFrom(Plan)))
-                throw new Exception("Argument #1 in ExecutePlan(Type) must be of type PlanModel.");
+            	
+            //If Plan doesn't implement IPlanModel, then throw an exception
+            if (!(typeof(IPlanModel).IsAssignableFrom(PlanModel)))
+                throw new Exception("Argument #1 in ExecutePlan(Type) must implement IPlanModel.");
 			
-            /*Type planInstanceType = typeof(BasePlanInstance<>).MakeGenericType(Plan);
-            IPlanInstance the_plan = null;*/
-            Type planInstanceType = PlanInstanceFactory.GetPlanInstanceFor(Plan);
             IPlanInstance the_plan = null;
 
             //Search for the input plan
-            PlansCollection.TryGetValue(Plan, out the_plan);
+            PlansCollection.TryGetValue(PlanModel, out the_plan);
 
             //If the input plan has not been found within the agent's plans collection, throw an exception
             if (the_plan == null)
-                throw new Exception("Plan '" + Plan.Name + "' not found in agent [" + Name + "] plans collection.");
+                throw new Exception("Plan '" + PlanModel.Name + "' not found in agent [" + Name + "] plans collection.");
 
             //Get the plan's Execute() method
-            MethodInfo execute_method = planInstanceType.GetMethod("Execute", BindingFlags.Public | BindingFlags.Instance);
+            MethodInfo execute_method = PlanFacade.GetExecuteMethodForPlan(PlanModel);
 
             //Set the agent to busy
             Busy = true;
@@ -611,15 +595,16 @@ namespace AgentLibrary
         /// <summary>
         /// Tell this agent to achieve a goal by executing a specified plan
         /// </summary>
-        public void AchieveGoal(Type Plan, AgentLibrary.AgentEventArgs Args = null)
+        public void AchieveGoal(Type Plan, AgentEventArgs Args = null)
         {
             if (Plan == null)
                 throw new ArgumentNullException("Plan", "Argument #1 'Plan' cannot be null.");
 
             //Set the achievement of the plan [Plan] as an agent's perception
-            PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(new List<Type>(){ Plan }, AgentPerception.Achieve));
+            PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(new List<Type>{ Plan }, AgentPerception.Achieve));
 
             //Set the parameters to be used when the plan [Plan] is invoked
+            //TODO ATTENZIONE QUI
             if (Args != null)
                 reasoner.EventsArgs.Add(new AgentEventKey(Plan.Name, AgentPerception.Achieve), Args);
         }
@@ -633,7 +618,7 @@ namespace AgentLibrary
         /// triggered.</param>
         /// <param name="Args">The argument to be passed to the invoked plan
         /// when the event is triggered.</param>
-        public void AddEvent(string formula, AgentPerception perception, Type Plan, AgentLibrary.AgentEventArgs Args = null)
+        public void AddEvent(string formula, AgentPerception perception, Type Plan, AgentEventArgs Args = null)
         {
             reasoner.AddEvent(formula, perception, Plan, Args);
         }
