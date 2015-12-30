@@ -54,11 +54,6 @@ namespace AgentLibrary
         private List<AgentRole> roles;
 
         /// <summary>
-        /// The workbench this agent use to do reasoning activities
-        /// </summary>
-        private AgentWorkbench workbench;
-
-        /// <summary>
         /// A unique identifier for this agent
         /// </summary>
         private readonly Guid ID;
@@ -72,6 +67,21 @@ namespace AgentLibrary
         }
 
         private readonly DateTime createdAt;
+
+        /// <summary>
+        /// The belief set of this agent.
+        /// </summary>
+        public List<AtomicFormula> Beliefs
+        {
+            get{ return new List<AtomicFormula>(Workbench.Statements); }
+        }
+
+        public List<AssignmentType> Assignments
+        {
+            get { return new List<AssignmentType>(Workbench.AssignmentSet); }
+        }
+
+
 
         /// <summary>
         /// This queue contains the changes to the environment that this agent have to perceive. Since an agent can be 
@@ -212,7 +222,8 @@ namespace AgentLibrary
         /// </summary>
         public AgentWorkbench Workbench
         {
-            get { return workbench; }
+            get;
+            internal set;
         }
 
         /// <summary>
@@ -259,7 +270,6 @@ namespace AgentLibrary
             get;
             set;
         }
-
 
         /// <summary>
         /// Gets a value indicating whether this agent is paused.
@@ -326,7 +336,7 @@ namespace AgentLibrary
             pause_requested = false;
             ID = Guid.NewGuid();
             roles = new List<AgentRole>();
-            workbench = new AgentWorkbench(this);
+            Workbench = new AgentWorkbench(this);
             reasoner = new AgentReasoner(this);
             PerceivedEnvironementChanges = new Stack<Tuple<IList, AgentPerception>>();
             mailBox = new Stack<Tuple<AgentPassport, AgentMessage>>();
@@ -403,7 +413,8 @@ namespace AgentLibrary
         {
             if (current_executing_plan.IsAtomic())
             {
-                Logger.Log(MusaLogger.LogLevel.Trace, "[" + Name + "] I'm executing an atomic plan. It Will be paused after the plan has finished its execution.");
+                Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.DarkYellow);
+                Logger.Log(LogLevel.Trace, "[" + Name + "] I'm executing an atomic plan. It Will be paused after the plan has finished its execution.");
 
                 //Request this agent to pause only after the current atomic plan 
                 //has finished its execution
@@ -433,6 +444,7 @@ namespace AgentLibrary
 			
             Paused = false;
 
+            Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.DarkYellow);
             Logger.Log(LogLevel.Trace, "[" + Name + "] resumed");
 
             //Resume the execution of the suspended plan
@@ -455,15 +467,11 @@ namespace AgentLibrary
         /// <param name="PlanModel">The plan model to be added. An instance of this plan is instantiated</param>
         public void AddPlan(Type PlanModel)
         {
-            //if (!Plan.BaseType.IsEquivalentTo(typeof(IPlanModel))){
-            //Check if the provisioned plan type extends the interface 
-            //IPlanModel
+            //Check if the provisioned type is a valid plan
             if (!(typeof(IPlanModel).IsAssignableFrom(PlanModel)))
                 throw new Exception("Argument #1 in AddPlan(Type) must implement IPlanModel.");
             
             //Create a new plan instance
-            /*MethodInfo RegisterResultHandler = GetType().GetMethod("onPlanInstanceRegisterResult", BindingFlags.NonPublic | BindingFlags.Instance);
-            MethodInfo PlanFinishedHandler = GetType().GetMethod("onPlanInstanceFinished", BindingFlags.NonPublic | BindingFlags.Instance);*/
             var plan_instance = PlanFacade.CreateInstance(PlanModel, this, RegisterResultHandler, PlanFinishedHandler, Logger);
 
             //Add the plan to the agent's plan collection
@@ -484,7 +492,7 @@ namespace AgentLibrary
 
             if (!Plan.BaseType.IsEquivalentTo(typeof(IPlanModel)))
                 throw new Exception("In AddPlan(Assembly, string): the specified" +
-                                    "plan '"+PlanName+"' must implement IPlanModel.");
+                    "plan '" + PlanName + "' must implement IPlanModel.");
 
             //Create a new plan instance
             var plan_instance = PlanFacade.CreateInstance(Plan, this, RegisterResultHandler, PlanFinishedHandler, Logger);
@@ -492,7 +500,6 @@ namespace AgentLibrary
             //Add the plan to the agent's plan collection
             PlansCollection.Add(Plan, plan_instance);
         }
-
 
         #region Agent's plans event handlers
 
@@ -503,6 +510,7 @@ namespace AgentLibrary
         /// <param name="args">Arguments.</param>
         private void onPlanInstanceFinished(object sender, EventArgs args)
         {
+            Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.DarkYellow);
             Logger.Log(LogLevel.Trace, "[" + Name + "] plan " + (sender as IPlanInstance).GetName() + " finished its execution.");
 
             //Set the value of CurrentExecutingPlan to null
@@ -589,7 +597,8 @@ namespace AgentLibrary
 
             //TODO [ALTA PRIORITÀ] migliorare il sistema di bloccaggio dell'agente
             //Lock the agent's reasoning life cycle until the invoked plan terminates its execution
-            while (Busy);
+            while (Busy)
+                ;
         }
 
         /// <summary>
@@ -633,24 +642,47 @@ namespace AgentLibrary
         }
 
         /// <summary>
-        /// Adds the beliefs to this agent's workbench. Each formula is added as a unique agent perception.
+        /// Adds the beliefs to this agent's workbench. Each formula is added 
+        /// as a unique agent perception.
         /// </summary>
         public void AddBelief(params AtomicFormula[] formula)
         {
             foreach (AtomicFormula ff in formula)
-                PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(new List<AtomicFormula>(){ ff }, AgentPerception.AddBelief));
+            {
+                Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.Magenta);
+                Logger.Log(LogLevel.Debug, "[" + Name + "] Adding belief " + ff);
+                PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(new List<AtomicFormula>{ ff }, AgentPerception.AddBelief));
+            }
         }
 
-        /// <summary>
-        /// Adds a belief to this agent's workbench.
-        /// </summary>
-        /// <param name="formula">Formula.</param>
-        public void AddBelief(AtomicFormula formula)
+        public void AddBelief(params Formula[] formula)
         {
-            PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(new List<AtomicFormula>(){ formula }, AgentPerception.AddBelief));
+            foreach (Formula af in formula)
+            {
+                Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.Magenta);
+                Logger.Log(LogLevel.Debug, "[" + Name + "] Adding belief " + af);
+                PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.AddBelief));
+            }
+        }
+
+        public void AddBelief(IList formula_list)
+        {
+            foreach (Formula af in formula_list)
+            {
+                Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.Magenta);
+                Logger.Log(LogLevel.Debug, "[" + Name + "] Adding belief " + af);
+                PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.AddBelief));
+            }
         }
 
 
         #endregion
+
+
+        public bool TestCondition(Formula formula)
+        {
+            return Workbench.TestCondition(formula);
+        }
+
     }
 }

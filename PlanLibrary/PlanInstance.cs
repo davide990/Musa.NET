@@ -27,13 +27,13 @@
 
 using System;
 using System.Reflection;
-using FormulaLibrary;
-using FormulaLibrary.ANTLR;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 using MusaLogger;
 using MusaCommon;
+using FormulaLibrary;
+using FormulaLibrary.ANTLR;
 
 namespace PlanLibrary
 {
@@ -48,11 +48,10 @@ namespace PlanLibrary
 		/// The trigger condition necessary to activate this plan.
 		/// </summary>
 		public Formula TriggerCondition
-		{
-			get { return triggerCondition; }		//Type of TriggerCondition here must be Formula
-			private set { triggerCondition = value; }
+        {
+            get;
+            private set;
 		}
-		private Formula triggerCondition;
 
 		/// <summary>
 		/// The plan model this instance references to.

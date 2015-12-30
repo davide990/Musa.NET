@@ -1,12 +1,30 @@
-﻿/**
-         __  __                                     _   
-        |  \/  |                                   | |  
-        | \  / | _   _  ___   __ _     _ __    ___ | |_ 
-        | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
-        | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
-        |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+﻿//          __  __                                     _   
+//         |  \/  |                                   | |  
+//         | \  / | _   _  ___   __ _     _ __    ___ | |_ 
+//         | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
+//         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
+//         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+//
+//  AtomicFormula.cs
+//
+//  Author:
+//       Davide Guastella <davide.guastella90@gmail.com>
+//
+//  Copyright (c) 2015 Davide Guastella
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the Terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-*/
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -18,8 +36,7 @@ namespace FormulaLibrary
     /// A first-order logic predicate. It includes:
     /// 
     /// - a functor, and
-    /// - a list of terms
-    /// 
+    /// - a list of Terms
     /// </summary>
     public sealed class AtomicFormula : Formula, ICloneable
     {
@@ -28,41 +45,38 @@ namespace FormulaLibrary
         /// </summary>
         public string Functor
         {
-            get { return functor; }
-            private set { }
+            get;
+            private set;
         }
-        private readonly string functor;
 
         /// <summary>
-        /// The list of terms of this formula
+        /// The list of Terms of this formula
         /// </summary>
         public List<Term> Terms
         {
-            get { return terms; }
-            private set { }
+            get;
+            private set;
         }
-        private List<Term> terms;
 
         /// <summary>
-        /// Return the number of terms this formula has
+        /// Return the number of terms of this formula
         /// </summary>
         public int TermsCount
         {
             get { return Terms.Count; }
-            private set { }
         }
 
-        public AtomicFormula(string functor, params Term[] terms)
+        public AtomicFormula(string functor, params Term[] Terms)
         {
-            this.functor = functor;
-            this.terms = new List<Term>(terms);
+            Functor = functor;
+            this.Terms = new List<Term>(Terms);
         }
 
-        public AtomicFormula(string functor, IEnumerable<Term> terms)
+        public AtomicFormula(string functor, IEnumerable<Term> Terms)
         {
-            this.functor = functor;
-            this.terms = new List<Term>();
-            this.terms.AddRange(terms);
+            Functor = functor;
+            this.Terms = new List<Term>(Terms);
+            //Terms.AddRange(Terms);
         }
 
 
@@ -74,12 +88,12 @@ namespace FormulaLibrary
         public override string ToString()
         {
             StringBuilder b = new StringBuilder();
-            b.Append(functor);
+            b.Append(Functor);
             b.Append("(");
-            for(byte i=0;i<terms.Count;i++)
+            for (byte i = 0; i < Terms.Count; i++)
             {
-                b.Append(terms[i]);
-                if (i != terms.Count - 1)
+                b.Append(Terms[i]);
+                if (i != Terms.Count - 1)
                     b.Append(",");
             }
             
@@ -101,12 +115,12 @@ namespace FormulaLibrary
                 return ToString();
 
             StringBuilder b = new StringBuilder();
-            b.Append(functor);
+            b.Append(Functor);
             b.Append("(");
-            for (byte i = 0; i < terms.Count; i++)
+            for (byte i = 0; i < Terms.Count; i++)
             {
-                b.Append(terms[i].Name);
-                if (i != terms.Count - 1)
+                b.Append(Terms[i].Name);
+                if (i != Terms.Count - 1)
                     b.Append(",");
             }
 
@@ -124,9 +138,9 @@ namespace FormulaLibrary
             if (!other.Functor.Equals(Functor))
                 return false;
             
-            foreach (var t in terms)
+            foreach (var t in Terms)
             {
-                if (!other.terms.Contains(t))
+                if (!other.Terms.Contains(t))
                     return false;
             }
 
@@ -137,14 +151,14 @@ namespace FormulaLibrary
         {
             return base.GetHashCode();
         }
-        
+
         /// <summary>
         /// Check if this formula is simple or parametric (that is, check if
-        /// this formula contains or not variable terms)
+        /// this formula contains or not variable Terms)
         /// </summary>
         public override bool IsParametric()
         {
-            foreach (Term t in terms)
+            foreach (Term t in Terms)
             {
                 if (!(t is LiteralTerm))
                     return true;
@@ -154,29 +168,29 @@ namespace FormulaLibrary
 
         /// <summary>
         /// Convert this formula to a simple type formula. That is, if this formula
-        /// contains any variable term, convert them to literal terms. Found variable
-        /// terms are returned to the output list
+        /// contains any variable term, convert them to literal Terms. Found variable
+        /// Terms are returned to the output list
         /// </summary>
-        /// <returns>a list containing the variable terms this formula previously contained</returns>
+        /// <returns>a list containing the variable Terms this formula previously contained</returns>
         public List<object> ConvertToSimpleFormula()
         {
             List<object> variableTerms = new List<object>();
             
             //Iterate each term
-            for (int i=0;i<terms.Count;i++)
+            for (int i = 0; i < Terms.Count; i++)
             {
                 //if a variable term occurs
-                if(terms[i].GetType().IsGenericType)
+                if (Terms[i].GetType().IsGenericType)
                 {
                     //add the variable term to the output list
-                    variableTerms.Add(terms[i]);
+                    variableTerms.Add(Terms[i]);
 
                     //get the type info for the current term
-                    Type variableTermType = typeof(VariableTerm<>).MakeGenericType(terms[i].GetType().GetGenericArguments()[0]);
+                    Type variableTermType = typeof(VariableTerm<>).MakeGenericType(Terms[i].GetType().GetGenericArguments()[0]);
                     MethodInfo parse_method = variableTermType.GetMethod("toLiteralTerm");
                     
                     //convert to literal term
-                    terms[i] = (LiteralTerm)parse_method.Invoke(terms[i], new object[] { });
+                    Terms[i] = (LiteralTerm)parse_method.Invoke(Terms[i], new object[] { });
                 }
             }
 
@@ -191,28 +205,28 @@ namespace FormulaLibrary
             AtomicFormula clone = new AtomicFormula(Functor);
 
             //Iterate each term
-            for (int i = 0; i < terms.Count; i++)
+            for (int i = 0; i < Terms.Count; i++)
             {
                 //if a variable term occurs
-                if (terms[i].GetType().IsGenericType)
+                if (Terms[i].GetType().IsGenericType)
                 { 
                     //get the type info for the current term
-                    Type variableTermType = typeof(VariableTerm<>).MakeGenericType(terms[i].GetType().GetGenericArguments()[0]);
-                    ConstructorInfo cinfo = variableTermType.GetConstructor(new[] { typeof(string), terms[i].GetType().GetGenericArguments()[0] });
+                    Type variableTermType = typeof(VariableTerm<>).MakeGenericType(Terms[i].GetType().GetGenericArguments()[0]);
+                    ConstructorInfo cinfo = variableTermType.GetConstructor(new[] { typeof(string), Terms[i].GetType().GetGenericArguments()[0] });
 
                     //get the value of the current term
-                    object value = variableTermType.GetProperty("Value").GetValue(terms[i]);
-                    value = Convert.ChangeType(value, terms[i].GetType().GetGenericArguments()[0]);
+                    object value = variableTermType.GetProperty("Value").GetValue(Terms[i]);
+                    value = Convert.ChangeType(value, Terms[i].GetType().GetGenericArguments()[0]);
 
                     //create a new variable term instance
-                    object varTerm = cinfo.Invoke(new[] { terms[i].Name, value });
+                    object varTerm = cinfo.Invoke(new[] { Terms[i].Name, value });
 
                     //add the new instance to the cloned formula
-                    clone.terms.Add((Term)varTerm);
+                    clone.Terms.Add((Term)varTerm);
                 }
                 else
                 {
-                    clone.terms.Add(new LiteralTerm(terms[i].Name));
+                    clone.Terms.Add(new LiteralTerm(Terms[i].Name));
                 }
             }
             return clone;
@@ -228,12 +242,12 @@ namespace FormulaLibrary
         }
 
         public InvalidFormulaFormatException(string message)
-        : base(message)
+            : base(message)
         {
         }
 
         public InvalidFormulaFormatException(string message, Exception inner)
-        : base(message, inner)
+            : base(message, inner)
         {
         }
     }

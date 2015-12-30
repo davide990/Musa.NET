@@ -46,10 +46,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\FormulaLibrary\FormulaLibrary.csproj">
-      <Project>{2A2DD9B6-50F6-4D87-AF2E-B422E31A999C}</Project>
-      <Name>FormulaLibrary</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MusaLogger\MusaLogger.csproj">
       <Project>{5CF5FB93-94DC-4A88-BCB1-95F2AD757F01}</Project>
       <Name>MusaLogger</Name>
@@ -57,6 +53,10 @@
     <ProjectReference Include="..\MusaCommon\MusaCommon.csproj">
       <Project>{3B8C5698-817C-4C05-87BF-2340C699CC1F}</Project>
       <Name>MusaCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FormulaLibrary\FormulaLibrary.csproj">
+      <Project>{2A2DD9B6-50F6-4D87-AF2E-B422E31A999C}</Project>
+      <Name>FormulaLibrary</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

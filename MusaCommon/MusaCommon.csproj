@@ -37,6 +37,7 @@
     <Compile Include="IMusaConfig.cs" />
     <Compile Include="IAgentEventArgs.cs" />
     <Compile Include="BasePlanInstance.cs" />
+    <Compile Include="IFormula.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

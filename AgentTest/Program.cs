@@ -14,6 +14,8 @@ using MusaLogger;
 using FormulaLibrary;
 using System.ComponentModel;
 using PlanLibrary;
+using FormulaLibrary.ANTLR;
+using System.Collections.Generic;
 
 
 namespace AgentTest
@@ -49,25 +51,31 @@ namespace AgentTest
 				//env.DeleteStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
 
 			};
-			//wk.RunWorkerAsync ();
+			wk.RunWorkerAsync ();
 
 			a.AddPlan (typeof(PlanExample));
 			a.AddPlan (typeof(PlanExample2));
 			a.AddPlan (typeof(PlanForEvent));
 
             var argss = new AgentEventArgs { { "nome", "davide" } };
-                
             a.AddEvent ("f(x)", AgentPerception.AddBelief, typeof(PlanExample2), argss);
 
 
             //a.AddEvent ("f(x)", AgentPerception.RemoveBelief, typeof(PlanExample2));
             env.RegisterAgent (a);
 
+
+            /*a.AddBelief(FormulaParser.Parse("f(x)"));*/
+            a.AddBelief(FormulaParser.Parse("k(x)"), FormulaParser.Parse("p(y<-int(3))"));
+
+            var ll = new List<Formula>{ FormulaParser.Parse("w(x)"), FormulaParser.Parse("cc(x)") };
+            a.AddBelief(ll);
+
 			//env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
 			//a.AchieveGoal (typeof(PlanExample2));
-            Thread.Sleep(3000);
-            a.AchieveGoal(typeof(PlanForEvent), argss);
 
+
+            //a.AchieveGoal(typeof(PlanForEvent), argss);
 
             //env.Serialize().Save("/home/davide/ehyehy.xml");
 
@@ -80,10 +88,9 @@ namespace AgentTest
             //startMUSA();
 
 			MusaConfig.ReadFromFile ("../../test_conf.xml");
-            //AgentEnvironement env = AgentEnvironement.GetInstance();
-            //env.RegisterAgentFromConfiguration();
-
-            //env.WaitForAgents();
+            /*AgentEnvironement env = AgentEnvironement.GetInstance();
+            env.RegisterAgentFromConfiguration();
+            env.WaitForAgents();*/
 
 			/*
 			BackgroundWorker wk = new BackgroundWorker ();
@@ -168,7 +175,6 @@ namespace AgentTest
 			//object a;
 			//args.TryGetValue ("nome",out a);
 
-			//Console.WriteLine ("Hello from " + EntryPointName + " to " + a.ToString());
 			Console.WriteLine ("Hello plan =)");
 
             var the_args = new AgentEventArgs (){ { "nome", "davide" } };

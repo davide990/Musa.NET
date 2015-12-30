@@ -113,6 +113,7 @@ namespace AgentLibrary
         /// </summary>
         private void on_assignment_set_changed(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.DarkMagenta);
             switch (e.Action)
             {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
@@ -132,6 +133,7 @@ namespace AgentLibrary
         /// </summary>
         private void on_workbench_changed(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.DarkMagenta);
             switch (e.Action)
             {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:

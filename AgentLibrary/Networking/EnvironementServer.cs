@@ -190,7 +190,7 @@ namespace AgentLibrary
         {
             List<string> outList = new List<string>();
 
-            foreach (Formula f in Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(agent.AgentName)).Workbench.Statements)
+            foreach (Formula f in Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(agent.AgentName)).Beliefs)
                 outList.Add(f.ToString());
 
             return outList;
@@ -200,7 +200,7 @@ namespace AgentLibrary
         {
             List<string> outList = new List<string>();
 
-            foreach (AssignmentType f in Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(agent.AgentName)).Workbench.AssignmentSet)
+            foreach (AssignmentType f in Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(agent.AgentName)).Assignments)
                 outList.Add(f.ToString());
 
             return outList;
@@ -212,7 +212,7 @@ namespace AgentLibrary
                 return false;
 
             Formula ff = FormulaParser.Parse(formula);
-            return Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(receiver.AgentName)).Workbench.TestCondition(ff);
+            return Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(receiver.AgentName)).TestCondition(ff);
         }
 
         public bool RegisterAgent(AgentPassport newAgent)
@@ -249,7 +249,8 @@ namespace AgentLibrary
 		public bool AddStatement (string agent_name, string statement)
     	{
 			Agent ag = Environment.RegisteredAgents.FirstOrDefault (s => s.Name.Equals (agent_name));
-			ag.Workbench.AddStatement (FormulaParser.Parse (statement));
+            ag.AddBelief(new Formula[] { FormulaParser.Parse(statement) });
+			//ag.Workbench.AddStatement (FormulaParser.Parse (statement));
 			return true;
     	}
 

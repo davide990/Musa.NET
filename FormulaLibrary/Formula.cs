@@ -7,6 +7,9 @@ __  __                                     _
 |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 
 */
+using MusaCommon;
+
+
 namespace FormulaLibrary
 {
     public abstract class Formula
@@ -15,6 +18,5 @@ namespace FormulaLibrary
         public abstract bool IsParametric();
         public abstract override string ToString();
         public abstract override bool Equals(object obj);
-
     }
 }

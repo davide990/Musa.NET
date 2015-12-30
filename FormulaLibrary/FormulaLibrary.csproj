@@ -82,4 +82,10 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <ProjectReference Include="..\MusaCommon\MusaCommon.csproj">
+      <Project>{3B8C5698-817C-4C05-87BF-2340C699CC1F}</Project>
+      <Name>MusaCommon</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

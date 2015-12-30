@@ -24,9 +24,6 @@ namespace MusaConfiguration
         [XmlElement("NetworkingEnabled")]
         public bool NetworkingEnabled { get; set; }
 
-        [XmlElement("MinimumLogLevel")]
-        public int MinimumLogLevel { get; set; }
-
         [XmlArray("Logging")]
         [XmlArrayItem("ConsoleLogger", typeof(ConsoleLogger))]
         [XmlArrayItem("FileLogger", typeof(FileLogger))]
@@ -196,7 +193,6 @@ namespace MusaConfiguration
             MusaAddress = "127.0.0.1";
             MusaAddressPort = 8089;
             NetworkingEnabled = true;
-            MinimumLogLevel = 0;
 
         }
 
@@ -214,16 +210,16 @@ namespace MusaConfiguration
                 instance.Loggers.Add(new ConsoleLogger());
 
             loggerSet = new LoggerSet(instance.Loggers);
-            SetMinimumLogLevel();
+            //SetMinimumLogLevel();
 
             return loggerSet;
         }
 
-        private static void SetMinimumLogLevel()
+        /*private static void SetMinimumLogLevel()
         {
             foreach (Logger l in instance.Loggers)
                 l.MinimumLogLevel = instance.MinimumLogLevel;
-        }
+        }*/
 
         /// <summary>
         /// Gets the MUSA configuration.

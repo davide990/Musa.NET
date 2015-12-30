@@ -234,6 +234,7 @@ namespace AgentLibrary
             //wait until this reasoning cycle has finished
             reasoning_timer.Change(Timeout.Infinite, Timeout.Infinite);
 
+            Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.DarkBlue);
             Logger.Log(LogLevel.Trace, "[" + parentAgent.Name + "] reasoning cycle #" + currentReasoningCycle++);
             Logger.Log(LogLevel.Trace, "[" + parentAgent.Name + "] Checking mailbox");
             //Check the agent's mail box and update its workbench according to the last received message
@@ -247,7 +248,9 @@ namespace AgentLibrary
             Logger.Log(LogLevel.Trace, "[" + parentAgent.Name + "] Triggering events");
             triggerEvent();
 
+            Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.DarkBlue);
             Logger.Log(LogLevel.Trace, "[" + parentAgent.Name + "] done reasoning");
+            Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.DarkBlue);
             Logger.Log(LogLevel.Trace, "[" + parentAgent.Name + "] ##############");
 
             Thread.Sleep(ReasoningUpdateTime);
@@ -279,17 +282,19 @@ namespace AgentLibrary
             AgentMessage msg = last_message.Item2;
             //TODO [importante] bisogna capire qui se un evento è interno o esterno
 
+            Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.Green);
             //process the message
             switch (msg.InfoType)
             {
                 case InformationType.Tell:
                     Logger.Log(LogLevel.Debug, "[" + parentAgent.Name + "] perceiving TELL: " + msg);
-                    parentAgent.Workbench.AddStatement(FormulaParser.Parse(msg.Message as string));
+                    //parentAgent.Workbench.AddStatement(FormulaParser.Parse(msg.Message as string));
+                    parentAgent.AddBelief(FormulaParser.Parse(msg.Message as string));
                     break;
 
                 case InformationType.Untell:
                     Logger.Log(LogLevel.Debug, "[" + parentAgent.Name + "] perceiving UNTELL: " + msg);
-                    parentAgent.Workbench.RemoveStatement(FormulaParser.Parse(msg.Message as string));
+                    parentAgent.AddBelief(FormulaParser.Parse(msg.Message as string));
                     break;
 			
                 case InformationType.Achieve:
@@ -320,17 +325,19 @@ namespace AgentLibrary
                     AgentEventArgs args = null;
                     EventsArgs.TryGetValue(new AgentEventKey(plan_to_execute.Name, perception_type), out args);
 
+                    Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.Yellow);
                     Logger.Log(LogLevel.Debug, "[" + parentAgent.Name + "] Achieving goal " + plan_to_execute.Name);
                     parentAgent.ExecutePlan(plan_to_execute, args);
                     break;
 
                 case AgentPerception.AddBelief:
+                    //Tell the agent to add the beliefs to its workbench
                     parentAgent.Workbench.AddStatement(changes_list);
                     checkExternalEvents(changes_list, perception_type);
                     break;
 
                 case AgentPerception.RemoveBelief:
-                    parentAgent.Workbench.RemoveStatement(changes_list);
+                    parentAgent.Workbench.AddStatement(changes_list);
                     checkExternalEvents(changes_list, perception_type);
                     break;
 
@@ -384,6 +391,7 @@ namespace AgentLibrary
             AgentPerception perception_type = eventTuple.Item2;
             Type plan_to_execute = eventTuple.Item3;
 
+            Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.Cyan);
             Logger.Log(LogLevel.Debug, "[" + parentAgent.Name + "] Triggering event {" + formula + "-" + perception_type + "-" + plan_to_execute.Name + "}");
 
             //Try get values related to this event
@@ -426,6 +434,7 @@ namespace AgentLibrary
             if (EventsCatalogue.ContainsKey(the_key))
                 return;
 
+            Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.DarkCyan);
             Logger.Log(LogLevel.Debug, "[" + parentAgent.Name + "] Added event {key}" + the_key + " {plan}" + Plan.Name);
 
             //Add the event

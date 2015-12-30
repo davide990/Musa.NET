@@ -16,11 +16,9 @@ namespace PlanLibrary
         /// <value>The allowed roles.</value>
         public HashSet<string> AllowedRoles
         {
-            get { return allowed_roles; }
-            private set { allowed_roles = value; }
+            get;
+            private set;
         }
-
-        private HashSet<string> allowed_roles;
 
         /// <summary>
         /// Gets the expected result.
@@ -28,11 +26,9 @@ namespace PlanLibrary
         /// <value>The expected result.</value>
         public string ExpectedResult
         {
-            get { return expected_result; }
-            private set { expected_result = value; }
+            get;
+            private set;
         }
-
-        private string expected_result;
 
         /// <summary>
         /// Gets the trigger conditions.
@@ -40,11 +36,9 @@ namespace PlanLibrary
         /// <value>The trigger conditions.</value>
         public string TriggerCondition
         {
-            get { return trigger_condition; }
-            private set { trigger_condition = value; }
+            get;
+            private set;
         }
-
-        private string trigger_condition;
 
         /// <summary>
         /// Gets the steps.
@@ -52,11 +46,9 @@ namespace PlanLibrary
         /// <value>The steps.</value>
         public List<PlanStep> Steps
         {
-            get { return steps; }
-            private set { steps = value; }
+            get;
+            private set;
         }
-
-        private List<PlanStep> steps;
 
         /// <summary>
         /// Gets this plan's name.
@@ -87,8 +79,6 @@ namespace PlanLibrary
             internal set;
         }
 
-
-
         /// <summary>
         /// Gets the name of the plan step from within this property is accessed.
         /// </summary>
@@ -109,11 +99,9 @@ namespace PlanLibrary
         /// </summary>
         public bool IsAtomic
         {
-            get { return is_atomic; }
-            private set { is_atomic = value; }
+            get;
+            private set;
         }
-
-        private bool is_atomic;
 
         #endregion Fields/Properties
 

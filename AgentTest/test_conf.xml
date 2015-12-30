@@ -3,13 +3,17 @@
   <MaxNumAgent>100</MaxNumAgent>
   <MusaAddressPort>0</MusaAddressPort>
   <NetworkingEnabled>false</NetworkingEnabled>
-  <MinimumLogLevel>1</MinimumLogLevel>
+
+  <PlanLibraries>
+  	<PlanLibrary>/home/davide/Projects/PlanLibExample/PlanLibExample/bin/Release/PlanLibExample.dll</PlanLibrary>
+  </PlanLibraries>
+
   <Logging>
-    <ConsoleLogger MinimumLogLevel="1" Enabled="true" />
+    <ConsoleLogger MinimumLogLevel="0" Enabled="true" />
     <!--<WCFLogger MinimumLogLevel="1" Enabled="true" EndpointAddress="http://localhost:8089/" />
     <FileLogger MinimumLogLevel="1" Enabled="true" FileName="/home/davide/log.txt" Layout="${longdate}	${level:uppercase=true}	FileLogger	${message}" />-->
   </Logging>
-  <!--<Agents>
+  <Agents>
     <Agent Name="agent_1">
       <Plans>
         <Plan>PlanExample</Plan>
@@ -28,5 +32,5 @@
         </Event>
       </Events>
     </Agent>
-  </Agents>-->
+  </Agents>
 </MusaConfiguration>

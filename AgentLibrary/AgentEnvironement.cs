@@ -339,7 +339,7 @@ namespace AgentLibrary
                 foreach(Type plan in a.Plans)
                     ae.Plans.Add(plan.Name);
 
-                foreach(AtomicFormula ff in a.Workbench.Statements)
+                foreach(AtomicFormula ff in a.Beliefs)
                 {
                     ae.BeliefBase.Add(ff.ToString());
                 }
@@ -359,7 +359,12 @@ namespace AgentLibrary
         private List<AgentEvent> parseEventFromConfiguration(AgentEntry ag)
         {
             List<AgentEvent> events = new List<AgentEvent>();
-            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+            List<Assembly> assemblies = new List<Assembly>();
+            foreach (string assembly_path in MusaConfig.GetConfig().PlanLibraries)
+                assemblies.Add(Assembly.LoadFile(assembly_path));
+
+            var cd = AppDomain.CurrentDomain.GetAssemblies();
 
             //TODO da finire
             foreach (EventEntry ev in ag.Events)
@@ -378,12 +383,12 @@ namespace AgentLibrary
                     //Parse the perception this event reacts to
                     var perception = (AgentPerception)Enum.Parse(typeof(AgentPerception), ev.perception);
 
-                    Assembly myDllAssembly = Assembly.LoadFile("/home/davide/PlanLibraryExample.dll");
-
                     //Parse the plan that must be invoked when this event is
                     //triggered
+
                     foreach (Assembly assembly in assemblies)
                     {
+                        var all_types = assembly.GetTypes();
                         Type type = assembly.GetType(ev.plan);
                         if (type != null)
                             events.Add(new AgentEvent(ev.formula, perception, type, event_args));

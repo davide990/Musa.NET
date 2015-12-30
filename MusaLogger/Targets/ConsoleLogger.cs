@@ -39,6 +39,7 @@ namespace MusaLogger
         {
             string logMessage = Layout.Render(logEvent);
             Console.WriteLine(logMessage);
+
         }
     }
 
@@ -55,6 +56,12 @@ namespace MusaLogger
             configured = false;
         }
 
+        public void SetColorForNextLog(ConsoleColor BackgroundColor, ConsoleColor ForegroundColor)
+        {
+            Console.BackgroundColor = BackgroundColor;
+            Console.ForegroundColor = ForegroundColor;
+        }
+
         private void configure()
         {
             // Create targets and add them to the configuration 
@@ -62,7 +69,7 @@ namespace MusaLogger
             var consoleTarget = new ConsoleTarget();
 
             // Set target properties 
-            consoleTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger}|${level:uppercase=true}|${message}";
+            consoleTarget.Layout = @"${date:format=HH\:mm\:ss}|${logger}|${level:uppercase=true}| ${message}";
 
             // Define rules
             //var rule1 = new LoggingRule(LoggerName, GetLogLevel(LogLevel.Trace), consoleTarget);
@@ -83,7 +90,9 @@ namespace MusaLogger
                 configured = true;
                 configure();
             }
+
             logger.Log(GetLogLevel(LogLevel), message);
+            Console.ResetColor();
         }
 
         public override string ToString()
