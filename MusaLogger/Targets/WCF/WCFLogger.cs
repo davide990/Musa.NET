@@ -7,7 +7,7 @@ using NLog;
 
 namespace MusaLogger
 {
-	public class WCFLogger : Logger
+	public class WCFLogger : LoggerFragment
 	{
 		[XmlAttribute("Enabled")]
 		public bool Enabled { get; set; }

@@ -1,10 +1,39 @@
-﻿using System;
+﻿//          __  __                                     _   
+//         |  \/  |                                   | |  
+//         | \  / | _   _  ___   __ _     _ __    ___ | |_ 
+//         | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
+//         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
+//         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+//
+//  AgentMessage.cs
+//
+//  Author:
+//       Davide Guastella <davide.guastella90@gmail.com>
+//
+//  Copyright (c) 2015 Davide Guastella
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+using System;
 using System.Runtime.Serialization;
+using System.Collections.Generic;
 
 namespace AgentLibrary
 {
     /// <summary>
-    /// As stated on Jason .send internal action documentation: "the illocutionary force of the message (tell, achieve, ...)"
+    /// As stated on Jason .send internal action documentation: "the 
+    /// illocutionary force of the message (tell, achieve, ...)"
     /// </summary>
     [DataContract]
     public enum InformationType
@@ -24,13 +53,11 @@ namespace AgentLibrary
         /// </summary>
         [EnumMember]
         Achieve = 2,
-
         /// <summary>
         /// 
         /// </summary>
         [EnumMember]
         AskOne = 3,
-
         /// <summary>
         /// 
         /// </summary>
@@ -41,50 +68,36 @@ namespace AgentLibrary
     [DataContract]
     public class AgentMessage
     {
-        private object message;
-        private DateTime validity;
-        private byte messagePriority;
-        private InformationType infoType;
-        
         /// <summary>
         /// The content of this message
         /// </summary>
         [DataMember]
-        public object Message
-        {
-            get { return message; }
-            set { message = value; }
-        }
+        public object Message { get; set; }
+
+        /// <summary>
+        /// Gets or sets the arguments.
+        /// </summary>
+        /// <value>The arguments.</value>
+        [DataMember]
+        public IList<object> Args { get; set; }
 
         /// <summary>
         /// A timestamp indicating the period within which the message is to be considered valid
         /// </summary>
         [DataMember]
-        public DateTime MessageValidity
-        {
-            get { return validity; }
-            set { validity = value; }
-        }
+        public DateTime MessageValidity { get; set; }
 
         /// <summary>
         /// The priority level of this message
         /// </summary>
         [DataMember]
-        public byte MessagePriority
-        {
-            get { return messagePriority; }
-            set { messagePriority = value; }
-        }
+        public byte MessagePriority { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
         [DataMember]
-        public InformationType InfoType
-        {
-            get { return infoType; }
-            set { infoType = value; }
-        }
+        public InformationType InfoType { get; set; }
 
         public override string ToString()
         {

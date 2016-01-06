@@ -5,7 +5,7 @@ using System.Xml.Serialization;
 
 namespace MusaLogger
 {
-	public sealed class FileLogger : Logger
+	public sealed class FileLogger : LoggerFragment
 	{
 		[XmlAttribute ("Enabled")]
 		public bool Enabled { get; set; }

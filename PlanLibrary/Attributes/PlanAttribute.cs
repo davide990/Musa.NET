@@ -12,33 +12,30 @@ namespace PlanLibrary
 		/// </summary>
 		/// <value>The allowed role.</value>
 		public List<string> AllowedRoles
-		{
-			get { return allowed_roles; }
-			private set { allowed_roles = value; }
+        {
+            get;
+            private set;
 		}
-		private List<string> allowed_roles;
 
 		/// <summary>
 		/// Gets the trigger condition necessary to activate this plan.
 		/// </summary>
 		/// <value>The trigger condition.</value>
 		public string TriggerCondition
-		{
-			get { return trigger_condition; }
-			private set { trigger_condition = value; }
+        {
+            get;
+            private set;
 		}
-		private string trigger_condition;
-
+		
 		/// <summary>
 		/// Gets the expected result.
 		/// </summary>
 		/// <value>The expected result.</value>
 		public string ExpectedResult
-		{
-			get { return expected_result; }
-			private set { expected_result = value; }
+        {
+            get;
+            private set;
 		}
-		private string expected_result;
 
 		#endregion Properties/Fields
 
@@ -56,7 +53,7 @@ namespace PlanLibrary
 			AllowedRoles = new List<string> ();
 			AllowedRoles.Add ("all");
 			TriggerCondition = "";
-			ExpectedResult = "";
+            ExpectedResult = expected_result;
 		}
 
 		public PlanAttribute (string expected_result, string trigger_condition)

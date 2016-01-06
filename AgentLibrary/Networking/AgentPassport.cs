@@ -7,84 +7,48 @@ namespace AgentLibrary
     /// </summary>
     [DataContract]
     public class AgentPassport
-    {
-        /*private string agent_name;
-        private string agent_role;
-        private string workgroup_name;
-        private string environement_name;
-        private string environement_ipaddress;
-		private string createdAt;
-        private object auth_token;*/
-        
+    {        
         /// <summary>
         /// The name of the workgroup the agent belongs to
         /// </summary>
         [DataMember]
-        public string WorkgroupName
-        {
-            get;// { return workgroup_name; }
-            set;// { workgroup_name = value; }
-        }
+        public string WorkgroupName { get; set; }
 
         /// <summary>
         /// The name of the environment in which the agent is located
         /// </summary>
         [DataMember]
-        public string EnvironementName
-        {
-            get;// { return environement_name; }
-            set;// { environement_name = value; }
-        }
+        public string EnvironementName { get; set; }
 
         /// <summary>
         /// The IP address of the environment in which the agent is located
         /// </summary>
         [DataMember]
-        public string EnvironementAddress
-        {
-            get;// { return environement_ipaddress; }
-            set;// { environement_ipaddress = value; }
-        }
+        public string EnvironementAddress { get; set; }
 
         /// <summary>
         /// The name of the agent
         /// </summary>
         [DataMember]
-        public string AgentName
-        {
-            get;// { return agent_name; }
-            set;// { agent_name = value; }
-        }
+        public string AgentName { get; set; }
 
         /// <summary>
         /// The role of the agent
         /// </summary>
         [DataMember]
-        public string AgentRole
-        {
-            get;// { return agent_role; }
-            set;// { agent_role = value; }
-        }
+        public string AgentRole { get; set; }
 
 		/// <summary>
 		/// An authorization token of the agent
 		/// </summary>
 		[DataMember]
-		public object AuthorizationToken
-		{
-            get;// { return auth_token; }
-            set;// { auth_token = value; }
-		}
+        public object AuthorizationToken { get; set; }
 
 		/// <summary>
 		/// 
 		/// </summary>
 		[DataMember]
-		public string CreatedAt
-		{
-            get;// { return createdAt; }
-            set;// { createdAt = value; }
-		}
+        public string CreatedAt { get; set; }
 
         public override string ToString()
         {

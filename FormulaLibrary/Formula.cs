@@ -12,7 +12,7 @@ using MusaCommon;
 
 namespace FormulaLibrary
 {
-    public abstract class Formula
+    public abstract class Formula : IFormula
     {
         public abstract FormulaType getType();
         public abstract bool IsParametric();

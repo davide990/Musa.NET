@@ -1,11 +1,10 @@
 ﻿using FormulaLibrary;
-using FormulaLibrary.ANTLR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Net.Sockets;
-using MusaLogger;
+using MusaCommon;
 
 namespace AgentLibrary
 {
@@ -35,7 +34,7 @@ namespace AgentLibrary
 		private bool HostOpened;
 
 
-        public LoggerSet Logger
+        public ILogger Logger
         {
             get;
             private set;
@@ -63,7 +62,7 @@ namespace AgentLibrary
         /// Attachs a logger to this class.
         /// </summary>
         /// <param name="Logger">Logger.</param>
-        public void AttachLogger(LoggerSet Logger)
+        public void AttachLogger(ILogger Logger)
         {
             this.Logger = Logger;
         }

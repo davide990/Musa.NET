@@ -7,10 +7,9 @@ __  __                                     _
 |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 
 */
-namespace FormulaLibrary.ANTLR
+namespace FormulaLibrary
 {
-    
-    class TypesMapping
+    static class TypesMapping
     {
         /// <summary>
         /// Given a short type name, return its full qualified name

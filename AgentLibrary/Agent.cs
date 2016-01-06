@@ -34,7 +34,6 @@ using FormulaLibrary;
 using FormulaLibrary.ANTLR;
 using MusaConfiguration;
 using MusaCommon;
-using MusaLogger;
 using PlanLibrary;
 
 namespace AgentLibrary
@@ -286,7 +285,7 @@ namespace AgentLibrary
         /// The logger of this agent. It is automatically configured using the environment configuration file. If this
         /// file is missing, a console logger is automatically set up.
         /// </summary>
-        public LoggerSet Logger
+        public ILogger Logger
         {
             get;
             private set;
@@ -343,8 +342,11 @@ namespace AgentLibrary
             createdAt = DateTime.Now;
             resume_reasoning = false;
             PlansCollection = new PlanCollection();
-            Logger = MusaConfig.GetLoggerSet();
 
+
+
+            //Logger = MusaConfig.GetLogger();
+            Logger = ModuleProvider.Get().Resolve<ILogger>();
 
             RegisterResultHandler = GetType().GetMethod("onPlanInstanceRegisterResult", BindingFlags.NonPublic | BindingFlags.Instance);
             PlanFinishedHandler = GetType().GetMethod("onPlanInstanceFinished", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -413,7 +415,7 @@ namespace AgentLibrary
         {
             if (current_executing_plan.IsAtomic())
             {
-                Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.DarkYellow);
+                Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkYellow);
                 Logger.Log(LogLevel.Trace, "[" + Name + "] I'm executing an atomic plan. It Will be paused after the plan has finished its execution.");
 
                 //Request this agent to pause only after the current atomic plan 
@@ -444,7 +446,7 @@ namespace AgentLibrary
 			
             Paused = false;
 
-            Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.DarkYellow);
+            Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkYellow);
             Logger.Log(LogLevel.Trace, "[" + Name + "] resumed");
 
             //Resume the execution of the suspended plan
@@ -510,7 +512,7 @@ namespace AgentLibrary
         /// <param name="args">Arguments.</param>
         private void onPlanInstanceFinished(object sender, EventArgs args)
         {
-            Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.DarkYellow);
+            Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkYellow);
             Logger.Log(LogLevel.Trace, "[" + Name + "] plan " + (sender as IPlanInstance).GetName() + " finished its execution.");
 
             //Set the value of CurrentExecutingPlan to null
@@ -649,7 +651,7 @@ namespace AgentLibrary
         {
             foreach (AtomicFormula ff in formula)
             {
-                Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.Magenta);
+                Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
                 Logger.Log(LogLevel.Debug, "[" + Name + "] Adding belief " + ff);
                 PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(new List<AtomicFormula>{ ff }, AgentPerception.AddBelief));
             }
@@ -659,7 +661,7 @@ namespace AgentLibrary
         {
             foreach (Formula af in formula)
             {
-                Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.Magenta);
+                Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
                 Logger.Log(LogLevel.Debug, "[" + Name + "] Adding belief " + af);
                 PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.AddBelief));
             }
@@ -669,7 +671,7 @@ namespace AgentLibrary
         {
             foreach (Formula af in formula_list)
             {
-                Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.Magenta);
+                Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
                 Logger.Log(LogLevel.Debug, "[" + Name + "] Adding belief " + af);
                 PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.AddBelief));
             }

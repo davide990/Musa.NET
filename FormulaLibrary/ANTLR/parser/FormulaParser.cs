@@ -1,23 +1,46 @@
-﻿/**
-         __  __                                     _   
-        |  \/  |                                   | |  
-        | \  / | _   _  ___   __ _     _ __    ___ | |_ 
-        | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
-        | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
-        |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+﻿//          __  __                                     _   
+//         |  \/  |                                   | |  
+//         | \  / | _   _  ___   __ _     _ __    ___ | |_ 
+//         | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
+//         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
+//         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+//
+//  FormulaParser.cs
+//
+//  Author:
+//       Davide Guastella <davide.guastella90@gmail.com>
+//
+//  Copyright (c) 2016 Davide Guastella
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-*/
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using FormulaLibrary.ANTLR.visitor;
 using System.IO;
 using System.Text;
-using System;
 
-namespace FormulaLibrary.ANTLR
+namespace FormulaLibrary
 {
-    public static class FormulaParser
+    public class FormulaParser
     {
+        private static FormulaParser instance = new FormulaParser();
+
+        public FormulaParser()
+        {
+        }
+
         /// <summary>
         /// Convert a formula in the form of string to a <typeparamref name="Formula"/>
         /// </summary>
@@ -32,14 +55,14 @@ namespace FormulaLibrary.ANTLR
 
             // convert stream to string
             StreamReader reader = new StreamReader(m_stream);
-			AntlrInputStream stream = new AntlrInputStream(reader);
-			ITokenSource lexer = new formula_grammarLexer(stream);
-			ITokenStream tokens = new CommonTokenStream(lexer);
-			formula_grammarParser parser = new formula_grammarParser(tokens);
+            AntlrInputStream stream = new AntlrInputStream(reader);
+            ITokenSource lexer = new formula_grammarLexer(stream);
+            ITokenStream tokens = new CommonTokenStream(lexer);
+            formula_grammarParser parser = new formula_grammarParser(tokens);
 
-			//Invoke the parser
-			IParseTree tree = parser.disjunction();	
-			/*
+            //Invoke the parser
+            IParseTree tree = parser.disjunction();	
+            /*
 			catch(Exception e)
 			{
 				if (e is InputMismatchException)
@@ -53,8 +76,8 @@ namespace FormulaLibrary.ANTLR
             Formula formulaObject;
             using (FormulaVisitor vv = new FormulaVisitor())
             {
-				//Visit the parse tree
-				formulaObject = vv.Visit(tree);	     
+                //Visit the parse tree
+                formulaObject = vv.Visit(tree);	     
             }
 
             stream.Reset();

@@ -44,6 +44,10 @@
       <Project>{5CF5FB93-94DC-4A88-BCB1-95F2AD757F01}</Project>
       <Name>MusaLogger</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MusaCommon\MusaCommon.csproj">
+      <Project>{3B8C5698-817C-4C05-87BF-2340C699CC1F}</Project>
+      <Name>MusaCommon</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AgentConfig\" />

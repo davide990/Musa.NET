@@ -32,8 +32,7 @@ using System.Collections.ObjectModel;
 using System.Collections;
 using System.Text;
 using System.Runtime.Serialization;
-using MusaConfiguration;
-using MusaLogger;
+using MusaCommon;
 
 
 namespace AgentLibrary
@@ -91,7 +90,7 @@ namespace AgentLibrary
         /// </summary>
         private readonly Agent parentAgent;
         
-        private LoggerSet logger;
+        private ILogger logger;
 
         /// <summary>
         /// Create a new agent workbench
@@ -105,7 +104,8 @@ namespace AgentLibrary
             Statements.CollectionChanged    += on_workbench_changed;
             AssignmentSet.CollectionChanged += on_assignment_set_changed;
 
-            logger = MusaConfig.GetLoggerSet();
+            /*logger = MusaConfig.GetLogger();*/
+            logger = ModuleProvider.Get().Resolve<ILogger>();
         }
 
         /// <summary>
@@ -113,7 +113,8 @@ namespace AgentLibrary
         /// </summary>
         private void on_assignment_set_changed(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.DarkMagenta);
+            logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkMagenta);
+
             switch (e.Action)
             {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
@@ -133,7 +134,7 @@ namespace AgentLibrary
         /// </summary>
         private void on_workbench_changed(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.DarkMagenta);
+            logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkMagenta);
             switch (e.Action)
             {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:

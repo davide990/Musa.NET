@@ -30,10 +30,7 @@ using System.Collections;
 using System.Threading;
 using System;
 using AgentLibrary;
-using FormulaLibrary.ANTLR;
 using FormulaLibrary;
-using MusaLogger;
-using MusaConfiguration;
 using MusaCommon;
 
 namespace AgentLibrary
@@ -161,7 +158,7 @@ namespace AgentLibrary
         /// <summary>
         /// The logger set this reasoner uses to log its activities.
         /// </summary>
-        private readonly LoggerSet Logger;
+        private readonly ILogger Logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AgentLibrary.AgentReasoner"/> class.
@@ -187,7 +184,10 @@ namespace AgentLibrary
             reasoning_timer = new System.Threading.Timer(reasoning_method_callback, new object(), ReasoningUpdateTime, ReasoningUpdateTime);
 
             //Get the default logger set from the environment configuration
-            Logger = MusaConfig.GetLoggerSet();
+            //Logger = MusaConfig.GetLogger();
+
+            Logger = ModuleProvider.Get().Resolve<ILogger>();
+                
         }
 
         internal void startReasoning()
@@ -234,7 +234,8 @@ namespace AgentLibrary
             //wait until this reasoning cycle has finished
             reasoning_timer.Change(Timeout.Infinite, Timeout.Infinite);
 
-            Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.DarkBlue);
+            Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkBlue);
+
             Logger.Log(LogLevel.Trace, "[" + parentAgent.Name + "] reasoning cycle #" + currentReasoningCycle++);
             Logger.Log(LogLevel.Trace, "[" + parentAgent.Name + "] Checking mailbox");
             //Check the agent's mail box and update its workbench according to the last received message
@@ -248,9 +249,9 @@ namespace AgentLibrary
             Logger.Log(LogLevel.Trace, "[" + parentAgent.Name + "] Triggering events");
             triggerEvent();
 
-            Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.DarkBlue);
+            Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkBlue);
             Logger.Log(LogLevel.Trace, "[" + parentAgent.Name + "] done reasoning");
-            Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.DarkBlue);
+            Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkBlue);
             Logger.Log(LogLevel.Trace, "[" + parentAgent.Name + "] ##############");
 
             Thread.Sleep(ReasoningUpdateTime);
@@ -282,7 +283,7 @@ namespace AgentLibrary
             AgentMessage msg = last_message.Item2;
             //TODO [importante] bisogna capire qui se un evento è interno o esterno
 
-            Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.Green);
+            Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Green);
             //process the message
             switch (msg.InfoType)
             {
@@ -298,6 +299,12 @@ namespace AgentLibrary
                     break;
 			
                 case InformationType.Achieve:
+                    //AchieveGoal(Type Plan, AgentEventArgs Args = null)
+
+
+                    var message_args = msg.Args;
+
+
                     throw new NotImplementedException();
 
                     break;
@@ -325,7 +332,7 @@ namespace AgentLibrary
                     AgentEventArgs args = null;
                     EventsArgs.TryGetValue(new AgentEventKey(plan_to_execute.Name, perception_type), out args);
 
-                    Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.Yellow);
+                    Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Yellow);
                     Logger.Log(LogLevel.Debug, "[" + parentAgent.Name + "] Achieving goal " + plan_to_execute.Name);
                     parentAgent.ExecutePlan(plan_to_execute, args);
                     break;
@@ -391,7 +398,7 @@ namespace AgentLibrary
             AgentPerception perception_type = eventTuple.Item2;
             Type plan_to_execute = eventTuple.Item3;
 
-            Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.Cyan);
+            Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Cyan);
             Logger.Log(LogLevel.Debug, "[" + parentAgent.Name + "] Triggering event {" + formula + "-" + perception_type + "-" + plan_to_execute.Name + "}");
 
             //Try get values related to this event
@@ -434,7 +441,7 @@ namespace AgentLibrary
             if (EventsCatalogue.ContainsKey(the_key))
                 return;
 
-            Logger.ConsoleLogger.SetColorForNextLog(ConsoleColor.Black, ConsoleColor.DarkCyan);
+            Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkCyan);
             Logger.Log(LogLevel.Debug, "[" + parentAgent.Name + "] Added event {key}" + the_key + " {plan}" + Plan.Name);
 
             //Add the event

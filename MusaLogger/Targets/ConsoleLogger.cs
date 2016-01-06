@@ -43,7 +43,7 @@ namespace MusaLogger
         }
     }
 
-    public sealed class ConsoleLogger : Logger
+    public sealed class ConsoleLogger : LoggerFragment
     {
         [XmlAttribute("Enabled")]
         public bool Enabled { get; set; }
@@ -56,7 +56,7 @@ namespace MusaLogger
             configured = false;
         }
 
-        public void SetColorForNextLog(ConsoleColor BackgroundColor, ConsoleColor ForegroundColor)
+        internal void SetColorForNextLog(ConsoleColor BackgroundColor, ConsoleColor ForegroundColor)
         {
             Console.BackgroundColor = BackgroundColor;
             Console.ForegroundColor = ForegroundColor;

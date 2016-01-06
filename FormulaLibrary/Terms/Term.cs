@@ -14,21 +14,18 @@ namespace FormulaLibrary
         /// <summary>
         /// This term's name
         /// </summary>
-        private readonly string name;
-        public string Name
-        {
-            get { return name; }
-            private set { }
-        }
+        public string Name{ get; private set; }
 
-        public Term(string name)
+        public Term(string Name)
         {
-            this.name = name;
+            this.Name = Name;
         }
 
         public override string ToString()
         {
-            return name;
+            return Name;
         }
+
+
     }
 }

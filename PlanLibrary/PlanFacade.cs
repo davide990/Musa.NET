@@ -27,7 +27,7 @@
 using System;
 using MusaCommon;
 using System.Reflection;
-using MusaLogger;
+
 
 namespace PlanLibrary
 {
@@ -46,7 +46,7 @@ namespace PlanLibrary
         /// <param name="PlanFinishedDelegate">The delegate method invoked when
         /// the execution of the plan has terminated.</param>
         /// <param name="Logger">The logger to be used from within the plan.</param>
-        public static IPlanInstance CreateInstance(Type PlanModel, object sender, MethodInfo RegisterResultDelegate, MethodInfo PlanFinishedDelegate, LoggerSet Logger)
+        public static IPlanInstance CreateInstance(Type PlanModel, object sender, MethodInfo RegisterResultDelegate, MethodInfo PlanFinishedDelegate, ILogger Logger)
         {
             Type planInstanceType = typeof(PlanInstance<>).MakeGenericType(PlanModel);
             var plan_instance = Activator.CreateInstance(planInstanceType);

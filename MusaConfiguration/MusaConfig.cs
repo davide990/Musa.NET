@@ -4,6 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 using MusaLogger;
 using System.Reflection;
+using MusaCommon;
 
 namespace MusaConfiguration
 {
@@ -29,12 +30,11 @@ namespace MusaConfiguration
         [XmlArrayItem("FileLogger", typeof(FileLogger))]
         [XmlArrayItem("MongoDBLogger", typeof(MongoDBLogger))]
         [XmlArrayItem("WCFLogger", typeof(WCFLogger))]
-        public List<Logger> Loggers { get; set; }
+        public List<ILoggerFragment> LoggerFragments { get; set; }
 
         [XmlArray("Agents")]
         [XmlArrayItem("Agent", typeof(AgentEntry))]
         public List<AgentEntry> Agents { get; set; }
-
 
         /// <summary>
         /// Gets or sets the plan libraries. Each plan library is a full path to
@@ -43,7 +43,10 @@ namespace MusaConfiguration
         /// <value>The plan libraries.</value>
         [XmlArray("PlanLibraries")]
         [XmlArrayItem("PlanLibrary", typeof(string))]
-        public List<string> PlanLibraries { get; set; }
+        public List<string> PlanLibrariesPath { get; set; }
+
+        [XmlIgnore]
+        public List<Assembly> PlanLibraries { get; set; }
 
         #endregion XML elements
 
@@ -56,7 +59,7 @@ namespace MusaConfiguration
             {
                 var list = new List<Type>();
 
-                foreach (string assembly in PlanLibraries)
+                foreach (string assembly in PlanLibrariesPath)
                 {
                     Assembly planLibrary = Assembly.LoadFile(assembly);    
                     list.AddRange(planLibrary.DefinedTypes);
@@ -91,16 +94,16 @@ namespace MusaConfiguration
         { 
             get
             { 
-                if (Loggers == null)
+                if (LoggerFragments == null)
                     return null;
                 else
-                    return Loggers.Find(x => x is MongoDBLogger) as MongoDBLogger; 
+                    return LoggerFragments.Find(x => x is MongoDBLogger) as MongoDBLogger; 
             } 
             set
             { 
-                Loggers.RemoveAll(x => x is MongoDBLogger); 
+                LoggerFragments.RemoveAll(x => x is MongoDBLogger); 
                 if (value is MongoDBLogger)
-                    Loggers.Add(value);
+                    LoggerFragments.Add(value);
             }
         }
 
@@ -109,16 +112,16 @@ namespace MusaConfiguration
         { 
             get
             { 
-                if (Loggers == null)
+                if (LoggerFragments == null)
                     return null;
                 else
-                    return Loggers.Find(x => x is ConsoleLogger) as ConsoleLogger; 
+                    return LoggerFragments.Find(x => x is ConsoleLogger) as ConsoleLogger; 
             } 
             set
             { 
-                Loggers.RemoveAll(x => x is MongoDBLogger); 
+                LoggerFragments.RemoveAll(x => x is MongoDBLogger); 
                 if (value is ConsoleLogger)
-                    Loggers.Add(value);
+                    LoggerFragments.Add(value);
             }
         }
 
@@ -127,28 +130,28 @@ namespace MusaConfiguration
         { 
             get
             { 
-                if (Loggers == null)
+                if (LoggerFragments == null)
                     return null;
                 else
-                    return Loggers.Find(x => x is FileLogger) as FileLogger; 
+                    return LoggerFragments.Find(x => x is FileLogger) as FileLogger; 
             }
             set
             { 
-                Loggers.RemoveAll(x => x is MongoDBLogger); 
+                LoggerFragments.RemoveAll(x => x is MongoDBLogger); 
                 if (value is FileLogger)
-                    Loggers.Add(value);
+                    LoggerFragments.Add(value);
             }
         }
 
         [XmlIgnore()]
         public WCFLogger WCFLogger
         { 
-            get { return Loggers.Find(x => x is WCFLogger) as WCFLogger; } 
+            get { return LoggerFragments.Find(x => x is WCFLogger) as WCFLogger; } 
             set
             { 
-                Loggers.RemoveAll(x => x is MongoDBLogger); 
+                LoggerFragments.RemoveAll(x => x is MongoDBLogger); 
                 if (value is WCFLogger)
-                    Loggers.Add(value);
+                    LoggerFragments.Add(value);
             }
         }
 
@@ -161,9 +164,9 @@ namespace MusaConfiguration
         {
             get
             {
-                if (Loggers == null)
+                if (LoggerFragments == null)
                     return false;
-                else if (Loggers.Count <= 0)
+                else if (LoggerFragments.Count <= 0)
                     return false;
 
                 return true;
@@ -179,15 +182,13 @@ namespace MusaConfiguration
         private static MusaConfig instance;
 
         /// <summary>
-        /// The set of loggers registered within this configuration.
+        /// Initializes a new instance of the <see cref="MusaConfiguration.MusaConfig"/> class.
         /// </summary>
-        [XmlIgnore()]
-        private static LoggerSet loggerSet;
-
         public MusaConfig()
         {
-            Loggers = new List<Logger>();
+            LoggerFragments = new List<ILoggerFragment>();
             Agents = new List<AgentEntry>();
+            PlanLibraries = new List<Assembly>();
 
             MaxNumAgent = "100";
             MusaAddress = "127.0.0.1";
@@ -197,22 +198,17 @@ namespace MusaConfiguration
         }
 
         /// <summary>
-        /// Gets the logger set. This class contains all the avaible registered loggers.
+        /// Setups the logger according to this configuration. If not logger
+        /// configuration is found, a logger is created with a console fragment.
         /// </summary>
-        /// <returns>The logger set.</returns>
-        public static LoggerSet GetLoggerSet()
+        private static void setupLogger()
         {
-            if (loggerSet != null)
-                return loggerSet;
-
             //If no logger has been found, create a default console logger
-            if (instance.Loggers.Count <= 0)
-                instance.Loggers.Add(new ConsoleLogger());
+            if (instance.LoggerFragments.Count <= 0)
+                instance.LoggerFragments.Add(new ConsoleLogger());
 
-            loggerSet = new LoggerSet(instance.Loggers);
-            //SetMinimumLogLevel();
-
-            return loggerSet;
+            ModuleProvider.Get().RegisterType(typeof(ILogger), typeof(Logger), true);
+            ModuleProvider.Get().Resolve<ILogger>().AddFragment(instance.LoggerFragments);
         }
 
         /*private static void SetMinimumLogLevel()
@@ -229,7 +225,7 @@ namespace MusaConfiguration
             if (instance == null)
             {
                 instance = new MusaConfig();
-                instance.Loggers = new List<Logger>(){ new ConsoleLogger() };
+                instance.LoggerFragments = new List<ILoggerFragment>{ new ConsoleLogger() };
             }
 			
             return instance;
@@ -260,7 +256,11 @@ namespace MusaConfiguration
             // with data from the XML document. */
             try
             {
-                instance = (MusaConfig)serializer.Deserialize(fs);    
+                instance = (MusaConfig)serializer.Deserialize(fs);
+
+                setupLogger();
+
+                //ReadExternalPlanLibraries(instance);
             }
             catch (InvalidOperationException ex)
             {
@@ -269,6 +269,13 @@ namespace MusaConfiguration
             }
 
         }
+
+        private void ReadExternalPlanLibraries(MusaConfig instance)
+        {
+            foreach (string s in instance.PlanLibrariesPath)
+                instance.PlanLibraries.Add(Assembly.Load(s));
+        }
+
 
         /// <summary>
         /// Save this configuration to file.
@@ -297,7 +304,7 @@ namespace MusaConfiguration
 
         public override string ToString()
         {
-            return string.Format("[MusaConfig: MaxNumAgent={0}, MusaAddress={1}, MusaAddressPort={2}, NetworkingEnabled={3}, Loggers={4}, FileName={5}]", MaxNumAgent, MusaAddress, MusaAddressPort, NetworkingEnabled, Loggers, FileName);
+            return string.Format("[MusaConfig: MaxNumAgent={0}, MusaAddress={1}, MusaAddressPort={2}, NetworkingEnabled={3}, Loggers={4}, FileName={5}]", MaxNumAgent, MusaAddress, MusaAddressPort, NetworkingEnabled, LoggerFragments, FileName);
         }
 		
     }

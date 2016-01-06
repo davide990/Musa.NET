@@ -9,7 +9,7 @@ namespace MusaLogger
 	/// <summary>
 	/// Mongo DB logger.
 	/// </summary>
-	public sealed class MongoDBLogger : Logger
+	public sealed class MongoDBLogger : LoggerFragment
 	{
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="MusaConfig.MongoDBLogger"/> is enabled.

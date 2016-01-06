@@ -67,9 +67,9 @@
     <Compile Include="Targets\WCF\WCFClient.cs" />
     <Compile Include="Targets\WCF\WCFLogger.cs" />
     <Compile Include="Targets\WCF\WCFTarget.cs" />
-    <Compile Include="LoggerSet.cs" />
-    <Compile Include="Logger.cs" />
     <Compile Include="LogLevel.cs" />
+    <Compile Include="LoggerFragment.cs" />
+    <Compile Include="Logger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="UML\MusaLogger.cd" />

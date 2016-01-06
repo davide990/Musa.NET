@@ -1,7 +1,7 @@
-﻿using FormulaLibrary.ANTLR;
+﻿using FormulaLibrary;
 using NUnit.Framework;
 
-namespace FormulaLibraryTest.ANTLRTest
+namespace FormulaLibraryTest
 {
     /// <summary>
     /// The purpose of this test is to validate formulas by using random generated ones. More precisely, generate random

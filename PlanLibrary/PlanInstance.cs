@@ -30,10 +30,11 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
-using MusaLogger;
+//using MusaLogger;
 using MusaCommon;
-using FormulaLibrary;
-using FormulaLibrary.ANTLR;
+/*using FormulaLibrary;
+using FormulaLibrary.ANTLR;*/
+
 
 namespace PlanLibrary
 {
@@ -47,7 +48,7 @@ namespace PlanLibrary
 		/// <summary>
 		/// The trigger condition necessary to activate this plan.
 		/// </summary>
-		public Formula TriggerCondition
+		public IFormula TriggerCondition
         {
             get;
             private set;
@@ -97,7 +98,7 @@ namespace PlanLibrary
 		/// </summary>
 		public bool HasFinished
 		{
-			get { return background_worker == null ? true : !background_worker.IsBusy; }
+			get { return background_worker == null || !background_worker.IsBusy; }
 		}
 
 		/// <summary>
@@ -108,7 +109,7 @@ namespace PlanLibrary
 		/// <summary>
 		/// Gets the logger of the agent this plan is registered to.
 		/// </summary>
-		protected LoggerSet Logger 
+		protected ILogger Logger 
 		{
 			get;
 			private set;
@@ -145,15 +146,14 @@ namespace PlanLibrary
 			//Parse the trigger condition of the plan model
 			string trigger_condition = plan_model.TriggerCondition;
 
-			if (!string.IsNullOrEmpty (trigger_condition))
+            /*if (!string.IsNullOrEmpty (trigger_condition))
 			{
 				try 				{ TriggerCondition = FormulaParser.Parse (trigger_condition); }
 				catch(Exception e) 	{ Console.WriteLine ("Unable to parse plan's trigger condition '" + trigger_condition + "'.\n" + e.Message); }
-			}
+			}*/
 				
 			//Initialize the ManualResetEvent object
 			_busy = new ManualResetEvent (true);
-
 		}
 
 

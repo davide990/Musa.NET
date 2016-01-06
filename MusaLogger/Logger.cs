@@ -1,98 +1,118 @@
-﻿using System.Xml.Serialization;
-using NLog.Config;
-using NLog;
+﻿using System.Collections.Generic;
+using MusaCommon;
+using System;
 
 namespace MusaLogger
 {
     /// <summary>
-    /// The abstract class that defines the behaviour of the logger
+    /// Logger.
     /// </summary>
-    public abstract class Logger
+    public class Logger : ILogger
     {
-        [XmlAttribute("MinimumLogLevel")]
-        public int MinimumLogLevel { get; set; }
-
-        /// <summary>
-        /// Gets or sets the nlog logging configuration.
-        /// </summary>
-        /// <value>The configuration.</value>
-        [XmlIgnore()]
-        public static LoggingConfiguration Configuration
+        public List<ILoggerFragment> Fragments
         {
-            get
-            {
-                if (conf == null)
-                    conf = new LoggingConfiguration();
-
-                return conf;
-            }
-            set
-            {
-                conf = value;
-            }
+            get;
+            private set;
         }
 
-        [XmlIgnore()]
-        private static LoggingConfiguration conf;
-
-        /// <summary>
-        /// Gets the nlog logger.
-        /// </summary>
-        /// <value>The logger.</value>
-        [XmlIgnore()]
-        protected NLog.Logger logger
-        {
-            get { return LogManager.GetLogger(GetType().Name); }
-        }
-
-        /// <summary>
-        /// Gets the name of this logger (the class type name)
-        /// </summary>
-        [XmlIgnore()]
-        protected string LoggerName
-        {
+        public MongoDBLogger MongoDBLogger
+        { 
             get
             { 
-                return GetType().Name;
+                if (Fragments == null)
+                    return null;
+                else
+                    return Fragments.Find(x => x is MongoDBLogger) as MongoDBLogger; 
+            } 
+        }
+
+        public ConsoleLogger ConsoleLogger
+        { 
+            get
+            { 
+                if (Fragments == null)
+                    return null;
+                else
+                    return Fragments.Find(x => x is ConsoleLogger) as ConsoleLogger; 
+            } 
+        }
+
+        public FileLogger FileLogger
+        { 
+            get
+            { 
+                if (Fragments == null)
+                    return null;
+                else
+                    return Fragments.Find(x => x is FileLogger) as FileLogger; 
             }
         }
 
+        public WCFLogger WCFLogger
+        { 
+            get { return Fragments.Find(x => x is WCFLogger) as WCFLogger; } 
+        }
 
-        protected NLog.LogLevel GetLogLevel(int level)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MusaLogger.Logger"/> class.
+        /// </summary>
+        public Logger()
         {
-            switch (level)
+            Fragments = new List<ILoggerFragment>();
+        }
+
+        /// <summary>
+        /// Adds a fragment to this logger.
+        /// </summary>
+        /// <param name="fragment">Fragment.</param>
+        public void AddFragment(ILoggerFragment fragment)
+        {
+            if (fragment != null)
+                Fragments.Add(fragment);
+        }
+
+        /// <summary>
+        /// Adds a set of fragments to this logger.
+        /// </summary>
+        /// <param name="fragments">Fragments.</param>
+        public void AddFragment(IEnumerable<ILoggerFragment> fragments)
+        {
+            Fragments.AddRange(fragments);
+        }
+
+        /// <summary>
+        /// Log the specified message using all the registered loggers.
+        /// </summary>
+        public void Log(int level, string message)
+        {
+            foreach (ILoggerFragment a in Fragments)
             {
-                case LogLevel. Fatal:
-                    return NLog.LogLevel.Fatal;
-
-                case LogLevel. Error:
-                    return NLog.LogLevel.Error;
-
-                case LogLevel. Warn:
-                    return NLog.LogLevel.Warn;
-
-                case LogLevel. Info:
-                    return NLog.LogLevel.Info;
-
-                case LogLevel. Debug:
-                    return NLog.LogLevel.Debug;
-
-                case LogLevel. Trace:
-                default:
-                    return NLog.LogLevel.Trace;
+                if (a != null)
+                    a.Log(level, message);
             }
         }
 
         /// <summary>
-        /// Log the specified message.
+        /// Gets the fragments.
         /// </summary>
-        public abstract void Log(int LogLevel, string message);
+        /// <returns>The fragments.</returns>
+        public IEnumerable<ILoggerFragment> GetFragments()
+        {
+            return Fragments;
+        }
 
+        /// <summary>
+        /// Sets the color to be used for the next console log.
+        /// </summary>
+        /// <param name="BackgroundColor">Background color.</param>
+        /// <param name="ForegroundColor">Foreground color.</param>
+        public void SetColorForNextConsoleLog(ConsoleColor BackgroundColor, ConsoleColor ForegroundColor)
+        {
+            if (ConsoleLogger == null)
+                return;
 
-
-
-
-
+            ConsoleLogger.SetColorForNextLog(BackgroundColor, ForegroundColor);
+        }
     }
 }
 

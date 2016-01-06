@@ -3,12 +3,10 @@ using FormulaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Net;
 using System.Threading;
-using MusaLogger;
 using MusaConfiguration;
-using FormulaLibrary.ANTLR;
 using System.Reflection;
+using MusaCommon;
 
 namespace AgentLibrary
 {
@@ -41,7 +39,7 @@ namespace AgentLibrary
             }
         }
 
-        private static ManualResetEvent mre = new ManualResetEvent(false);
+        private static readonly ManualResetEvent mre = new ManualResetEvent(false);
 
         #endregion Fields
 
@@ -106,7 +104,7 @@ namespace AgentLibrary
         /// <summary>
         /// The logger this environment uses.
         /// </summary>
-        private LoggerSet logger;
+        private ILogger logger;
 
         /// <summary>
         /// Get the unique agent environement for this MUSA.NET process instance.
@@ -128,7 +126,8 @@ namespace AgentLibrary
                     srv.StartNetworking(instance.Port.ToString(), instance.IPAddress);
                 }
 
-                instance.logger = MusaConfig.GetLoggerSet();
+                //Inject the logger
+                instance.logger = ModuleProvider.Get().Resolve<ILogger>();
             }
 
             return instance;
@@ -164,12 +163,12 @@ namespace AgentLibrary
             switch (e.Action)
             {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                    foreach(var newItem in e.NewItems)
+                    foreach (var newItem in e.NewItems)
                         logger.Log(LogLevel.Debug, "Added agent: " + newItem);    
                     break;
 
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-                    foreach(var newItem in e.NewItems)
+                    foreach (var newItem in e.NewItems)
                         logger.Log(LogLevel.Debug, "Removed agent: " + newItem);    
                     break;
             }
@@ -250,6 +249,8 @@ namespace AgentLibrary
         /// </summary>
         public void RegisterAgentFromConfiguration()
         {
+            LoadExternalPlanLibraries();
+
             var ae = MusaConfig.GetConfig().Agents;
 
             foreach (AgentEntry ag in ae)
@@ -270,13 +271,13 @@ namespace AgentLibrary
                         var the_plan = Type.GetType(plan);
                         new_agent.AddPlan(the_plan);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         logger.Log(LogLevel.Error, "Failed to load plan '" + plan + "' for agent '" + ag.Name + "'.\n Error: " + e.Message + "\nStackTrace: " + e.StackTrace);
                     }
                 }
 
-                foreach(AgentEvent agent_event in parseEventFromConfiguration(ag))
+                foreach (AgentEvent agent_event in parseEventFromConfiguration(ag))
                     new_agent.AddEvent(agent_event);
 
                 //Register the agent to this environment
@@ -284,12 +285,24 @@ namespace AgentLibrary
             }
         }
 
+        private void LoadExternalPlanLibraries()
+        {
+            List<Assembly> assemblies = new List<Assembly>();
+            foreach (string assembly_path in MusaConfig.GetConfig().PlanLibrariesPath)
+                AppDomain.CurrentDomain.Load(Assembly.LoadFile(assembly_path).GetName());
+            
+            //assemblies.Add(Assembly.LoadFile(assembly_path));
+        }
 
         public MusaConfig Serialize()
         {
             MusaConfig conf = new MusaConfig();
             conf.NetworkingEnabled = NetworkingEnabled;
-            conf.Loggers = logger.Loggers;
+
+            //conf.LoggerFragments = logger.Fragments;
+            conf.LoggerFragments = new List<ILoggerFragment>();
+            conf.LoggerFragments.AddRange(logger.GetFragments());
+
             conf.MusaAddress = IPAddress;
             conf.MusaAddressPort = Port;
 
@@ -302,13 +315,13 @@ namespace AgentLibrary
         {
             List<AgentEntry> agents = new List<AgentEntry>();
 
-            foreach(Agent a in RegisteredAgents)
+            foreach (Agent a in RegisteredAgents)
             {
                 var ae = new AgentEntry();
                 ae.Name = a.Name;
 
                 //Parse each event
-                foreach(KeyValuePair<AgentEventKey, Type> kvp in a.Events)
+                foreach (KeyValuePair<AgentEventKey, Type> kvp in a.Events)
                 {
                     var ek = new EventEntry();
                     ek.formula = kvp.Key.Formula;
@@ -324,11 +337,11 @@ namespace AgentLibrary
                         continue;
                     }
 
-                    foreach(KeyValuePair<string, object> arg in eventArgs)
+                    foreach (KeyValuePair<string, object> arg in eventArgs)
                     {
                         var the_arg = new EventArgEntry();
-                        the_arg.Name    = arg.Key;
-                        the_arg.Value   = arg.Value;
+                        the_arg.Name = arg.Key;
+                        the_arg.Value = arg.Value;
 
                         ek.EventArgs.Add(the_arg);
                     }
@@ -336,10 +349,10 @@ namespace AgentLibrary
                     ae.Events.Add(ek);
                 }
 
-                foreach(Type plan in a.Plans)
+                foreach (Type plan in a.Plans)
                     ae.Plans.Add(plan.Name);
 
-                foreach(AtomicFormula ff in a.Beliefs)
+                foreach (AtomicFormula ff in a.Beliefs)
                 {
                     ae.BeliefBase.Add(ff.ToString());
                 }
@@ -359,12 +372,12 @@ namespace AgentLibrary
         private List<AgentEvent> parseEventFromConfiguration(AgentEntry ag)
         {
             List<AgentEvent> events = new List<AgentEvent>();
-
+            /*
             List<Assembly> assemblies = new List<Assembly>();
             foreach (string assembly_path in MusaConfig.GetConfig().PlanLibraries)
                 assemblies.Add(Assembly.LoadFile(assembly_path));
-
-            var cd = AppDomain.CurrentDomain.GetAssemblies();
+            */
+            //var cd = AppDomain.CurrentDomain.GetAssemblies();
 
             //TODO da finire
             foreach (EventEntry ev in ag.Events)
@@ -385,21 +398,30 @@ namespace AgentLibrary
 
                     //Parse the plan that must be invoked when this event is
                     //triggered
-
-                    foreach (Assembly assembly in assemblies)
+                    //var all_assemblies = Assembly.GetExecutingAssembly();//CurrentDomain.GetAssemblies();
+                    foreach (Assembly assembly in MusaConfig.GetConfig().PlanLibraries)
                     {
                         var all_types = assembly.GetTypes();
-                        Type type = assembly.GetType(ev.plan);
-                        if (type != null)
-                            events.Add(new AgentEvent(ev.formula, perception, type, event_args));
+                        
+                        foreach (var type in all_types)
+                        {
+                            if (type.Name.Equals(ev.plan))
+                            {
+                                events.Add(new AgentEvent(ev.formula, perception, type, event_args));
+                            }
+                        }
                     }
+                    /*Type type = assembly.GetType() //GetType(ev.plan);
+                        if (type != null)
+                            events.Add(new AgentEvent(ev.formula, perception, type, event_args));*/
+                    //}
 
                     //var plan = Type.GetType(ev.plan);
                     //events.Add(new AgentEvent(ev.formula, perception, plan, event_args));
                 }
                 catch (Exception e)
                 {
-                    logger.Log(LogLevel.Error, "An error occurred while parsing event '" + ev + "' for agent '" + ag.Name + "'.\n Error: " +  e.Message + "\nStackTrace: " + e.StackTrace);
+                    logger.Log(LogLevel.Error, "An error occurred while parsing event '" + ev + "' for agent '" + ag.Name + "'.\n Error: " + e.Message + "\nStackTrace: " + e.StackTrace);
                 }
             }
             return events;
