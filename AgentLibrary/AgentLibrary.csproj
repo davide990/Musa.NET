@@ -64,7 +64,6 @@
     <Compile Include="Trigger\TriggerType.cs" />
     <Compile Include="Reasoner\AgentPerception.cs" />
     <Compile Include="AgentEvent.cs" />
-    <Compile Include="Event\AgentEventArgs.cs" />
     <Compile Include="Event\AgentEventKey.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -72,10 +71,6 @@
     <None Include="UML\MusaNetworking.cd" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FormulaLibrary\FormulaLibrary.csproj">
-      <Project>{2A2DD9B6-50F6-4D87-AF2E-B422E31A999C}</Project>
-      <Name>FormulaLibrary</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MusaConfiguration\MusaConfiguration.csproj">
       <Project>{E05E465D-3BBD-4708-B00E-8001089DE01B}</Project>
       <Name>MusaConfiguration</Name>
@@ -84,9 +79,9 @@
       <Project>{3B8C5698-817C-4C05-87BF-2340C699CC1F}</Project>
       <Name>MusaCommon</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PlanLibrary\PlanLibrary.csproj">
-      <Project>{5EB4BE6E-6C14-43D5-9F98-86E635F74C78}</Project>
-      <Name>PlanLibrary</Name>
+    <ProjectReference Include="..\FormulaLibrary\FormulaLibrary.csproj">
+      <Project>{2A2DD9B6-50F6-4D87-AF2E-B422E31A999C}</Project>
+      <Name>FormulaLibrary</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

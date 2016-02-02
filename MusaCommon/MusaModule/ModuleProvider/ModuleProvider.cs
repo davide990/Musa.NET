@@ -77,20 +77,83 @@ namespace MusaCommon
                 container.RegisterType(Interface, Implementation);
         }
 
+        //TODO testami
+        public void RegisterType(Type Interface, Type Implementation, string name, bool singleton = false)
+        {
+            if (singleton)
+                container.RegisterType(Interface, Implementation, name, new ContainerControlledLifetimeManager(), null);
+            else
+                container.RegisterType(Interface, Implementation, name);
+        }
+
+        public bool IsRegistered(Type T)
+        {
+            return container.IsRegistered(T);
+        }
+
+        public bool IsRegistered<T>()
+        {
+            return container.IsRegistered<T>();
+        }
+
         /// <summary>
         /// Resolve an instance of the requested type.
+        /// Throws an exception if type T is not registered
         /// </summary>
         /// <typeparam name="T">The type to be resolved.</typeparam>
-        public T Resolve<T>()
+        public T Resolve<T>(string name = null)
         {
             //Resolve the type T
-            var the_instance = container.Resolve<T>();
+            object the_instance = null;
+            try
+            {
+                //Resolve the type T
+                if (string.IsNullOrEmpty(name))
+                    the_instance = container.Resolve<T>();
+                else
+                    the_instance = container.Resolve<T>(name);       
+            }
+            catch (ResolutionFailedException)
+            {
+                //throw new Exception("Failed to resolve module '" + (string)T + "'.\nError: " + e);
+                return default(T);
+            }
 
-            //Check for properties, within T, marked with [Dependency] attribute
+            //Check for properties, within T, marked with [Inject] attribute
             var props = the_instance.GetType().GetProperties().Where(
-                            prop => Attribute.IsDefined(prop, typeof(DependencyAttribute)));
+                            prop => Attribute.IsDefined(prop, typeof(InjectAttribute)));
 
-            //Resolve each property decorated with [Dependency] attribute
+            //Resolve each property decorated with [Inject] attribute
+            foreach (var Property in props)
+                Property.SetValue(the_instance, container.Resolve(Property.PropertyType));
+
+            //return the resolved instance
+            return (T)the_instance;
+        }
+
+        public object Resolve(Type T, string name = null)
+        {
+            object the_instance = null;
+            try
+            {
+                if (string.IsNullOrEmpty(name))
+                {
+                    //Resolve the type T
+                    the_instance = container.Resolve(T);    
+                }
+                else
+                    the_instance = container.Resolve(T, name);  
+            }
+            catch (ResolutionFailedException e)
+            {
+                throw new Exception("Failed to resolve module '" + T.Name + "'.\nError: " + e);
+            }
+
+            //Check for properties, within T, marked with [Inject] attribute
+            var props = the_instance.GetType().GetProperties().Where(
+                            prop => Attribute.IsDefined(prop, typeof(InjectAttribute)));
+
+            //Resolve each property decorated with [Inject] attribute
             foreach (var Property in props)
                 Property.SetValue(the_instance, container.Resolve(Property.PropertyType));
 

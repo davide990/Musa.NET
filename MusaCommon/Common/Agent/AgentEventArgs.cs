@@ -28,18 +28,20 @@ using System;
 using System.Collections.Generic;
 using MusaCommon;
 
-namespace AgentLibrary
+namespace MusaCommon
 {
+    //TODO RINOMINA QUESTA CLASSE
+
     /// <summary>
     /// Event arguments.
     /// </summary>
     public class AgentEventArgs : IAgentEventArgs
     {
-        readonly Dictionary<string,object> internalDict = new Dictionary<string,object>();
+        readonly Dictionary<string,string> internalDict = new Dictionary<string,string>();
 
         public String Name { get; set; }
 
-        public void Add(string key, object value)
+        public void Add(string key, string value)
         {
             internalDict.Add(key, value);
         }
@@ -59,17 +61,17 @@ namespace AgentLibrary
             return internalDict.Remove(key);
         }
 
-        public bool TryGetValue(string key, out object value)
+        public bool TryGetValue(string key, out string value)
         {
             return internalDict.TryGetValue(key, out value);
         }
 
-        public ICollection<object> Values
+        public ICollection<string> Values
         {
             get { return internalDict.Values; }
         }
 
-        public object this [string key]
+        public string this [string key]
         {
             get
             {
@@ -81,8 +83,7 @@ namespace AgentLibrary
             }
         }
 
-
-        #region ICollection<KeyValuePair<string,object>> Members
+        #region ICollection<KeyValuePair<string,string>> Members
 
         /// <Docs>The item to add to the current collection.</Docs>
         /// <para>Adds an item to the current collection.</para>
@@ -92,9 +93,9 @@ namespace AgentLibrary
         /// Add the specified item.
         /// </summary>
         /// <param name="item">The item to be added to this collection. The key
-        /// represents the unique name of the argument, while the object is the
+        /// represents the unique name of the argument, while the string is the
         /// value of the argument.</param>
-        public void Add(KeyValuePair<string, object> item)
+        public void Add(KeyValuePair<string, string> item)
         {
             internalDict.Add(item.Key, item.Value);
         }
@@ -104,7 +105,7 @@ namespace AgentLibrary
             internalDict.Clear();
         }
 
-        public bool Contains(KeyValuePair<string, object> item)
+        public bool Contains(KeyValuePair<string, string> item)
         {
             return (internalDict.ContainsKey(item.Key) && internalDict.ContainsValue(item.Value));
         }
@@ -119,16 +120,16 @@ namespace AgentLibrary
             get { return false; }
         }
 
-        public bool Remove(KeyValuePair<string, object> item)
+        public bool Remove(KeyValuePair<string, string> item)
         {
             throw new NotImplementedException();
         }
 
         #endregion
 
-        #region IEnumerable<KeyValuePair<string,object>> Members
+        #region IEnumerable<KeyValuePair<string,string>> Members
 
-        public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
+        public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
         {    
             return internalDict.GetEnumerator();
         }
@@ -144,7 +145,7 @@ namespace AgentLibrary
 
         #endregion
 
-        public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
+        public void CopyTo(KeyValuePair<string, string>[] array, int arrayIndex)
         {
             throw new NotImplementedException();
         }

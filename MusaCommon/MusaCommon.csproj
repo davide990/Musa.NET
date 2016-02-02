@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>MusaCommon</RootNamespace>
     <AssemblyName>MusaCommon</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -44,22 +44,33 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="IPlanInstance.cs" />
-    <Compile Include="IPlanModel.cs" />
-    <Compile Include="IMusaConfig.cs" />
-    <Compile Include="IAgentEventArgs.cs" />
-    <Compile Include="BasePlanInstance.cs" />
-    <Compile Include="IFormula.cs" />
-    <Compile Include="Logger\ILogger.cs" />
-    <Compile Include="Logger\ILoggerFragment.cs" />
-    <Compile Include="Logger\LogLevel.cs" />
-    <Compile Include="ModuleProvider\ModuleProvider.cs" />
-    <Compile Include="ModuleProvider\DependencyAttribute.cs" />
+    <Compile Include="MusaModule\ModuleInitializer.cs" />
+    <Compile Include="MusaModule\MusaModule.cs" />
+    <Compile Include="Common\IFormula.cs" />
+    <Compile Include="Common\IMusaConfig.cs" />
+    <Compile Include="Common\Logger\ILogger.cs" />
+    <Compile Include="Common\Logger\ILoggerFragment.cs" />
+    <Compile Include="Common\Logger\LogLevel.cs" />
+    <Compile Include="Common\Agent\AgentEventArgs.cs" />
+    <Compile Include="Common\Plan\BasePlanInstance.cs" />
+    <Compile Include="MusaModule\ModuleProvider\Attributes\DependencyAttribute.cs" />
+    <Compile Include="MusaModule\ModuleProvider\Attributes\InjectAttribute.cs" />
+    <Compile Include="MusaModule\ModuleProvider\Attributes\RegisterAttribute.cs" />
+    <Compile Include="MusaModule\ModuleProvider\ModuleProvider.cs" />
+    <Compile Include="Common\Plan\IPlanInstance.cs" />
+    <Compile Include="Common\Plan\IPlanModel.cs" />
+    <Compile Include="Common\Agent\IAgentEventArgs.cs" />
+    <Compile Include="Common\Plan\IPlanFacade.cs" />
+    <Compile Include="Common\Plan\IPlanCollection.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Folder Include="Logger\" />
-    <Folder Include="ModuleProvider\" />
+    <Folder Include="MusaModule\" />
+    <Folder Include="Common\" />
+    <Folder Include="Common\Logger\" />
+    <Folder Include="Common\Agent\" />
+    <Folder Include="Common\Plan\" />
+    <Folder Include="MusaModule\ModuleProvider\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

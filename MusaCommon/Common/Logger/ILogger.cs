@@ -5,12 +5,12 @@
 //         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
 //         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 //
-//  EventArgEntry.cs
+//  ILogger.cs
 //
 //  Author:
 //       Davide Guastella <davide.guastella90@gmail.com>
 //
-//  Copyright (c) 2015 Davide Guastella
+//  Copyright (c) 2016 Davide Guastella
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
@@ -24,25 +24,28 @@
 //
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-using System.Xml.Serialization;
+using System.Collections.Generic;
+using System;
 
-namespace MusaConfiguration
+namespace MusaCommon
 {
-    public class EventArgEntry
-    {
-        /// <summary>
-        /// Gets or sets the name of the argument.
-        /// </summary>
-        /// <value>The name.</value>
-        [XmlAttribute("Name")]
-        public string Name { get; set; }
+	public interface ILogger
+	{
+		void Log (int level, string message);
 
-        /// <summary>
-        /// Gets or sets the value of the argument.
-        /// </summary>
-        /// <value>The value.</value>
-        [XmlAttribute("Value")]
-        public string Value { get; set; }
-    }
+		/// <summary>
+		/// Sets the color to be used for the next console log.
+		/// </summary>
+		/// <param name="bg">Background color</param>
+		/// <param name="fg">Foreground color</param>
+		void SetColorForNextConsoleLog (ConsoleColor bg, ConsoleColor fg);
+
+
+		IEnumerable<ILoggerFragment> GetFragments ();
+
+		void AddFragment (IEnumerable<ILoggerFragment> fragments);
+
+		void AddFragment (ILoggerFragment fragment);
+	}
 }
 

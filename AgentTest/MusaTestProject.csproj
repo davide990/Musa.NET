@@ -83,6 +83,10 @@
       <Project>{5EB4BE6E-6C14-43D5-9F98-86E635F74C78}</Project>
       <Name>PlanLibrary</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MusaInitializer\MusaInitializer.csproj">
+      <Project>{CCAE3DAD-3075-451C-8BCE-B50F3A1B6128}</Project>
+      <Name>MusaInitializer</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

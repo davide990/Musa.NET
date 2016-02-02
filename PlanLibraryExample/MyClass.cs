@@ -25,9 +25,7 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using AgentLibrary;
 using System.Threading;
-using MusaLogger;
 using PlanLibrary;
 using MusaCommon;
 
@@ -35,11 +33,7 @@ namespace PlanLibraryExample
 {
     public class MyClass
     {
-        public MyClass()
-        {
-        }
     }
-
 
     [Plan]
     public class PlanForEvent : PlanModel
@@ -47,7 +41,7 @@ namespace PlanLibraryExample
         [PlanEntryPoint]
         void entry_point(IAgentEventArgs args)
         {
-            object a;
+            string a;
             args.TryGetValue ("nome",out a);
 
             Console.WriteLine ("Hello from " + EntryPointName + " to " + a.ToString());
@@ -62,7 +56,7 @@ namespace PlanLibraryExample
         [PlanEntryPoint]
         void wella(IAgentEventArgs args)
         {
-            object a;
+            string a;
             args.TryGetValue ("nome",out a);
 
             //log (LogLevel.Info, "Ciao LOGGERRRRRRRRRRRRRRRRRRR");
@@ -90,7 +84,7 @@ namespace PlanLibraryExample
     class PlanExample : PlanModel
     {
         [PlanEntryPoint]
-        void entry_point(AgentEventArgs args)
+        void entry_point(IAgentEventArgs args)
         {
             //object a;
             //args.TryGetValue ("nome",out a);
@@ -100,14 +94,13 @@ namespace PlanLibraryExample
 
             var the_args = new AgentEventArgs (){ { "nome", "davide" } };
 
-
             ExecuteStep ("wella", the_args);
         }
 
         [PlanStep]
-        void wella(AgentEventArgs args)
+        void wella(IAgentEventArgs args)
         {
-            object a;
+            string a;
             args.TryGetValue ("nome",out a);
 
             Console.WriteLine ("working...");

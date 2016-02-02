@@ -5,12 +5,12 @@
 //         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
 //         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 //
-//  ILogger.cs
+//  AssemblyInfo.cs
 //
 //  Author:
-//       Davide Guastella <davide.guastella90@gmail.com>
+//       davide <>
 //
-//  Copyright (c) 2016 Davide Guastella
+//  Copyright (c) 2016 davide
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
@@ -24,26 +24,30 @@
 //
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
-namespace MusaCommon
-{
-    public interface ILogger
-    {
-        void Log(int level, string message);
+// Information about this assembly is defined by the following attributes.
+// Change them to the values specific to your project.
 
-        /// <summary>
-        /// Sets the color to be used for the next console log.
-        /// </summary>
-        /// <param name="bg">Background color</param>
-        /// <param name="fg">Foreground color</param>
-        void SetColorForNextConsoleLog(System.ConsoleColor bg, System.ConsoleColor fg);
+[assembly: AssemblyTitle("MusaInitializer")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("")]
+[assembly: AssemblyCopyright("davide")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
 
+// The assembly version has the format "{Major}.{Minor}.{Build}.{Revision}".
+// The form "{Major}.{Minor}.*" will automatically update the build and revision,
+// and "{Major}.{Minor}.{Build}.*" will update just the revision.
 
-        IEnumerable<ILoggerFragment> GetFragments();
+[assembly: AssemblyVersion("1.0.*")]
 
-        void AddFragment(IEnumerable<ILoggerFragment> fragments);
-        void AddFragment(ILoggerFragment fragment);
-    }
-}
+// The following attributes are used to specify the signing key for the assembly,
+// if desired. See the Mono documentation for more information about signing.
+
+//[assembly: AssemblyDelaySign(false)]
+//[assembly: AssemblyKeyFile("")]
 

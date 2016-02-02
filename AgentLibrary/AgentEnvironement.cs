@@ -287,7 +287,7 @@ namespace AgentLibrary
 
         private void LoadExternalPlanLibraries()
         {
-            List<Assembly> assemblies = new List<Assembly>();
+            //List<Assembly> assemblies = new List<Assembly>();
             foreach (string assembly_path in MusaConfig.GetConfig().PlanLibrariesPath)
                 AppDomain.CurrentDomain.Load(Assembly.LoadFile(assembly_path).GetName());
             
@@ -300,9 +300,9 @@ namespace AgentLibrary
             conf.NetworkingEnabled = NetworkingEnabled;
 
             //conf.LoggerFragments = logger.Fragments;
-            conf.LoggerFragments = new List<ILoggerFragment>();
-            conf.LoggerFragments.AddRange(logger.GetFragments());
 
+            //conf.LoggerFragments.AddRange(logger.GetFragments());
+			conf.AddLoggerFragment(logger.GetFragments());
             conf.MusaAddress = IPAddress;
             conf.MusaAddressPort = Port;
 
@@ -337,7 +337,7 @@ namespace AgentLibrary
                         continue;
                     }
 
-                    foreach (KeyValuePair<string, object> arg in eventArgs)
+                    foreach (KeyValuePair<string, string> arg in eventArgs)
                     {
                         var the_arg = new EventArgEntry();
                         the_arg.Name = arg.Key;

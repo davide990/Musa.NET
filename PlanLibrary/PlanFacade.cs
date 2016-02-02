@@ -31,7 +31,8 @@ using System.Reflection;
 
 namespace PlanLibrary
 {
-    public static class PlanFacade
+    [Register(typeof(IPlanFacade))]
+    public class PlanFacade : MusaModule, IPlanFacade
     {
         /// <summary>
         /// Creates an instance of plan for a specific model.
@@ -46,7 +47,7 @@ namespace PlanLibrary
         /// <param name="PlanFinishedDelegate">The delegate method invoked when
         /// the execution of the plan has terminated.</param>
         /// <param name="Logger">The logger to be used from within the plan.</param>
-        public static IPlanInstance CreateInstance(Type PlanModel, object sender, MethodInfo RegisterResultDelegate, MethodInfo PlanFinishedDelegate, ILogger Logger)
+        public IPlanInstance CreatePlanInstance(Type PlanModel, object sender, MethodInfo RegisterResultDelegate, MethodInfo PlanFinishedDelegate, ILogger Logger)
         {
             Type planInstanceType = typeof(PlanInstance<>).MakeGenericType(PlanModel);
             var plan_instance = Activator.CreateInstance(planInstanceType);
@@ -68,21 +69,24 @@ namespace PlanLibrary
             return plan_instance as IPlanInstance;
         }
 
-
+        public IPlanCollection CreatePlanCollection()
+        {
+            return new PlanCollection();
+        }
 
         /// <summary>
         /// Gets a plan instance generic type for the specific model.
         /// </summary>
         /// <returns>The plan instance for.</returns>
         /// <param name="planModel">Plan model.</param>
-        public static Type GetPlanInstanceFor(Type planModel)
+        public Type GetPlanInstanceTypeFor(Type planModel)
         {
             return typeof(PlanInstance<>).MakeGenericType(planModel);
         }
 
-        public static MethodInfo GetExecuteMethodForPlan(Type PlanModel)
+        public MethodInfo GetExecuteMethodForPlan(Type PlanModel)
         {
-            return GetPlanInstanceFor(PlanModel).GetMethod("Execute", BindingFlags.Public | BindingFlags.Instance);
+            return GetPlanInstanceTypeFor(PlanModel).GetMethod("Execute", BindingFlags.Public | BindingFlags.Instance);
         }
 
     }

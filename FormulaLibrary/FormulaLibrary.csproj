@@ -39,7 +39,7 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="Antlr4.Runtime">
-      <HintPath>..\Antlr4.Runtime.dll</HintPath>
+      <HintPath>..\..\..\Antlr4.Runtime.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

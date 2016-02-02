@@ -7,8 +7,14 @@ namespace MusaLogger
     /// <summary>
     /// Logger.
     /// </summary>
-    public class Logger : ILogger
+    [Register(typeof(ILogger))]
+    public class Logger : MusaModule, ILogger
     {
+        /// <summary>
+        /// Gets the fragments of this logger. Each fragment is responsible for
+        /// logging to a specific output.
+        /// </summary>
+        /// <value>The fragments.</value>
         public List<ILoggerFragment> Fragments
         {
             get;

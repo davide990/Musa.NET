@@ -33,17 +33,10 @@
   <ItemGroup>
     <Compile Include="MyClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PlanLib2.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\AgentLibrary\AgentLibrary.csproj">
-      <Project>{0124CAC4-A805-459B-8434-27257B0F1E6E}</Project>
-      <Name>AgentLibrary</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MusaLogger\MusaLogger.csproj">
-      <Project>{5CF5FB93-94DC-4A88-BCB1-95F2AD757F01}</Project>
-      <Name>MusaLogger</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PlanLibrary\PlanLibrary.csproj">
       <Project>{5EB4BE6E-6C14-43D5-9F98-86E635F74C78}</Project>
       <Name>PlanLibrary</Name>

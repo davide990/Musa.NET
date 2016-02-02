@@ -5,12 +5,12 @@
 //         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
 //         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 //
-//  IAgentEventArgs.cs
+//  PlanLib2.cs
 //
 //  Author:
 //       Davide Guastella <davide.guastella90@gmail.com>
 //
-//  Copyright (c) 2015 Davide Guastella
+//  Copyright (c) 2016 davide
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
@@ -25,13 +25,18 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.Collections;
-using System.Collections.Generic;
+using PlanLibrary;
+using MusaCommon;
 
-namespace MusaCommon
+namespace PlanLibraryExample
 {
-    public interface IAgentEventArgs : IDictionary<string, object>
+    [Plan]
+    public class PlanLib2 : PlanModel
     {
+        [PlanEntryPoint]
+        void wella(IAgentEventArgs args)
+        {
+        }
     }
 }
 

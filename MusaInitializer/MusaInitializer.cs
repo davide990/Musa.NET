@@ -5,12 +5,12 @@
 //         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
 //         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 //
-//  EventArgEntry.cs
+//  MusaInitializer.cs
 //
 //  Author:
-//       Davide Guastella <davide.guastella90@gmail.com>
+//       davide <>
 //
-//  Copyright (c) 2015 Davide Guastella
+//  Copyright (c) 2016 davide
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
@@ -24,25 +24,19 @@
 //
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-using System.Xml.Serialization;
 
-namespace MusaConfiguration
+namespace MusaInitializer
 {
-    public class EventArgEntry
+    public static class MusaInitializer
     {
-        /// <summary>
-        /// Gets or sets the name of the argument.
-        /// </summary>
-        /// <value>The name.</value>
-        [XmlAttribute("Name")]
-        public string Name { get; set; }
+        public static void Initialize()
+        {
+            MusaLogger.MusaLoggerInitializer.Initialize();
+            PlanLibrary.PlanLibraryInitializer.Initialize();
 
-        /// <summary>
-        /// Gets or sets the value of the argument.
-        /// </summary>
-        /// <value>The value.</value>
-        [XmlAttribute("Value")]
-        public string Value { get; set; }
+            //...
+            //Initialize other modules (projects) here
+        }
     }
 }
 

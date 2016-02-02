@@ -5,7 +5,7 @@
 //         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
 //         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 //
-//  EventArgEntry.cs
+//  IAgentEventArgs.cs
 //
 //  Author:
 //       Davide Guastella <davide.guastella90@gmail.com>
@@ -24,25 +24,14 @@
 //
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-using System.Xml.Serialization;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 
-namespace MusaConfiguration
+namespace MusaCommon
 {
-    public class EventArgEntry
+    public interface IAgentEventArgs : IDictionary<string, string>
     {
-        /// <summary>
-        /// Gets or sets the name of the argument.
-        /// </summary>
-        /// <value>The name.</value>
-        [XmlAttribute("Name")]
-        public string Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets the value of the argument.
-        /// </summary>
-        /// <value>The value.</value>
-        [XmlAttribute("Value")]
-        public string Value { get; set; }
     }
 }
 

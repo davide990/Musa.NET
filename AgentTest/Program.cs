@@ -16,6 +16,7 @@ using System.ComponentModel;
 using PlanLibrary;
 using FormulaLibrary.ANTLR;
 using System.Collections.Generic;
+using MusaCommon;
 
 
 namespace AgentTest
@@ -87,6 +88,7 @@ namespace AgentTest
         {
             //startMUSA();
 
+            MusaInitializer.MusaInitializer.Initialize();
 			MusaConfig.ReadFromFile ("../../test_conf.xml");
             /*AgentEnvironement env = AgentEnvironement.GetInstance();
             env.RegisterAgentFromConfiguration();
@@ -125,7 +127,7 @@ namespace AgentTest
 		[PlanEntryPoint]
         void entry_point(AgentEventArgs args)
 		{
-			object a;
+			string a;
 			args.TryGetValue ("nome",out a);
 
 			Console.WriteLine ("Hello from " + EntryPointName + " to " + a);
@@ -140,7 +142,7 @@ namespace AgentTest
 		[PlanEntryPoint]
 		void wella(AgentEventArgs args)
 		{
-            object a;
+			string a;
             args.TryGetValue ("nome",out a);
 
             Console.WriteLine("ECCOMI, MALEDIZIONE");
@@ -186,7 +188,7 @@ namespace AgentTest
 		[PlanStep]
 		void wella(AgentEventArgs args)
 		{
-			object a;
+			string a;
 			args.TryGetValue ("nome",out a);
 
 			Console.WriteLine ("working...");

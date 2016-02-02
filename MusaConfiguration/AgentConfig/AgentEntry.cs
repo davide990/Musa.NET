@@ -5,7 +5,7 @@ namespace MusaConfiguration
 {
 	public class AgentEntry
 	{
-		[XmlAttribute("Name", typeof(string))]
+        [XmlAttribute("Name")]
 		public string Name { get; set; }
 
 		[XmlArray("Plans")]

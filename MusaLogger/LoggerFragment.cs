@@ -24,7 +24,6 @@
 //
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 using System.Xml.Serialization;
 using NLog.Config;
 using NLog;
@@ -89,22 +88,22 @@ namespace MusaLogger
         {
             switch (level)
             {
-                case LogLevel. Fatal:
+                case MusaCommon.LogLevel.Fatal:
                     return NLog.LogLevel.Fatal;
 
-                case LogLevel. Error:
+                case MusaCommon.LogLevel.Error:
                     return NLog.LogLevel.Error;
 
-                case LogLevel. Warn:
+                case MusaCommon.LogLevel.Warn:
                     return NLog.LogLevel.Warn;
 
-                case LogLevel. Info:
+                case MusaCommon.LogLevel.Info:
                     return NLog.LogLevel.Info;
 
-                case LogLevel. Debug:
+                case MusaCommon.LogLevel.Debug:
                     return NLog.LogLevel.Debug;
 
-                case LogLevel. Trace:
+                case MusaCommon.LogLevel. Trace:
                 default:
                     return NLog.LogLevel.Trace;
             }

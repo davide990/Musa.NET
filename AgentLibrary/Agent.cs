@@ -31,10 +31,7 @@ using System.Collections;
 using AgentLibrary;
 using System.Reflection;
 using FormulaLibrary;
-using FormulaLibrary.ANTLR;
-using MusaConfiguration;
 using MusaCommon;
-using PlanLibrary;
 
 namespace AgentLibrary
 {
@@ -79,8 +76,6 @@ namespace AgentLibrary
         {
             get { return new List<AssignmentType>(Workbench.AssignmentSet); }
         }
-
-
 
         /// <summary>
         /// This queue contains the changes to the environment that this agent have to perceive. Since an agent can be 
@@ -145,7 +140,7 @@ namespace AgentLibrary
         /// <summary>
         /// The plans collection.
         /// </summary>
-        private PlanCollection PlansCollection;
+        private IPlanCollection PlansCollection;
 
         /// <summary>
         /// Gets the events.
@@ -311,6 +306,11 @@ namespace AgentLibrary
             set;
         }
 
+        /// <summary>
+        /// An utility class for handling plans
+        /// </summary>
+        private IPlanFacade PlanFacade;
+
         #region Constructors
 
         /// <summary>
@@ -341,12 +341,15 @@ namespace AgentLibrary
             mailBox = new Stack<Tuple<AgentPassport, AgentMessage>>();
             createdAt = DateTime.Now;
             resume_reasoning = false;
-            PlansCollection = new PlanCollection();
 
-
-
-            //Logger = MusaConfig.GetLogger();
+            //Inject the logger
             Logger = ModuleProvider.Get().Resolve<ILogger>();
+
+            //Inject the PlanFacade 
+            PlanFacade = ModuleProvider.Get().Resolve<IPlanFacade>();
+
+            //Create a PlanCollection object
+            PlansCollection = PlanFacade.CreatePlanCollection();
 
             RegisterResultHandler = GetType().GetMethod("onPlanInstanceRegisterResult", BindingFlags.NonPublic | BindingFlags.Instance);
             PlanFinishedHandler = GetType().GetMethod("onPlanInstanceFinished", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -474,7 +477,7 @@ namespace AgentLibrary
                 throw new Exception("Argument #1 in AddPlan(Type) must implement IPlanModel.");
             
             //Create a new plan instance
-            var plan_instance = PlanFacade.CreateInstance(PlanModel, this, RegisterResultHandler, PlanFinishedHandler, Logger);
+            var plan_instance = PlanFacade.CreatePlanInstance(PlanModel, this, RegisterResultHandler, PlanFinishedHandler, Logger);
 
             //Add the plan to the agent's plan collection
             PlansCollection.Add(PlanModel, plan_instance);
@@ -497,7 +500,7 @@ namespace AgentLibrary
                     "plan '" + PlanName + "' must implement IPlanModel.");
 
             //Create a new plan instance
-            var plan_instance = PlanFacade.CreateInstance(Plan, this, RegisterResultHandler, PlanFinishedHandler, Logger);
+            var plan_instance = PlanFacade.CreatePlanInstance(Plan, this, RegisterResultHandler, PlanFinishedHandler, Logger);
 
             //Add the plan to the agent's plan collection
             PlansCollection.Add(Plan, plan_instance);
@@ -679,7 +682,6 @@ namespace AgentLibrary
 
 
         #endregion
-
 
         public bool TestCondition(Formula formula)
         {

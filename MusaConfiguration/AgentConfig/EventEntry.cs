@@ -5,13 +5,13 @@ namespace MusaConfiguration
 {
 	public class EventEntry
 	{
-		[XmlAttribute("Formula", typeof(string))]
+		[XmlAttribute("Formula")]
 		public string formula { get; set; }
 
-		[XmlAttribute("Plan", typeof(string))]
+        [XmlAttribute("Plan")]
 		public string plan { get; set; }
 
-        [XmlAttribute("Perception", typeof(string))]
+        [XmlAttribute("Perception")]
 		public string perception { get; set; }
 
 		[XmlArray("EventArgs")]

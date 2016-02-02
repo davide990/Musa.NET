@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlanLibraryExample", "PlanL
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusaCommon", "MusaCommon\MusaCommon.csproj", "{3B8C5698-817C-4C05-87BF-2340C699CC1F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusaInitializer", "MusaInitializer\MusaInitializer.csproj", "{CCAE3DAD-3075-451C-8BCE-B50F3A1B6128}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{C56594B3-805A-4BA7-A18A-96C4B39BC0DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C56594B3-805A-4BA7-A18A-96C4B39BC0DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C56594B3-805A-4BA7-A18A-96C4B39BC0DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCAE3DAD-3075-451C-8BCE-B50F3A1B6128}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCAE3DAD-3075-451C-8BCE-B50F3A1B6128}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCAE3DAD-3075-451C-8BCE-B50F3A1B6128}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCAE3DAD-3075-451C-8BCE-B50F3A1B6128}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E05E465D-3BBD-4708-B00E-8001089DE01B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E05E465D-3BBD-4708-B00E-8001089DE01B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E05E465D-3BBD-4708-B00E-8001089DE01B}.Release|Any CPU.ActiveCfg = Release|Any CPU

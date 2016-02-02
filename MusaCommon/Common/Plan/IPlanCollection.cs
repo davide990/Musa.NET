@@ -5,12 +5,12 @@
 //         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
 //         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 //
-//  EventArgEntry.cs
+//  IPlanCollection.cs
 //
 //  Author:
-//       Davide Guastella <davide.guastella90@gmail.com>
+//       davide <>
 //
-//  Copyright (c) 2015 Davide Guastella
+//  Copyright (c) 2016 davide
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
@@ -24,25 +24,24 @@
 //
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-using System.Xml.Serialization;
+using System;
+using System.Collections.Generic;
+using System.Collections;
 
-namespace MusaConfiguration
+namespace MusaCommon
 {
-    public class EventArgEntry
+    public interface IPlanCollection : IDictionary<Type, IPlanInstance>
     {
-        /// <summary>
-        /// Gets or sets the name of the argument.
-        /// </summary>
-        /// <value>The name.</value>
-        [XmlAttribute("Name")]
-        public string Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets the value of the argument.
-        /// </summary>
-        /// <value>The value.</value>
-        [XmlAttribute("Value")]
-        public string Value { get; set; }
+        /*void Add(Type key, IPlanInstance value) ;
+        void Add(KeyValuePair<Type, IPlanInstance> item);
+        void Clear();
+        bool Contains(KeyValuePair<Type, IPlanInstance> item);
+        bool ContainsKey(Type key);
+        bool Remove(Type key);
+        bool Remove(KeyValuePair<Type, IPlanInstance> item);
+        IEnumerator<KeyValuePair<Type, IPlanInstance>> GetEnumerator();
+        bool TryGetValue(Type key, out IPlanInstance value);
+        void CopyTo(KeyValuePair<Type, IPlanInstance>[] array, int arrayIndex);*/
     }
 }
 

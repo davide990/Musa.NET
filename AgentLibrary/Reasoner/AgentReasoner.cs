@@ -300,14 +300,8 @@ namespace AgentLibrary
 			
                 case InformationType.Achieve:
                     //AchieveGoal(Type Plan, AgentEventArgs Args = null)
-
-
                     var message_args = msg.Args;
-
-
                     throw new NotImplementedException();
-
-                    break;
             }
         }
 
@@ -353,7 +347,6 @@ namespace AgentLibrary
                 case AgentPerception.UpdateBeliefValue:
                 case AgentPerception.Null:
                     throw new NotImplementedException();
-                    break;
             }
         }
 
@@ -433,7 +426,7 @@ namespace AgentLibrary
             //If Plan is not of type PlanModel, then throw an exception
             //if (!Plan.BaseType.IsEquivalentTo (typeof(IPlanModel)))
             if (!(typeof(IPlanModel).IsAssignableFrom(Plan)))
-                throw new Exception("Argument #3 in AddEvent(...) must implement IPlanModel, or be of type PlanModel.");
+                throw new Exception("Argument #3 in AddEvent(...) must inherits from PlanModel.");
 			
             AgentEventKey the_key = new AgentEventKey(formula, perception);
 
