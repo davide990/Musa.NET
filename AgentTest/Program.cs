@@ -90,9 +90,13 @@ namespace AgentTest
 
             MusaInitializer.MusaInitializer.Initialize();
 			MusaConfig.ReadFromFile ("../../test_conf.xml");
-            /*AgentEnvironement env = AgentEnvironement.GetInstance();
+            AgentEnvironement env = AgentEnvironement.GetInstance();
             env.RegisterAgentFromConfiguration();
-            env.WaitForAgents();*/
+
+
+            env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
+
+            env.WaitForAgents();
 
 			/*
 			BackgroundWorker wk = new BackgroundWorker ();
@@ -111,7 +115,7 @@ namespace AgentTest
             var a = env.RegisteredAgents;
             */
 
-			configureAndStartMusa ();
+			//configureAndStartMusa ();
         }
 
 		static void A_RegisterResult (string result)

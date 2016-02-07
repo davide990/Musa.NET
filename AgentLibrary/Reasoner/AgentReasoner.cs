@@ -425,9 +425,11 @@ namespace AgentLibrary
         {
             //If Plan is not of type PlanModel, then throw an exception
             //if (!Plan.BaseType.IsEquivalentTo (typeof(IPlanModel)))
-            if (!(typeof(IPlanModel).IsAssignableFrom(Plan)))
-                throw new Exception("Argument #3 in AddEvent(...) must inherits from PlanModel.");
+            /*if (!(typeof(IPlanModel).IsAssignableFrom(Plan)))
+                throw new Exception("Argument #3 in AddEvent(...) must inherits from PlanModel.");*/
 			
+
+
             AgentEventKey the_key = new AgentEventKey(formula, perception);
 
             //Check if the event is already contained within the agent's event catalogue

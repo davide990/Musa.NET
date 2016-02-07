@@ -30,10 +30,15 @@ namespace MusaCommon
     public interface IPlanModel
     {
         void RegisterResult(string result);
+
         void ExecuteStep(string step_name, IAgentEventArgs args = null);
+
         string GetEntryPointName();
+
         string GetPlanName();
+
         string GetPlanStepName();
+
         void log(int LogLevel, string message);
     }
 }

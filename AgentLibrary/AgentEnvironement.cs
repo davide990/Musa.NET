@@ -7,6 +7,7 @@ using System.Threading;
 using MusaConfiguration;
 using System.Reflection;
 using MusaCommon;
+using System.Linq;
 
 namespace AgentLibrary
 {
@@ -249,8 +250,6 @@ namespace AgentLibrary
         /// </summary>
         public void RegisterAgentFromConfiguration()
         {
-            LoadExternalPlanLibraries();
-
             var ae = MusaConfig.GetConfig().Agents;
 
             foreach (AgentEntry ag in ae)
@@ -264,12 +263,17 @@ namespace AgentLibrary
                     new_agent.AddBelief(unrolled_formula);
                 }
 
+                List<Type> the_assemblies = LoadExternalPlanLibraries();
+
                 foreach (string plan in ag.Plans)
                 {
                     try
                     {
-                        var the_plan = Type.GetType(plan);
-                        new_agent.AddPlan(the_plan);
+                        var ImportedPlan = the_assemblies.Find(x => x.Name.Equals(plan));
+                        var IsPlanModel = typeof(IPlanModel).IsAssignableFrom(ImportedPlan);
+
+                        if (IsPlanModel)
+                            new_agent.AddPlan(ImportedPlan);
                     }
                     catch (Exception e)
                     {
@@ -277,7 +281,7 @@ namespace AgentLibrary
                     }
                 }
 
-                foreach (AgentEvent agent_event in parseEventFromConfiguration(ag))
+                foreach (AgentEvent agent_event in parseEventFromConfiguration(ag, new_agent.Plans))
                     new_agent.AddEvent(agent_event);
 
                 //Register the agent to this environment
@@ -285,14 +289,24 @@ namespace AgentLibrary
             }
         }
 
-        private void LoadExternalPlanLibraries()
+        private List<Type> LoadExternalPlanLibraries()
         {
-            //List<Assembly> assemblies = new List<Assembly>();
+            var runtime_types = new List<Type>();
+            List<Assembly> assemblies = new List<Assembly>();
             foreach (string assembly_path in MusaConfig.GetConfig().PlanLibrariesPath)
+            {
+                var assembly = Assembly.LoadFrom(assembly_path);
+                assemblies.Add(assembly);
                 AppDomain.CurrentDomain.Load(Assembly.LoadFile(assembly_path).GetName());
+            }
+
+            foreach (var ass in assemblies)
+                runtime_types.AddRange(ass.GetExportedTypes());
             
-            //assemblies.Add(Assembly.LoadFile(assembly_path));
+            return runtime_types;
         }
+
+        #region Serialization
 
         public MusaConfig Serialize()
         {
@@ -302,7 +316,7 @@ namespace AgentLibrary
             //conf.LoggerFragments = logger.Fragments;
 
             //conf.LoggerFragments.AddRange(logger.GetFragments());
-			conf.AddLoggerFragment(logger.GetFragments());
+            conf.AddLoggerFragment(logger.GetFragments());
             conf.MusaAddress = IPAddress;
             conf.MusaAddressPort = Port;
 
@@ -365,21 +379,18 @@ namespace AgentLibrary
             return agents;
         }
 
+        #endregion
+
         /// <summary>
-        /// Parses the events for a specific agent from the MUSA XML 
-        /// configuration file.
+        /// Parses the events for a specific agent from the MUSA xml configuration file.
         /// </summary>
-        private List<AgentEvent> parseEventFromConfiguration(AgentEntry ag)
+        /// <returns>The events parsed from configuration for the agent [ag].</returns>
+        /// <param name="ag">The agent configuration.</param>
+        /// <param name="ag_plans">The plans type that [ag] supports.</param>
+        private List<AgentEvent> parseEventFromConfiguration(AgentEntry ag, List<Type> ag_plans)
         {
             List<AgentEvent> events = new List<AgentEvent>();
-            /*
-            List<Assembly> assemblies = new List<Assembly>();
-            foreach (string assembly_path in MusaConfig.GetConfig().PlanLibraries)
-                assemblies.Add(Assembly.LoadFile(assembly_path));
-            */
-            //var cd = AppDomain.CurrentDomain.GetAssemblies();
 
-            //TODO da finire
             foreach (EventEntry ev in ag.Events)
             {
                 //Parse event args
@@ -396,28 +407,10 @@ namespace AgentLibrary
                     //Parse the perception this event reacts to
                     var perception = (AgentPerception)Enum.Parse(typeof(AgentPerception), ev.perception);
 
-                    //Parse the plan that must be invoked when this event is
-                    //triggered
-                    //var all_assemblies = Assembly.GetExecutingAssembly();//CurrentDomain.GetAssemblies();
-                    foreach (Assembly assembly in MusaConfig.GetConfig().PlanLibraries)
-                    {
-                        var all_types = assembly.GetTypes();
-                        
-                        foreach (var type in all_types)
-                        {
-                            if (type.Name.Equals(ev.plan))
-                            {
-                                events.Add(new AgentEvent(ev.formula, perception, type, event_args));
-                            }
-                        }
-                    }
-                    /*Type type = assembly.GetType() //GetType(ev.plan);
-                        if (type != null)
-                            events.Add(new AgentEvent(ev.formula, perception, type, event_args));*/
-                    //}
-
-                    //var plan = Type.GetType(ev.plan);
-                    //events.Add(new AgentEvent(ev.formula, perception, plan, event_args));
+                    //Parse the plan that must be invoked when this event is triggered
+                    var the_plan = ag_plans.Find(x => x.Name.Equals(ev.plan));
+                    if (the_plan != null)
+                        events.Add(new AgentEvent(ev.formula, perception, the_plan, event_args));
                 }
                 catch (Exception e)
                 {
