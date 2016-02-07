@@ -68,6 +68,7 @@
     <Compile Include="Terms\VariableTerm.cs" />
     <Compile Include="FormulaUtils.cs" />
     <Compile Include="Terms\VariableTermFacace.cs" />
+    <Compile Include="FormulaLibraryInitializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ANTLR\formula_grammar.g" />

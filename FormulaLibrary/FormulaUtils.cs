@@ -25,37 +25,38 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System.Collections.Generic;
+using MusaCommon;
 
 namespace FormulaLibrary
 {
-	public static class FormulaUtils
-	{
-		/// <summary>
-		/// Given a generic formula, return its inner atomic formulas.
-		/// </summary>
-		public static List<AtomicFormula> UnrollFormula(Formula f)
-		{
-			List<AtomicFormula> unrolled_formula_list = new List<AtomicFormula>();
+    public static class FormulaUtils
+    {
+        /// <summary>
+        /// Given a generic formula, return its inner atomic formulas.
+        /// </summary>
+        public static List<AtomicFormula> UnrollFormula(IFormula f)
+        {
+            List<AtomicFormula> unrolled_formula_list = new List<AtomicFormula>();
 
-			if (f is AndFormula)
-			{
-				unrolled_formula_list.AddRange(UnrollFormula((f as AndFormula).Left));
-				unrolled_formula_list.AddRange(UnrollFormula((f as AndFormula).Right));
-			}
-			else if (f is OrFormula)
-			{
-				unrolled_formula_list.AddRange(UnrollFormula((f as OrFormula).Left));
-				unrolled_formula_list.AddRange(UnrollFormula((f as OrFormula).Right));
-			}
-			else if (f is NotFormula)
-			{
-				unrolled_formula_list.AddRange(UnrollFormula((f as NotFormula).Formula));
-			}
-			else
-				unrolled_formula_list.Add(f as AtomicFormula);
+            if (f is AndFormula)
+            {
+                unrolled_formula_list.AddRange(UnrollFormula((f as AndFormula).Left));
+                unrolled_formula_list.AddRange(UnrollFormula((f as AndFormula).Right));
+            }
+            else if (f is OrFormula)
+            {
+                unrolled_formula_list.AddRange(UnrollFormula((f as OrFormula).Left));
+                unrolled_formula_list.AddRange(UnrollFormula((f as OrFormula).Right));
+            }
+            else if (f is NotFormula)
+            {
+                unrolled_formula_list.AddRange(UnrollFormula((f as NotFormula).Formula));
+            }
+            else
+                unrolled_formula_list.Add(f as AtomicFormula);
 
-			return unrolled_formula_list;
-		}
-	}
+            return unrolled_formula_list;
+        }
+    }
 }
 

@@ -472,7 +472,7 @@ namespace AgentLibrary
         /// <param name="PlanModel">The plan model to be added. An instance of this plan is instantiated</param>
         public void AddPlan(Type PlanModel)
         {
-            //Check if the provisioned type is a valid plan
+            //Check if the provided type is a valid plan
             if (!(typeof(IPlanModel).IsAssignableFrom(PlanModel)))
                 throw new Exception("Argument #1 in AddPlan(Type) must implement IPlanModel.");
             
@@ -551,7 +551,8 @@ namespace AgentLibrary
         /// <param name="result">Result.</param>
         private void onPlanInstanceRegisterResult(string result)
         {
-            Formula resultFormula = FormulaParser.Parse(result);
+            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaParser>();
+            IFormula resultFormula = FormulaParser.Parse(result);
 
 
             if (resultFormula != null)
@@ -660,9 +661,9 @@ namespace AgentLibrary
             }
         }
 
-        public void AddBelief(params Formula[] formula)
+        public void AddBelief(params IFormula[] formula)
         {
-            foreach (Formula af in formula)
+            foreach (IFormula af in formula)
             {
                 Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
                 Logger.Log(LogLevel.Debug, "[" + Name + "] Adding belief " + af);
@@ -672,7 +673,7 @@ namespace AgentLibrary
 
         public void AddBelief(IList formula_list)
         {
-            foreach (Formula af in formula_list)
+            foreach (IFormula af in formula_list)
             {
                 Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
                 Logger.Log(LogLevel.Debug, "[" + Name + "] Adding belief " + af);
@@ -683,9 +684,11 @@ namespace AgentLibrary
 
         #endregion
 
-        public bool TestCondition(Formula formula)
+
+        public bool TestCondition(IFormula formula)
         {
-            return Workbench.TestCondition(formula);
+            return true;
+            //return Workbench.TestCondition(formula);
         }
 
     }

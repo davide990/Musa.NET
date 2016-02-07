@@ -34,6 +34,7 @@ using System.Threading;
 using MusaConfiguration;
 using System.Reflection;
 using MusaCommon;
+using System.Linq;
 
 namespace AgentLibrary
 {
@@ -47,9 +48,9 @@ namespace AgentLibrary
         private ObservableCollection<AtomicFormula> statements;
 
         /// <summary>
-        /// The set of attributes for the statement contained in this environment
+        /// The set of assignment for the statement contained in this environment
         /// </summary>
-        private ObservableCollection<AssignmentType> attributes;
+        private ObservableCollection<AssignmentType> assignments;
 
         /// <summary>
         /// The agents registered to this environment
@@ -77,11 +78,9 @@ namespace AgentLibrary
         /// </summary>
         public DateTime CreationDate
         {
-            get { return creationTime; }
-            private set { creationTime = value; }
+            get;
+            private set;
         }
-
-        private DateTime creationTime;
 
         /// <summary>
         /// Count how many much time elapsed between the moment in which this environment 
@@ -138,25 +137,23 @@ namespace AgentLibrary
         /// </summary>
         public static AgentEnvironement GetInstance()
         {
-            if (instance == null)
+            if (instance != null)
+                return instance;
+            
+            instance = new AgentEnvironement();
+            instance.NetworkingEnabled = MusaConfig.GetConfig().NetworkingEnabled;
+
+            if (instance.NetworkingEnabled)
             {
-                instance = new AgentEnvironement();
+                instance.Port = MusaConfig.GetConfig().MusaAddressPort;
+                instance.IPAddress = MusaConfig.GetConfig().MusaAddress;
 
-                instance.NetworkingEnabled = MusaConfig.GetConfig().NetworkingEnabled;
-
-                if (instance.NetworkingEnabled)
-                {
-                    instance.Port = MusaConfig.GetConfig().MusaAddressPort;
-                    instance.IPAddress = MusaConfig.GetConfig().MusaAddress;
-
-                    EnvironmentServer srv = new EnvironmentServer(instance);
-                    srv.StartNetworking(instance.Port.ToString(), instance.IPAddress);
-                }
-
-                //Inject the logger
-                instance.logger = ModuleProvider.Get().Resolve<ILogger>();
+                EnvironmentServer srv = new EnvironmentServer(instance);
+                srv.StartNetworking(instance.Port.ToString(), instance.IPAddress);
             }
 
+            //Inject the logger
+            instance.logger = ModuleProvider.Get().Resolve<ILogger>();
             return instance;
         }
 
@@ -169,7 +166,7 @@ namespace AgentLibrary
         {
 			
             statements = new ObservableCollection<AtomicFormula>();
-            attributes = new ObservableCollection<AssignmentType>();
+            assignments = new ObservableCollection<AssignmentType>();
             registeredAgents = new ObservableCollection<Agent>();
 
             CreationDate = DateTime.Now;
@@ -177,7 +174,7 @@ namespace AgentLibrary
             registeredAgents.CollectionChanged += RegisteredAgents_CollectionChanged;
             
             statements.CollectionChanged += Statements_CollectionChanged;
-            attributes.CollectionChanged += Attributes_CollectionChanged;
+            assignments.CollectionChanged += Attributes_CollectionChanged;
         }
 
         private void RegisteredAgents_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -277,6 +274,7 @@ namespace AgentLibrary
         public void RegisterAgentFromConfiguration()
         {
             var ae = MusaConfig.GetConfig().Agents;
+            List<Type> external_plans = GetPlansFromExternalLibraries();
 
             foreach (AgentEntry ag in ae)
             {
@@ -284,22 +282,19 @@ namespace AgentLibrary
 
                 foreach (string belief in ag.BeliefBase)
                 {
+                    var FormulaParser = ModuleProvider.Get().Resolve<IFormulaParser>();
                     var formula = FormulaParser.Parse(belief);
                     var unrolled_formula = FormulaUtils.UnrollFormula(formula).ToArray();
                     new_agent.AddBelief(unrolled_formula);
                 }
 
-                List<Type> the_assemblies = LoadExternalPlanLibraries();
-
                 foreach (string plan in ag.Plans)
                 {
                     try
                     {
-                        var ImportedPlan = the_assemblies.Find(x => x.Name.Equals(plan));
-                        var IsPlanModel = typeof(IPlanModel).IsAssignableFrom(ImportedPlan);
-
-                        if (IsPlanModel)
-                            new_agent.AddPlan(ImportedPlan);
+                        var the_plan = external_plans.Find(x => x.Name.Equals(plan));
+                        if(the_plan != null)
+                            new_agent.AddPlan(the_plan);
                     }
                     catch (Exception e)
                     {
@@ -315,21 +310,27 @@ namespace AgentLibrary
             }
         }
 
-        private List<Type> LoadExternalPlanLibraries()
+        /// <summary>
+        /// Gets the plans types from external libraries specified within the musa configuration file.
+        /// </summary>
+        /// <returns>The plans from external libraries.</returns>
+        private List<Type> GetPlansFromExternalLibraries()
         {
-            var runtime_types = new List<Type>();
-            List<Assembly> assemblies = new List<Assembly>();
+            var plan_types = new List<Type>();
+
+            //For each plan library
             foreach (string assembly_path in MusaConfig.GetConfig().PlanLibrariesPath)
             {
+                //Load the assembly
                 var assembly = Assembly.LoadFrom(assembly_path);
-                assemblies.Add(assembly);
-                AppDomain.CurrentDomain.Load(Assembly.LoadFile(assembly_path).GetName());
-            }
 
-            foreach (var ass in assemblies)
-                runtime_types.AddRange(ass.GetExportedTypes());
-            
-            return runtime_types;
+                //Get all types, from the loaded assembly, which implement IPlanModel interface
+                var this_assembly_plans = assembly.GetTypes().Where(x => typeof(IPlanModel).IsAssignableFrom(x));
+
+                //Add to the output types list
+                plan_types.AddRange(this_assembly_plans);
+            }
+            return plan_types;
         }
 
         #region Serialization
@@ -464,11 +465,11 @@ namespace AgentLibrary
                 foreach (object varTerm in variableTerms)
                 {
                     //get the type info for the current term
-                    Type variableTermType   = VariableTermFacace.GetVariableTermFor(varTerm.GetType().GetGenericArguments()[0]);
-                    object varTermName      = VariableTermFacace.GetNameOfVariableTerm(varTerm);
-                    object varTermValue     = VariableTermFacace.GetValueOfVariableTerm(varTerm);
+                    Type variableTermType = VariableTermFacace.GetVariableTermFor(varTerm.GetType().GetGenericArguments()[0]);
+                    object varTermName = VariableTermFacace.GetNameOfVariableTerm(varTerm);
+                    object varTermValue = VariableTermFacace.GetValueOfVariableTerm(varTerm);
 
-                    attributes.Add(AssignmentType.CreateAssignmentForTerm((string)varTermName, varTermValue, varTerm.GetType().GetGenericArguments()[0]));
+                    assignments.Add(AssignmentType.CreateAssignmentForTerm((string)varTermName, varTermValue, varTerm.GetType().GetGenericArguments()[0]));
                 }
 
                 //Add the formula to this environment
@@ -493,12 +494,12 @@ namespace AgentLibrary
                 foreach (object varTerm in variableTerms)
                 {
                     //get the type info for varTerm
-                    Type variableTermType   = VariableTermFacace.GetVariableTermFor(varTerm.GetType().GetGenericArguments()[0]);
-                    object varTermName      = VariableTermFacace.GetNameOfVariableTerm(varTerm);
-                    object varTermValue     = VariableTermFacace.GetValueOfVariableTerm(varTerm);
+                    Type variableTermType = VariableTermFacace.GetVariableTermFor(varTerm.GetType().GetGenericArguments()[0]);
+                    object varTermName = VariableTermFacace.GetNameOfVariableTerm(varTerm);
+                    object varTermValue = VariableTermFacace.GetValueOfVariableTerm(varTerm);
 
                     //remove the assignment
-                    attributes.Remove(AssignmentType.CreateAssignmentForTerm((string)varTermName, varTermValue, varTerm.GetType().GetGenericArguments()[0]));
+                    assignments.Remove(AssignmentType.CreateAssignmentForTerm((string)varTermName, varTermValue, varTerm.GetType().GetGenericArguments()[0]));
                 }
 
                 //Remove the formula from this environment

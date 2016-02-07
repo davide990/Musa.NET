@@ -10,6 +10,7 @@
 using FormulaLibrary;
 using FormulaLibrary.ANTLR;
 using NUnit.Framework;
+using MusaCommon;
 
 namespace FormulaLibraryTest.ANTLRTest
 {
@@ -20,9 +21,10 @@ namespace FormulaLibraryTest.ANTLRTest
         [Test]
         public bool formula_test_0()
         {
+            var FormulaParser = new FormulaParser();
             string formula = "!f(x)";
 
-            Formula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaParser.Parse(formula);
 
             Formula n = new AtomicFormula("f", new LiteralTerm("x"));
             Formula expectedFormula = new NotFormula(n);
@@ -34,9 +36,10 @@ namespace FormulaLibraryTest.ANTLRTest
         [Test]
         public bool formula_test_1()
         {
+            var FormulaParser = new FormulaParser();
             string formula = "f(x)|h(s)";
 
-            Formula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaParser.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula b = new AtomicFormula("h", new LiteralTerm("s"));
@@ -49,9 +52,10 @@ namespace FormulaLibraryTest.ANTLRTest
         [Test]
         public bool formula_test_2()
         {
+            var FormulaParser = new FormulaParser();
             string formula = "f(x)&h(s)";
 
-            Formula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaParser.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula b = new AtomicFormula("h", new LiteralTerm("s"));
@@ -64,9 +68,10 @@ namespace FormulaLibraryTest.ANTLRTest
         [Test]
         public bool formula_test_3()
         {
+            var FormulaParser = new FormulaParser();
             string formula = "f(x) &(!h(s))";
 
-            Formula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaParser.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula b = new AtomicFormula("h", new LiteralTerm("s"));
@@ -80,8 +85,9 @@ namespace FormulaLibraryTest.ANTLRTest
         [Test]
         public bool formula_test_4()
         {
+            var FormulaParser = new FormulaParser();
             string formula = "(!f(x)   | h(s))";
-            Formula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaParser.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula a_n = new NotFormula(a);
@@ -96,9 +102,10 @@ namespace FormulaLibraryTest.ANTLRTest
         [Test]
         public bool formula_test_5()
         {
+            var FormulaParser = new FormulaParser();
             string formula = "!(f(x)   | h(s))";
             
-            Formula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaParser.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula b = new AtomicFormula("h", new LiteralTerm("s"));
@@ -111,8 +118,9 @@ namespace FormulaLibraryTest.ANTLRTest
         [Test]
         public bool formula_test_6()
         {
+            var FormulaParser = new FormulaParser();
             string formula = "!(f(x))   | h(s)";
-            Formula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaParser.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula b = new AtomicFormula("h", new LiteralTerm("s"));
@@ -125,8 +133,9 @@ namespace FormulaLibraryTest.ANTLRTest
         [Test]
         public bool formula_test_7()
         {
+            var FormulaParser = new FormulaParser();
             string formula = "(!(f(x)) | h(s))";
-            Formula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaParser.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula b = new AtomicFormula("h", new LiteralTerm("s"));
@@ -142,8 +151,9 @@ namespace FormulaLibraryTest.ANTLRTest
         [Test]
         public bool formula_test_8()
         {
+            var FormulaParser = new FormulaParser();
             string formula = "(f(x)|h(s))&o(m)";
-            Formula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaParser.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula b = new AtomicFormula("h", new LiteralTerm("s"));
@@ -159,8 +169,9 @@ namespace FormulaLibraryTest.ANTLRTest
         [Test]
         public bool formula_test_9()
         {
+            var FormulaParser = new FormulaParser();
             string formula = "(f(x)&h(s))|o(m)";
-            Formula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaParser.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula b = new AtomicFormula("h", new LiteralTerm("s"));
@@ -175,8 +186,9 @@ namespace FormulaLibraryTest.ANTLRTest
         [Test]
         public bool formula_test_10()
         {
+            var FormulaParser = new FormulaParser();
             string formula = "(f(x)&!h(s))|o(m)";
-            Formula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaParser.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula b = new NotFormula(new AtomicFormula("h", new LiteralTerm("s")));
@@ -190,8 +202,9 @@ namespace FormulaLibraryTest.ANTLRTest
         [Test]
         public bool formula_test_11()
         {
+            var FormulaParser = new FormulaParser();
             string formula = "(f(x)&!h(s))|!o(m)";
-            Formula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaParser.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula b = new NotFormula(new AtomicFormula("h", new LiteralTerm("s")));
@@ -206,8 +219,9 @@ namespace FormulaLibraryTest.ANTLRTest
         [Test]
         public bool formula_test_12()
         {
+            var FormulaParser = new FormulaParser();
             string formula = "(   f(x,k<-int(3))&!h(s,o,a<-string(\"ciao mondo\")))  |!o(m,s<-char('d'))";
-            Formula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaParser.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"), new VariableTerm<int>("k",3));
             Formula b = new NotFormula(new AtomicFormula("h", new LiteralTerm("s"), new LiteralTerm("o"), new VariableTerm<string>("a", "ciao mondo")));

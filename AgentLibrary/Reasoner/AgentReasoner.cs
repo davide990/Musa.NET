@@ -284,6 +284,9 @@ namespace AgentLibrary
             //TODO [importante] bisogna capire qui se un evento è interno o esterno
 
             Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Green);
+
+            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaParser>();
+
             //process the message
             switch (msg.InfoType)
             {

@@ -58,7 +58,7 @@ namespace PlanLibrary
 
             //TODO TESTAMI
             if (!value.GetType().IsEquivalentTo(plan_type))
-                throw new Exception("Error: provisioned value must be a IPlanInstance with generic IPlanModel type");
+                throw new Exception("Error: provided value must be a IPlanInstance with generic IPlanModel type");
             
             internalDict.Add(key, value);
         }
@@ -70,7 +70,7 @@ namespace PlanLibrary
             if (!value.GetType().IsEquivalentTo(plan_type))
             {
                 //TODO RISCRIVIMI
-                throw new Exception("Error: provisioned value must be a IPlanInstance with generic IPlanModel type");
+                throw new Exception("Error: provided value must be a IPlanInstance with generic IPlanModel type");
             }
 
             internalDict.Add(item.Key, item.Value);

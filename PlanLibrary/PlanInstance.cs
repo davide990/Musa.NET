@@ -30,96 +30,99 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
+
 //using MusaLogger;
 using MusaCommon;
+
 /*using FormulaLibrary;
 using FormulaLibrary.ANTLR;*/
 
 
 namespace PlanLibrary
 {
-	/// <summary>
-	/// Plan instance.
-	/// </summary>
+    /// <summary>
+    /// Plan instance.
+    /// </summary>
     public class PlanInstance<T> : IPlanInstance where T : PlanModel
-	{
-		#region Fields/Properties
+    {
+        #region Fields/Properties
 
-		/// <summary>
-		/// The trigger condition necessary to activate this plan.
-		/// </summary>
-		public IFormula TriggerCondition
+        /// <summary>
+        /// The trigger condition necessary to activate this plan.
+        /// </summary>
+        public IFormula TriggerCondition
         {
             get;
             private set;
-		}
+        }
 
-		/// <summary>
-		/// The plan model this instance references to.
-		/// </summary>
-		private readonly PlanModel plan_model;
+        /// <summary>
+        /// The plan model this instance references to.
+        /// </summary>
+        private readonly PlanModel plan_model;
 
-		/// <summary>
-		/// Gets the entry point method for this plan.
-		/// </summary>
-		private MethodInfo EntryPointMethod
-		{
-			get { return plan_model.planEntryPointMethod; }
-		}
+        /// <summary>
+        /// Gets the entry point method for this plan.
+        /// </summary>
+        private MethodInfo EntryPointMethod
+        {
+            get { return plan_model.planEntryPointMethod; }
+        }
 
-		/// <summary>
-		/// Gets the plan steps.
-		/// </summary>
-		private List<PlanStep> PlanSteps
-		{
-			get { return plan_model.Steps; }
-		}
+        /// <summary>
+        /// Gets the plan steps.
+        /// </summary>
+        private List<PlanStep> PlanSteps
+        {
+            get { return plan_model.Steps; }
+        }
 
-		/// <summary>
-		/// Gets the name of this plan.
-		/// </summary>
-		public string Name 
-		{
-			get { return typeof(T).Name; }
-		}
+        /// <summary>
+        /// Gets the name of this plan.
+        /// </summary>
+        public string Name
+        {
+            get { return typeof(T).Name; }
+        }
 
-		/// <summary>
-		/// The background worker that handles the execution of this plan.
-		/// </summary>
-		private BackgroundWorker background_worker;
+        /// <summary>
+        /// The background worker that handles the execution of this plan.
+        /// </summary>
+        private BackgroundWorker background_worker;
 
-		/// <summary>
-		/// An object used to handle pause/resume of this plan
-		/// </summary>
-		ManualResetEvent _busy;
+        /// <summary>
+        /// An object used to handle pause/resume of this plan
+        /// </summary>
+        ManualResetEvent _busy;
 
-		/// <summary>
-		/// Gets a value indicating whether this plan has finished its execution.
-		/// </summary>
-		public bool HasFinished
-		{
-			get { return background_worker == null || !background_worker.IsBusy; }
-		}
+        /// <summary>
+        /// Gets a value indicating whether this plan has finished its execution.
+        /// </summary>
+        public bool HasFinished
+        {
+            get { return background_worker == null || !background_worker.IsBusy; }
+        }
 
-		/// <summary>
-		/// An event that occurs when this plan's execution terminates.
-		/// </summary>
-		public event EventHandler Finished;
+        /// <summary>
+        /// An event that occurs when this plan's execution terminates.
+        /// </summary>
+        public event EventHandler Finished;
 
-		/// <summary>
-		/// Gets the logger of the agent this plan is registered to.
-		/// </summary>
-		protected ILogger Logger 
-		{
-			get;
-			private set;
-		}
+        /// <summary>
+        /// Gets the logger of the agent this plan is registered to.
+        /// </summary>
+        protected ILogger Logger
+        {
+            get;
+            private set;
+        }
 
-		#endregion Fields/Properties
+        #endregion Fields/Properties
 
         #region Events
 
         public delegate void onRegisterResult(string result);
+
         /// <summary>
         /// This event is invoked when from within the plan a result is 
         /// required to be registered into the parent agent's workbench. 
@@ -128,241 +131,252 @@ namespace PlanLibrary
 
         #endregion Events
 
-		#region Constructor and initialization methods
+        #region Constructor and initialization methods
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="PlanInstance"/>class.
-		/// </summary>
-		public PlanInstance ()
-		{
-			plan_model = Activator.CreateInstance (typeof(T)) as PlanModel;
-			plan_model.RegisterResultEvent += OnRegisterResult;
-			plan_model.Log += Log;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PlanInstance"/>class.
+        /// </summary>
+        public PlanInstance()
+        {
+            plan_model = Activator.CreateInstance(typeof(T)) as PlanModel;
+            plan_model.RegisterResultEvent += OnRegisterResult;
+            plan_model.Log += Log;
 		
-			//add an event handler for step's execution
-			foreach(PlanStep step in plan_model.Steps)
-				step.ExecuteStep += onExecuteStep;
+            //add an event handler for step's execution
+            foreach (PlanStep step in plan_model.Steps)
+                step.ExecuteStep += onExecuteStep;
 
-			//Parse the trigger condition of the plan model
-			string trigger_condition = plan_model.TriggerCondition;
+            //Parse the trigger condition of the plan model
+            string trigger_condition = plan_model.TriggerCondition;
 
-            /*if (!string.IsNullOrEmpty (trigger_condition))
-			{
-				try 				{ TriggerCondition = FormulaParser.Parse (trigger_condition); }
-				catch(Exception e) 	{ Console.WriteLine ("Unable to parse plan's trigger condition '" + trigger_condition + "'.\n" + e.Message); }
-			}*/
+            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaParser>();
+            Logger = ModuleProvider.Get().Resolve<ILogger>();
+
+            if (!string.IsNullOrEmpty(trigger_condition))
+            {
+                try
+                {
+                    TriggerCondition = FormulaParser.Parse(trigger_condition);
+                }
+                catch (Exception e)
+                {
+                    Logger.Log(LogLevel.Error, "Unable to parse plan's trigger condition '" + trigger_condition + "'.\nError: " + e.Message);
+                    throw new Exception("Unable to parse plan's trigger condition '" + trigger_condition + "'.\nError: " + e.Message);
+                }
+            }
 				
-			//Initialize the ManualResetEvent object
-			_busy = new ManualResetEvent (true);
-		}
+            //Initialize the ManualResetEvent object
+            _busy = new ManualResetEvent(true);
+        }
 
 
-        private void Log (int level, string message)
-		{
-			Logger.Log (level, message);
-		}
+        private void Log(int level, string message)
+        {
+            Logger.Log(level, message);
+        }
 
-		/// <summary>
-		/// Raised when a result has be be registered after the invocation of RegisterResult(...) within a plan step.
-		/// </summary>
-		/// <param name="result">The result to be registered. It is a formula.</param>
-		private void OnRegisterResult (string result)
-		{
-			if(RegisterResult != null) 
-                RegisterResult (result);
-			else
-				throw new Exception("No agent is registered to catch this plan's results.");
-		}
+        /// <summary>
+        /// Raised when a result has be be registered after the invocation of RegisterResult(...) within a plan step.
+        /// </summary>
+        /// <param name="result">The result to be registered. It is a formula.</param>
+        private void OnRegisterResult(string result)
+        {
+            if (RegisterResult != null)
+                RegisterResult(result);
+            else
+                throw new Exception("No agent is registered to catch this plan's results.");
+        }
 
 
-		/// <summary>
-		/// Initializes the background worker for this plan.
-		/// </summary>
-		private void initializeBackgroundWorker()
-		{
-			background_worker = new BackgroundWorker ();
+        /// <summary>
+        /// Initializes the background worker for this plan.
+        /// </summary>
+        private void initializeBackgroundWorker()
+        {
+            background_worker = new BackgroundWorker();
 
-			background_worker.DoWork 				+= onBackgroundWorker_DoWork;
-			background_worker.RunWorkerCompleted 	+= onBackgroundWorker_WorkCompleted;
-			background_worker.ProgressChanged 		+= onBackgroundWorker_ProgressChanged;
+            background_worker.DoWork += onBackgroundWorker_DoWork;
+            background_worker.RunWorkerCompleted += onBackgroundWorker_WorkCompleted;
+            background_worker.ProgressChanged += onBackgroundWorker_ProgressChanged;
 
-			background_worker.WorkerReportsProgress = true;
-			background_worker.WorkerSupportsCancellation = true;
-		}
-		#endregion Constructor and initialization methods
+            background_worker.WorkerReportsProgress = true;
+            background_worker.WorkerSupportsCancellation = true;
+        }
 
-		#region Background worker methods
+        #endregion Constructor and initialization methods
 
-		void onBackgroundWorker_ProgressChanged (object sender, ProgressChangedEventArgs e)
-		{
-			//TODO log plan execution progress
-		}
+        #region Background worker methods
 
-		void onBackgroundWorker_WorkCompleted (object sender, RunWorkerCompletedEventArgs e)
-		{
+        void onBackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            //TODO log plan execution progress
+        }
+
+        void onBackgroundWorker_WorkCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
             Logger.Log(LogLevel.Trace, "[PLAN " + Name + "] Execution terminated.");
 
-			if (Finished != null)
-				Finished (this, null);
-		}
+            if (Finished != null)
+                Finished(this, null);
+        }
 
-		/// <summary>
-		/// Execute this plan in background.
-		/// </summary>
-		/// <param name="sender">Sender.</param>
-		/// <param name="e">The plan's parameters. [e.Argument] is of type Dictionary<string, object></param>
-		void onBackgroundWorker_DoWork (object sender, DoWorkEventArgs e)
-		{
-			if(plan_model == null)
-				throw new Exception ("Error: plan model is null");
+        /// <summary>
+        /// Execute this plan in background.
+        /// </summary>
+        /// <param name="sender">Sender.</param>
+        /// <param name="e">The plan's parameters. [e.Argument] is of type Dictionary<string, object></param>
+        void onBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            if (plan_model == null)
+                throw new Exception("Error: plan model is null");
 
-			if (EntryPointMethod == null)
-				throw new Exception ("In plan " + Name + ": invalid entry point method.");
+            if (EntryPointMethod == null)
+                throw new Exception("In plan " + Name + ": invalid entry point method.");
 
-			//Takes the plan's arguments
+            //Takes the plan's arguments
             IAgentEventArgs args = e.Argument as IAgentEventArgs;
 
-			//If the plan step method has parameters
-			if (EntryPointMethod.GetParameters ().Length > 0)
-			{
-				//If passed args are not null
-				if (args != null) 
-				{
+            //If the plan step method has parameters
+            if (EntryPointMethod.GetParameters().Length > 0)
+            {
+                //If passed args are not null
+                if (args != null)
+                {
                     //Check if the parameter is of type IAgentEventArgs
                     var EntryPointMethodArgType = EntryPointMethod.GetParameters()[0].ParameterType;
                     if (!(typeof(IAgentEventArgs).IsAssignableFrom(EntryPointMethodArgType)))
-                        throw new Exception ("In plan step" + Name + ": plan steps supports only a maximum of 1 parameter of type IAgentEventArgs.");
+                        throw new Exception("In plan step" + Name + ": plan steps supports only a maximum of 1 parameter of type IAgentEventArgs.");
 
-					//Invoke the method
-					InvokePlan (new object[]{ args });
-				} 
-				else 
-				{
-					//If the passed args are null, invoke the method with an empty dictionary
-                    InvokePlan (new object[]{ new object() as IAgentEventArgs });
-				}
-			} 
-			else 
-			{
-				//no args are passed neither provided by plan step method. Invoke the method without parameters.
-				InvokePlan (null);
-			}
-		}
+                    //Invoke the method
+                    InvokePlan(new object[]{ args });
+                }
+                else
+                {
+                    //If the passed args are null, invoke the method with an empty dictionary
+                    InvokePlan(new object[]{ new object() as IAgentEventArgs });
+                }
+            }
+            else
+            {
+                //no args are passed neither provided by plan step method. Invoke the method without parameters.
+                InvokePlan(null);
+            }
+        }
 
-		#endregion Background worker methods
+        #endregion Background worker methods
 
 
-		#region Methods
+        #region Methods
 
-		/// <summary>
-		/// This is invoked when a plan step [step_name] is invoked from within the plan. This method checks if this
-		/// plan is in pause or not. If in pause, wait for the execution to be resumed, then proceed executing the plan
-		/// step.
-		/// </summary>
+        /// <summary>
+        /// This is invoked when a plan step [step_name] is invoked from within the plan. This method checks if this
+        /// plan is in pause or not. If in pause, wait for the execution to be resumed, then proceed executing the plan
+        /// step.
+        /// </summary>
         /// <param name="the_step">The plan step to be executed.</param>
-		/// <param name="args">The arguments passed to the plan step (optional).</param>
-        private void onExecuteStep (PlanStep the_step, IAgentEventArgs args = null)
-		{
-			//If the plan is in pause, wait until it is resumed
-			_busy.WaitOne ();
+        /// <param name="args">The arguments passed to the plan step (optional).</param>
+        private void onExecuteStep(PlanStep the_step, IAgentEventArgs args = null)
+        {
+            //If the plan is in pause, wait until it is resumed
+            _busy.WaitOne();
 
-			//If it is not in pause, execute the requested plan step
-			the_step.InvokePlanStep(args);
-		}
+            //If it is not in pause, execute the requested plan step
+            the_step.InvokePlanStep(args);
+        }
 
-		/// <summary>
-		/// Execute this plan.
-		/// </summary>
+        /// <summary>
+        /// Execute this plan.
+        /// </summary>
         public void Execute(IAgentEventArgs args = null)
-		{
-			if(background_worker == null)
-				initializeBackgroundWorker ();
+        {
+            if (background_worker == null)
+                initializeBackgroundWorker();
 
-			//If the plan is not already in execution, execute it
-			if (!background_worker.IsBusy) 
-				background_worker.RunWorkerAsync (args);
-			else
-			{
-				//TODO decidere se generare una eccezione o non fare nulla
-				throw new Exception("Plan '"+Name+"' already running.");
-			}
-		}
+            //If the plan is not already in execution, execute it
+            if (!background_worker.IsBusy)
+                background_worker.RunWorkerAsync(args);
+            else
+            {
+                //TODO decidere se generare una eccezione o non fare nulla
+                throw new Exception("Plan '" + Name + "' already running.");
+            }
+        }
 
-		/// <summary>
-		/// Pause this plan's execution.
-		/// </summary>
+        /// <summary>
+        /// Pause this plan's execution.
+        /// </summary>
         public void Pause()
-		{
-			Console.WriteLine (Name + " paused");
-			_busy.Reset ();
-		}
+        {
+            Console.WriteLine(Name + " paused");
+            _busy.Reset();
+        }
 
-		/// <summary>
-		/// Resume this plan's execution.
-		/// </summary>
+        /// <summary>
+        /// Resume this plan's execution.
+        /// </summary>
         public void Resume()
-		{
-			Console.WriteLine (Name + " resumed");
-			_busy.Set();
-		}
+        {
+            Console.WriteLine(Name + " resumed");
+            _busy.Set();
+        }
 
-		/// <summary>
-		/// Abort this plan's execution.
-		/// </summary>
-		public void Abort()
-		{
-			if (!background_worker.IsBusy)
-				return;
+        /// <summary>
+        /// Abort this plan's execution.
+        /// </summary>
+        public void Abort()
+        {
+            if (!background_worker.IsBusy)
+                return;
 			
-			_busy.Close ();
-			background_worker.CancelAsync ();
-			background_worker.Dispose ();
-			background_worker = null;
-			GC.Collect ();
-		}
+            _busy.Close();
+            background_worker.CancelAsync();
+            background_worker.Dispose();
+            background_worker = null;
+            GC.Collect();
+        }
 
-		/// <summary>
-		/// Invokes this plan's entry point method.
-		/// </summary>
-		private void InvokePlan(object[] args)
-		{
-			try
-			{
-				EntryPointMethod.Invoke (plan_model, args);
-			}
-			catch(Exception e)
-			{
-				if (e is TargetInvocationException)
-					Console.WriteLine ("An exception has been throwed by the invoked plan '" + Name + "'.\nMessage: " + e.InnerException.ToString ());
-				else
-                    Console.WriteLine ("Error while executing plan " + Name + "\n" + e.ToString ());
-			}
-		}
+        /// <summary>
+        /// Invokes this plan's entry point method.
+        /// </summary>
+        private void InvokePlan(object[] args)
+        {
+            try
+            {
+                EntryPointMethod.Invoke(plan_model, args);
+            }
+            catch (Exception e)
+            {
+                if (e is TargetInvocationException)
+                    Console.WriteLine("An exception has been throwed by the invoked plan '" + Name + "'.\nMessage: " + e.InnerException.ToString());
+                else
+                    Console.WriteLine("Error while executing plan " + Name + "\n" + e.ToString());
+            }
+        }
 
-		/// <summary>
-		/// Returns a string that represents the current <see cref="PlanLibrary.PlanInstance`1"/>.
-		/// </summary>
-		/// <returns>A <see cref="System.String"/> that represents the current <see cref="PlanLibrary.PlanInstance`1"/>.</returns>
-		public override string ToString ()
-		{
-			return Name;
-		}
+        /// <summary>
+        /// Returns a string that represents the current <see cref="PlanLibrary.PlanInstance`1"/>.
+        /// </summary>
+        /// <returns>A <see cref="System.String"/> that represents the current <see cref="PlanLibrary.PlanInstance`1"/>.</returns>
+        public override string ToString()
+        {
+            return Name;
+        }
 
-		#region IPlanInstance inherithed methods
+        #region IPlanInstance inherithed methods
 
         public string GetName()
-		{
-			return Name;
-		}
+        {
+            return Name;
+        }
 
-		public bool IsAtomic()
-		{
-			return plan_model.IsAtomic;
-		}
+        public bool IsAtomic()
+        {
+            return plan_model.IsAtomic;
+        }
 
-		#endregion IPlanInstance inherithed methods
+        #endregion IPlanInstance inherithed methods
 
-		#endregion Methods
-	}
+        #endregion Methods
+    }
 }
 

@@ -5,7 +5,7 @@
 //         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
 //         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 //
-//  MusaInitializer.cs
+//  IFormulaParser.cs
 //
 //  Author:
 //       Davide Guastella <davide.guastella90@gmail.com>
@@ -24,23 +24,14 @@
 //
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+using System;
 
-using FormulaLibrary;
-using MusaLogger;
-using PlanLibrary;
-
-namespace MusaInitializer
+namespace MusaCommon
 {
-    public static class MusaInitializer
+    public interface IFormulaParser
     {
-        public static void Initialize()
-        {
-            MusaLoggerInitializer.Initialize();
-            PlanLibraryInitializer.Initialize();
-            FormulaLibraryInitializer.Initialize();
-            //...
-            //Initialize other modules (projects) here
-        }
+        IFormula Parse(string formula);
+        IFormula ConvertXMLtoFormula();
     }
 }
 

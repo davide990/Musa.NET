@@ -65,11 +65,12 @@ namespace AgentTest
             //a.AddEvent ("f(x)", AgentPerception.RemoveBelief, typeof(PlanExample2));
             env.RegisterAgent (a);
 
+            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaParser>();
 
             /*a.AddBelief(FormulaParser.Parse("f(x)"));*/
             a.AddBelief(FormulaParser.Parse("k(x)"), FormulaParser.Parse("p(y<-int(3))"));
 
-            var ll = new List<Formula>{ FormulaParser.Parse("w(x)"), FormulaParser.Parse("cc(x)") };
+            var ll = new List<IFormula>{ FormulaParser.Parse("w(x)"), FormulaParser.Parse("cc(x)") };
             a.AddBelief(ll);
 
 			//env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
@@ -94,7 +95,7 @@ namespace AgentTest
             env.RegisterAgentFromConfiguration();
 
             env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
-            env.RegisterStatement (new AtomicFormula ("f", new VariableTerm<int>("l",3)));
+            //env.RegisterStatement (new AtomicFormula ("f", new VariableTerm<int>("l",3)));
 
             env.WaitForAgents();
 

@@ -62,6 +62,7 @@
     <Compile Include="Common\Agent\IAgentEventArgs.cs" />
     <Compile Include="Common\Plan\IPlanFacade.cs" />
     <Compile Include="Common\Plan\IPlanCollection.cs" />
+    <Compile Include="Common\IFormulaParser.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

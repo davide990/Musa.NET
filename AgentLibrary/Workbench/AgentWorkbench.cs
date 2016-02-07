@@ -167,9 +167,9 @@ namespace AgentLibrary
                 AddStatement(ff);
         }
 
-        public void AddStatement(params Formula[] f)
+        public void AddStatement(params IFormula[] f)
         {
-            foreach (Formula ff in f)
+            foreach (IFormula ff in f)
                 AddStatement(FormulaUtils.UnrollFormula(ff));
         }
 
@@ -274,7 +274,7 @@ namespace AgentLibrary
         /// Test if a formula is verified into this workbench.
         /// </summary>
         /// <returns>True if formula is satisfied in this workbench</returns>
-        public bool TestCondition(Formula formula)
+        public bool TestCondition(IFormula formula)
         {
             if (formula is NotFormula)
                 return !TestCondition((formula as NotFormula).Formula);

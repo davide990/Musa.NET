@@ -30,23 +30,19 @@ using Antlr4.Runtime.Tree;
 using FormulaLibrary.ANTLR.visitor;
 using System.IO;
 using System.Text;
+using MusaCommon;
 
 namespace FormulaLibrary
 {
-    public class FormulaParser
+    [Register(typeof(IFormulaParser))]
+    public class FormulaParser : MusaModule, IFormulaParser
     {
-        private static FormulaParser instance = new FormulaParser();
-
-        public FormulaParser()
-        {
-        }
-
         /// <summary>
         /// Convert a formula in the form of string to a <typeparamref name="Formula"/>
         /// </summary>
         /// <param name="formula">a formula in the form of string</param>
         /// <returns></returns>
-        public static Formula Parse(string formula)
+        public IFormula Parse(string formula)
         {
             // convert string to stream
             byte[] byteArray = Encoding.ASCII.GetBytes(formula);
@@ -86,8 +82,7 @@ namespace FormulaLibrary
             return formulaObject;
         }
 
-
-        public static Formula ConvertXMLtoFormula()
+        public IFormula ConvertXMLtoFormula()
         {
             return null;
         }

@@ -210,7 +210,8 @@ namespace AgentLibrary
             if (!AgentIsAuthorized(sender))
                 return false;
 
-            Formula ff = FormulaParser.Parse(formula);
+            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaParser>();
+            IFormula ff = FormulaParser.Parse(formula);
             return Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(receiver.AgentName)).TestCondition(ff);
         }
 
@@ -247,8 +248,10 @@ namespace AgentLibrary
 
 		public bool AddStatement (string agent_name, string statement)
     	{
+            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaParser>();
+
 			Agent ag = Environment.RegisteredAgents.FirstOrDefault (s => s.Name.Equals (agent_name));
-            ag.AddBelief(new Formula[] { FormulaParser.Parse(statement) });
+            ag.AddBelief(new IFormula[] { FormulaParser.Parse(statement) });
 			//ag.Workbench.AddStatement (FormulaParser.Parse (statement));
 			return true;
     	}
