@@ -10,8 +10,8 @@
 
   <Logging>
     <ConsoleLogger MinimumLogLevel="0" Enabled="true" />
-    <!--<WCFLogger MinimumLogLevel="1" Enabled="true" EndpointAddress="http://localhost:8089/" />
-    <FileLogger MinimumLogLevel="1" Enabled="true" FileName="/home/davide/log.txt" Layout="${longdate}	${level:uppercase=true}	FileLogger	${message}" />-->
+    <!--<WCFLogger MinimumLogLevel="1" Enabled="true" EndpointAddress="http://localhost:8089/" />-->
+    <!--<FileLogger MinimumLogLevel="0" Enabled="true" FileName="/home/davide/log.txt" Layout="${longdate}	${level:uppercase=true}	FileLogger	${message}" />-->
   </Logging>
   <Agents>
     <Agent Name="agent_1">

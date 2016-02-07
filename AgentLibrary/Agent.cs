@@ -681,14 +681,11 @@ namespace AgentLibrary
             }
         }
 
-
         #endregion
-
 
         public bool TestCondition(IFormula formula)
         {
-            return true;
-            //return Workbench.TestCondition(formula);
+            return Workbench.TestCondition(formula);
         }
 
     }
