@@ -1,23 +1,40 @@
-﻿/**
-         __  __                                     _   
-        |  \/  |                                   | |  
-        | \  / | _   _  ___   __ _     _ __    ___ | |_ 
-        | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
-        | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
-        |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+﻿//          __  __                                     _   
+//         |  \/  |                                   | |  
+//         | \  / | _   _  ___   __ _     _ __    ___ | |_ 
+//         | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
+//         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
+//         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+//
+//  CompositeFormulaParserTest.cs
+//
+//  Author:
+//       Davide Guastella <davide.guastella90@gmail.com>
+//
+//  Copyright (c) 2016 Davide Guastella
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-*/
 using FormulaLibrary;
-using FormulaLibrary.ANTLR;
 using NUnit.Framework;
 using MusaCommon;
 
-namespace FormulaLibraryTest.ANTLRTest
+namespace FormulaLibraryTestProject
 {
     [TestFixture]
     class CompositeFormulaParserTest
     {
-        [TestCase(Result = true)]
+        [TestCase(ExpectedResult = true)]
         [Test]
         public bool formula_test_0()
         {
@@ -32,7 +49,7 @@ namespace FormulaLibraryTest.ANTLRTest
             return generatedFormula.Equals(expectedFormula);
         }
 
-        [TestCase(Result = true)]
+        [TestCase(ExpectedResult = true)]
         [Test]
         public bool formula_test_1()
         {
@@ -48,7 +65,7 @@ namespace FormulaLibraryTest.ANTLRTest
             return generatedFormula.Equals(expectedFormula);
         }
 
-        [TestCase(Result = true)]
+        [TestCase(ExpectedResult = true)]
         [Test]
         public bool formula_test_2()
         {
@@ -64,7 +81,7 @@ namespace FormulaLibraryTest.ANTLRTest
             return generatedFormula.Equals(expectedFormula);
         }
 
-        [TestCase(Result = true)]
+        [TestCase(ExpectedResult = true)]
         [Test]
         public bool formula_test_3()
         {
@@ -81,7 +98,7 @@ namespace FormulaLibraryTest.ANTLRTest
             return generatedFormula.Equals(expectedFormula);
         }
 
-        [TestCase(Result = true)]
+        [TestCase(ExpectedResult = true)]
         [Test]
         public bool formula_test_4()
         {
@@ -98,7 +115,7 @@ namespace FormulaLibraryTest.ANTLRTest
         }
 
 
-        [TestCase(Result = true)]
+        [TestCase(ExpectedResult = true)]
         [Test]
         public bool formula_test_5()
         {
@@ -114,7 +131,7 @@ namespace FormulaLibraryTest.ANTLRTest
             return generatedFormula.Equals(expectedFormula);
         }
 
-        [TestCase(Result = false)]
+        [TestCase(ExpectedResult = false)]
         [Test]
         public bool formula_test_6()
         {
@@ -129,7 +146,7 @@ namespace FormulaLibraryTest.ANTLRTest
             return generatedFormula.Equals(expectedFormula);
         }
 
-        [TestCase(Result = false)]
+        [TestCase(ExpectedResult = false)]
         [Test]
         public bool formula_test_7()
         {
@@ -147,7 +164,7 @@ namespace FormulaLibraryTest.ANTLRTest
         /// composite
         
 
-        [TestCase(Result = true)]
+        [TestCase(ExpectedResult = true)]
         [Test]
         public bool formula_test_8()
         {
@@ -165,7 +182,7 @@ namespace FormulaLibraryTest.ANTLRTest
 
 
 
-        [TestCase(Result = true)]
+        [TestCase(ExpectedResult = true)]
         [Test]
         public bool formula_test_9()
         {
@@ -182,7 +199,7 @@ namespace FormulaLibraryTest.ANTLRTest
         }
 
 
-        [TestCase(Result = true)]
+        [TestCase(ExpectedResult = true)]
         [Test]
         public bool formula_test_10()
         {
@@ -198,7 +215,7 @@ namespace FormulaLibraryTest.ANTLRTest
             return generatedFormula.Equals(expectedFormula);
         }
 
-        [TestCase(Result = true)]
+        [TestCase(ExpectedResult = true)]
         [Test]
         public bool formula_test_11()
         {
@@ -215,7 +232,7 @@ namespace FormulaLibraryTest.ANTLRTest
         }
 
 
-        [TestCase(Result = true)]
+        [TestCase(ExpectedResult = true)]
         [Test]
         public bool formula_test_12()
         {
@@ -223,9 +240,9 @@ namespace FormulaLibraryTest.ANTLRTest
             string formula = "(   f(x,k<-int(3))&!h(s,o,a<-string(\"ciao mondo\")))  |!o(m,s<-char('d'))";
             IFormula generatedFormula = FormulaParser.Parse(formula);
 
-            Formula a = new AtomicFormula("f", new LiteralTerm("x"), new VariableTerm<int>("k",3));
+            Formula a = new AtomicFormula("f", new LiteralTerm("x"), new VariableTerm<int>("k", 3));
             Formula b = new NotFormula(new AtomicFormula("h", new LiteralTerm("s"), new LiteralTerm("o"), new VariableTerm<string>("a", "ciao mondo")));
-            Formula c = new NotFormula(new AtomicFormula("o", new LiteralTerm("m"), new VariableTerm<char>("s",'d')));
+            Formula c = new NotFormula(new AtomicFormula("o", new LiteralTerm("m"), new VariableTerm<char>("s", 'd')));
             Formula ab = new AndFormula(a, b);
             
             Formula expectedFormula = new OrFormula(ab, c);

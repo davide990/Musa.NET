@@ -1,16 +1,34 @@
-﻿/**
-         __  __                                     _   
-        |  \/  |                                   | |  
-        | \  / | _   _  ___   __ _     _ __    ___ | |_ 
-        | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
-        | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
-        |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+﻿//          __  __                                     _   
+//         |  \/  |                                   | |  
+//         | \  / | _   _  ___   __ _     _ __    ___ | |_ 
+//         | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
+//         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
+//         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+//
+//  VariableTermTest.cs
+//
+//  Author:
+//       Davide Guastella <davide.guastella90@gmail.com>
+//
+//  Copyright (c) 2016 Davide Guastella
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-*/
 using NUnit.Framework;
 using FormulaLibrary;
 
-namespace FormulaLibraryTest
+namespace FormulaLibraryTestProject
 {
     [TestFixture]
     class VariableTermTest
@@ -18,11 +36,11 @@ namespace FormulaLibraryTest
         [Test]
         public void toLiteralTermTest()
         {
-            VariableTerm<int> var_a = new VariableTerm<int>("var",5);
+            VariableTerm<int> var_a = new VariableTerm<int>("var", 5);
             LiteralTerm literal_a = var_a.toLiteralTerm();
 
+            Assert.That(string.IsNullOrEmpty(literal_a.Name), Is.False, "Converted literal term has not been assigned a name.");
             Assert.IsInstanceOf<LiteralTerm>(literal_a, "Variable to literal term conversion has failed.");
-            Assert.IsNotNullOrEmpty(literal_a.Name, "Converted literal term has not been assigned a name.");
         }
 
         /// <summary>
@@ -34,7 +52,7 @@ namespace FormulaLibraryTest
             VariableTerm<short> var = new VariableTerm<short>("var", 5);
 
             Assert.IsInstanceOf<Term>(var, "Variable term [var] is not a valid Term object.");
-            Assert.IsNotNullOrEmpty(var.Name, "Variable term's name is null.");
+            Assert.That(string.IsNullOrEmpty(var.Name), Is.False, "Variable term's name is null.");
             Assert.IsNotNull(var.Value, "Variable term's value is null.");
         }
 
@@ -47,13 +65,13 @@ namespace FormulaLibraryTest
             VariableTerm<LiteralTerm> var = new VariableTerm<LiteralTerm>("var", new LiteralTerm("hello"));
 
             Assert.IsInstanceOf<Term>(var, "Variable term [var] is not a valid Term object.");
-            Assert.IsNotNullOrEmpty(var.Name, "Variable term's name is null.");
+            Assert.That(string.IsNullOrEmpty(var.Name), Is.False, "Variable term's name is null.");
             Assert.IsNotNull(var.Value, "Variable term's value is null.");
         }
 
-        [TestCase("var_a", 1, "var_b", 1, Result = false)]
-        [TestCase("var_a", 1, "var_a", 1, Result = true)]
-        [TestCase("var_a", 1, "var_a", 2, Result = false)]
+        [TestCase("var_a", 1, "var_b", 1, ExpectedResult = false)]
+        [TestCase("var_a", 1, "var_a", 1, ExpectedResult = true)]
+        [TestCase("var_a", 1, "var_a", 2, ExpectedResult = false)]
         [Test]
         public bool variableTermsEqualsTest(string var_a_name, short var_a_value, string var_b_name, short var_b_value)
         {
@@ -64,10 +82,10 @@ namespace FormulaLibraryTest
         }
 
 
-        [TestCase("", 1, "", 1, Result = true)]
-        [TestCase("var", 1, "var_b", 2, Result = false)]
-        [TestCase("var", 1, "var", 2, Result = true)]
-        [TestCase("var", 1, "var", 1, Result = true)]
+        [TestCase("", 1, "", 1, ExpectedResult = true)]
+        [TestCase("var", 1, "var_b", 2, ExpectedResult = false)]
+        [TestCase("var", 1, "var", 2, ExpectedResult = true)]
+        [TestCase("var", 1, "var", 1, ExpectedResult = true)]
         [Test]
         public bool unificationTest(string term_name, short initial_value, string assignment_name, short assignment_value)
         {
