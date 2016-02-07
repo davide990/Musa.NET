@@ -93,8 +93,8 @@ namespace AgentTest
             AgentEnvironement env = AgentEnvironement.GetInstance();
             env.RegisterAgentFromConfiguration();
 
-
             env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
+            env.RegisterStatement (new AtomicFormula ("f", new VariableTerm<int>("l",3)));
 
             env.WaitForAgents();
 

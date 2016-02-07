@@ -179,18 +179,15 @@ namespace FormulaLibrary
             //Iterate each term
             for (int i = 0; i < Terms.Count; i++)
             {
-                //if a variable term occurs
+                //if a variable term occurs, convert each one to literal term
                 if (Terms[i].GetType().IsGenericType)
                 {
                     //add the variable term to the output list
                     variableTerms.Add(Terms[i]);
 
                     //get the type info for the current term
-                    Type variableTermType = typeof(VariableTerm<>).MakeGenericType(Terms[i].GetType().GetGenericArguments()[0]);
-                    MethodInfo parse_method = variableTermType.GetMethod("toLiteralTerm");
-                    
-                    //convert to literal term
-                    Terms[i] = (LiteralTerm)parse_method.Invoke(Terms[i], new object[] { });
+                    Type variableTermType = VariableTermFacace.GetVariableTermFor(Terms[i].GetType().GetGenericArguments()[0]);
+                    Terms[i] = VariableTermFacace.ConvertToLiteralTerm(Terms[i]);
                 }
             }
 
@@ -211,15 +208,11 @@ namespace FormulaLibrary
                 if (Terms[i].GetType().IsGenericType)
                 { 
                     //get the type info for the current term
-                    Type variableTermType = typeof(VariableTerm<>).MakeGenericType(Terms[i].GetType().GetGenericArguments()[0]);
-                    ConstructorInfo cinfo = variableTermType.GetConstructor(new[] { typeof(string), Terms[i].GetType().GetGenericArguments()[0] });
+                    Type variableTermType = VariableTermFacace.GetVariableTermFor(Terms[i].GetType().GetGenericArguments()[0]);
 
-                    //get the value of the current term
-                    object value = variableTermType.GetProperty("Value").GetValue(Terms[i]);
-                    value = Convert.ChangeType(value, Terms[i].GetType().GetGenericArguments()[0]);
-
-                    //create a new variable term instance
-                    object varTerm = cinfo.Invoke(new[] { Terms[i].Name, value });
+                    string name = (string)VariableTermFacace.GetNameOfVariableTerm(Terms[i]);
+                    object value = VariableTermFacace.GetValueOfVariableTerm(Terms[i]);
+                    object varTerm = VariableTermFacace.CreateVariableTerm(name, value);
 
                     //add the new instance to the cloned formula
                     clone.Terms.Add((Term)varTerm);
@@ -232,8 +225,6 @@ namespace FormulaLibrary
             return clone;
         }
     }
-
-
 
     sealed internal class InvalidFormulaFormatException : Exception
     {

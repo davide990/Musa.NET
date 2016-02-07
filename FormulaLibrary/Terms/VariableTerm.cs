@@ -1,14 +1,31 @@
-﻿/**
-__  __                                     _   
-|  \/  |                                   | |  
-| \  / | _   _  ___   __ _     _ __    ___ | |_ 
-| |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
-| |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
-|_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+﻿//          __  __                                     _   
+//         |  \/  |                                   | |  
+//         | \  / | _   _  ___   __ _     _ __    ___ | |_ 
+//         | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
+//         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
+//         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
+//
+//  VariableTerm.cs
+//
+//  Author:
+//       Davide Guastella <davide.guastella90@gmail.com>
+//
+//  Copyright (c) 2016 Davide Guastella
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-*/
 using System;
-using FormulaLibrary.ANTLR;
 
 namespace FormulaLibrary
 {
@@ -22,6 +39,7 @@ namespace FormulaLibrary
             get { return value; }
             private set { this.value = value; }
         }
+
         private T value;
 
         /// <summary>
@@ -30,7 +48,8 @@ namespace FormulaLibrary
         /// <param name="name"></param>
         public VariableTerm(string name)
             : base(name)
-        {}
+        {
+        }
 
         /// <summary>
         /// Create a new variable term
@@ -42,7 +61,7 @@ namespace FormulaLibrary
         {
             Value = value;
         }
-        
+
         /// <summary>
         /// Return an equivalent literal term.
         /// </summary>
@@ -50,7 +69,7 @@ namespace FormulaLibrary
         {
             return new LiteralTerm(Name);
         }
-        
+
         /// <summary>
         /// Unify the value of this term with the given assignment. The unification
         /// succeeds only if the assignment's name is equal to the name of this term.
@@ -63,12 +82,12 @@ namespace FormulaLibrary
             Value = a.Value;
             return true;            
         }
-        
+
         public override string ToString()
         {
             string shortTypeName = TypesMapping.getShortTypeName(Value.GetType().FullName);
             
-            if(!shortTypeName.Equals("string") && !shortTypeName.Equals("bool"))
+            if (!shortTypeName.Equals("string") && !shortTypeName.Equals("bool"))
                 return Name + "<-" + shortTypeName + "(" + Value.ToString() + ")";
             else
                 return Name + "<-" + shortTypeName + "(\"" + Value.ToString().ToLower() + "\")";
@@ -78,7 +97,7 @@ namespace FormulaLibrary
         public bool Equals(VariableTerm<T> other)
         {
             return  Name.Equals(other.Name) &&
-                    Value.Equals(other.Value);
+            Value.Equals(other.Value);
         }
 
         public override bool Equals(object obj)
@@ -88,7 +107,5 @@ namespace FormulaLibrary
 
             return Equals(obj as VariableTerm<T>);
         }
-
-        
     }
 }
