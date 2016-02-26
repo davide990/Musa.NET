@@ -28,7 +28,8 @@
 namespace AgentLibrary
 {
     /// <summary>
-    /// The event key necessary to agent for triggering events.
+    /// The event key necessary to agent for triggering events. It is composed of a 
+    /// 1st order Formula and a perception.
     /// </summary>
     public class AgentEventKey
     {

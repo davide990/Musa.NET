@@ -554,7 +554,6 @@ namespace AgentLibrary
             var FormulaParser = ModuleProvider.Get().Resolve<IFormulaParser>();
             IFormula resultFormula = FormulaParser.Parse(result);
 
-
             if (resultFormula != null)
             {
                 Workbench.AddStatement(resultFormula);

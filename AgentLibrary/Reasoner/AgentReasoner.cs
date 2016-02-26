@@ -39,7 +39,7 @@ namespace AgentLibrary
     {
         //TODO questi campi andranno rimossi in futuro
         private int currentReasoningCycle = 0;
-        private readonly int ReasoningUpdateTime = 1500;
+        private readonly int ReasoningUpdateTime = 2000;
 
         /// <summary>
         /// The agent this reasoner belongs to
@@ -71,7 +71,8 @@ namespace AgentLibrary
 
         /// <summary>
         /// The collection of arguments that have to be passed to events when 
-        /// these are triggered.
+        /// these are triggered. It associates an event key (a formula-perception pair)
+        /// with a collection of arguments related to the event specified by the key.
         /// </summary>
         public Dictionary<AgentEventKey, AgentEventArgs> EventsArgs
         {
@@ -181,13 +182,10 @@ namespace AgentLibrary
             parentAgent = agent;
 
             TimerCallback reasoning_method_callback = new TimerCallback(reasoningCycleMain);
-            reasoning_timer = new System.Threading.Timer(reasoning_method_callback, new object(), ReasoningUpdateTime, ReasoningUpdateTime);
+            reasoning_timer = new Timer(reasoning_method_callback, new object(), ReasoningUpdateTime, ReasoningUpdateTime);
 
-            //Get the default logger set from the environment configuration
-            //Logger = MusaConfig.GetLogger();
-
+            //Inject the logger
             Logger = ModuleProvider.Get().Resolve<ILogger>();
-                
         }
 
         internal void startReasoning()
@@ -292,7 +290,6 @@ namespace AgentLibrary
             {
                 case InformationType.Tell:
                     Logger.Log(LogLevel.Debug, "[" + parentAgent.Name + "] perceiving TELL: " + msg);
-                    //parentAgent.Workbench.AddStatement(FormulaParser.Parse(msg.Message as string));
                     parentAgent.AddBelief(FormulaParser.Parse(msg.Message as string));
                     break;
 
@@ -302,10 +299,40 @@ namespace AgentLibrary
                     break;
 			
                 case InformationType.Achieve:
-                    //AchieveGoal(Type Plan, AgentEventArgs Args = null)
-                    var message_args = msg.Args;
-                    throw new NotImplementedException();
+                    if (string.IsNullOrEmpty(msg.Message as string))
+                        throw new Exception("Received an empty message. Cannot achieve any goal.");
+
+                    Type planToExecute = parentAgent.Plans.Find(x => x.Name.Equals(msg.Message as string));
+                    //TODO i parametri do stanno?
+                    AgentEventArgs args = null;
+
+                    //Achieve the goal
+                    achieveGoal(planToExecute, args);
             }
+        }
+
+        /// <summary>
+        /// Achieves a goal.
+        /// </summary>
+        /// <param name="planToExecute">Plan to execute.</param>
+        /// <param name="args">Arguments.</param>
+        private void achieveGoal(Type planToExecute, AgentEventArgs args = null)
+        {
+            //Check if user has been set any default argument to be passed when the agent perceive 
+            //an Achieve type perception togheter with the specified plan. If any argument is found, is added
+            //to the input argument list.
+            AgentEventArgs defaultArgs;
+            EventsArgs.TryGetValue(new AgentEventKey(planToExecute.Name, AgentPerception.Achieve), out defaultArgs);
+
+            //Merge the input args and the default args
+            if (args != null)
+                defaultArgs.Merge(args);
+
+            Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Yellow);
+            Logger.Log(LogLevel.Debug, "[" + parentAgent.Name + "] Achieving goal " + planToExecute.Name);
+
+            //Execute the input plan to achieve the goal
+            parentAgent.ExecutePlan(planToExecute, defaultArgs);
         }
 
         /// <summary>
@@ -325,13 +352,11 @@ namespace AgentLibrary
             switch (perception_type)
             {
                 case AgentPerception.Achieve:
+                    //Get the agent which has to be executed
                     Type plan_to_execute = changes_list[0] as Type;
-                    AgentEventArgs args = null;
-                    EventsArgs.TryGetValue(new AgentEventKey(plan_to_execute.Name, perception_type), out args);
 
-                    Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Yellow);
-                    Logger.Log(LogLevel.Debug, "[" + parentAgent.Name + "] Achieving goal " + plan_to_execute.Name);
-                    parentAgent.ExecutePlan(plan_to_execute, args);
+                    //Achieve the goal by executing the plan
+                    achieveGoal(plan_to_execute);
                     break;
 
                 case AgentPerception.AddBelief:
@@ -346,6 +371,11 @@ namespace AgentLibrary
                     break;
 
                 case AgentPerception.SetBeliefValue:
+
+                    //TODO
+                    //parentAgent.Workbench.SetValueForTerm
+
+                    break;
                 case AgentPerception.UnSetBeliefValue:
                 case AgentPerception.UpdateBeliefValue:
                 case AgentPerception.Null:

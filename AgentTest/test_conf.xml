@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <MusaConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <MaxNumAgent>100</MaxNumAgent>
-  <MusaAddressPort>0</MusaAddressPort>
-  <NetworkingEnabled>false</NetworkingEnabled>
+  <MusaAddressPort>8081</MusaAddressPort>
+  <NetworkingEnabled>true</NetworkingEnabled>
 
   <PlanLibraries>
   	<PlanLibrary>/home/davide/musa_libtest.dll</PlanLibrary>

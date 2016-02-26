@@ -91,6 +91,17 @@ namespace AgentLibrary
         List<string> GetAgentAssignments(AgentPassport agent);
 
         /// <summary>
+        /// Return the plans the specified agent has
+        /// </summary>
+        /// <param name="agent"></param>
+        /// <returns></returns>
+        [WebInvoke(Method = "POST",
+            ResponseFormat = WebMessageFormat.Json,
+            RequestFormat = WebMessageFormat.Json)]
+        [OperationContract]
+        List<string> GetAgentPlans(AgentPassport agent);
+
+        /// <summary>
         /// Ask to an agent to verify in its workbench a given formula
         /// </summary>
         /// <param name="agent"></param>

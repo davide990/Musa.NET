@@ -154,6 +154,7 @@ namespace AgentLibrary
 
             //Inject the logger
             instance.logger = ModuleProvider.Get().Resolve<ILogger>();
+
             return instance;
         }
 

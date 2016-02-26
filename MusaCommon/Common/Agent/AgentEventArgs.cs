@@ -145,6 +145,16 @@ namespace MusaCommon
 
         #endregion
 
+        /// <summary>
+        /// Merge all items in the input AgentEventArgs object to this collection.
+        /// </summary>
+        /// <param name="args">Arguments.</param>
+        public void Merge(AgentEventArgs args)
+        {
+            foreach (KeyValuePair<string, string> kvp in args)
+                Add(kvp);
+        }
+
         public void CopyTo(KeyValuePair<string, string>[] array, int arrayIndex)
         {
             throw new NotImplementedException();

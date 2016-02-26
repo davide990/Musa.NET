@@ -26,12 +26,11 @@ namespace AgentLibrary
         /// </summary>
         public AgentEnvironement Environment
         {
-            get;// { return env; }
-            private set;// { env = value; }
+            get;
+            private set;
         }
-        //AgentEnvironement env;
-        
-		private bool HostOpened;
+
+        private bool HostOpened;
 
 
         public ILogger Logger
@@ -41,7 +40,7 @@ namespace AgentLibrary
         }
 
         #endregion
-        
+
         #region Events
 
         /// <summary>
@@ -55,17 +54,12 @@ namespace AgentLibrary
         public EnvironmentServer(AgentEnvironement env)
         {
             Environment = env;
-			HostOpened = false;
+            HostOpened = false;
+
+            //Inject the logger
+            Logger = ModuleProvider.Get().Resolve<ILogger>();
         }
 
-        /// <summary>
-        /// Attachs a logger to this class.
-        /// </summary>
-        /// <param name="Logger">Logger.</param>
-        public void AttachLogger(ILogger Logger)
-        {
-            this.Logger = Logger;
-        }
 
 
         /// <summary>
@@ -87,7 +81,7 @@ namespace AgentLibrary
 
             return true;
         }
-        
+
         /// <summary>
         /// Setup and start the networking service for this environment
         /// </summary>
@@ -96,23 +90,26 @@ namespace AgentLibrary
         /// which this environment is located</param>
         public void StartNetworking(string port, string local_ip_address = "localhost")
         {
+            if (string.IsNullOrEmpty(local_ip_address))
+                local_ip_address = "localhost";
+
             Uri address = new Uri("http://" + local_ip_address + ":" + port);
             Host = new ServiceHost(this);
             Host.AddServiceEndpoint(typeof(IMusaCommunicationService), new BasicHttpBinding(), address);
-			Host.Opened += delegate 
-			{
-				HostOpened = true;
-			};
+            Host.Opened += delegate
+            {
+                HostOpened = true;
+            };
 
-			try
-			{
-				Host.Open();
-			}
-			catch(SocketException ex)
-			{
+            try
+            {
+                Host.Open();
+            }
+            catch (SocketException ex)
+            {
                 Logger.Log(LogLevel.Error, "Cannot setup networking for MUSA.net.\n Error: " + ex);
                 return;
-			}
+            }
 
             Logger.Log(LogLevel.Trace, "Networking setup done. Address: " + address);
 
@@ -126,10 +123,10 @@ namespace AgentLibrary
         /// </summary>
         public void StopNetworkingService()
         {
-			if (!HostOpened)
-				return;
+            if (!HostOpened)
+                return;
 
-			HostOpened = false;
+            HostOpened = false;
             Host.Close();
         }
 
@@ -159,7 +156,7 @@ namespace AgentLibrary
             if (receiver == null)
                 return false;
 			
-			receiver.MailBox.Push (new Tuple<AgentPassport, AgentMessage> (senderData, message));
+            receiver.MailBox.Push(new Tuple<AgentPassport, AgentMessage>(senderData, message));
             
             return true;
         }
@@ -171,12 +168,12 @@ namespace AgentLibrary
 
             foreach (Agent a in Environment.RegisteredAgents)
             {
-				a.MailBox.Push (new Tuple<AgentPassport, AgentMessage> (senderData, message));
+                a.MailBox.Push(new Tuple<AgentPassport, AgentMessage>(senderData, message));
             }
             
             return true;
         }
-        
+
         public List<string> GetAgentList(AgentPassport sender)
         {
             if (!AgentIsAuthorized(sender))
@@ -193,6 +190,17 @@ namespace AgentLibrary
                 outList.Add(f.ToString());
 
             return outList;
+        }
+
+        public List<string> GetAgentPlans(AgentPassport agent)
+        {
+            List<string> the_plan_list = new List<string>();
+            Agent the_agent = Environment.RegisteredAgents.First(x => x.Name.Equals(agent.AgentName));
+
+            foreach (var the_plan in the_agent.Plans)
+                the_plan_list.Add(the_plan.Name);
+
+            return the_plan_list;
         }
 
         public List<string> GetAgentAssignments(AgentPassport agent)
@@ -228,33 +236,33 @@ namespace AgentLibrary
             return true;
         }
 
-		/// <summary>
-		/// Gets the informations of an agent.
-		/// </summary>
-		/// <returns>The agentinfo.</returns>
-		/// <param name="agent_name">Agent name.</param>
-		public AgentPassport GetAgentinfo (string agent_name)
-    	{
-			Agent ag = Environment.RegisteredAgents.FirstOrDefault (s => s.Name.Equals (agent_name));
+        /// <summary>
+        /// Gets the informations of an agent.
+        /// </summary>
+        /// <returns>The agentinfo.</returns>
+        /// <param name="agent_name">Agent name.</param>
+        public AgentPassport GetAgentinfo(string agent_name)
+        {
+            Agent ag = Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(agent_name));
 
-			AgentPassport ag_passport 	= new AgentPassport ();
-			ag_passport.AgentName 		= ag.Name;
-			ag_passport.AgentRole 		= ag.Role;
-			ag_passport.CreatedAt 		= ag.CreatedAt.ToString(@"hh\:mm\:ss");
-			//TODO set other agent informations here
+            AgentPassport ag_passport = new AgentPassport();
+            ag_passport.AgentName = ag.Name;
+            ag_passport.AgentRole = ag.Role;
+            ag_passport.CreatedAt = ag.CreatedAt.ToString(@"hh\:mm\:ss");
+            //TODO set other agent informations here
 
-			return ag_passport;
-    	}
+            return ag_passport;
+        }
 
-		public bool AddStatement (string agent_name, string statement)
-    	{
+        public bool AddStatement(string agent_name, string statement)
+        {
             var FormulaParser = ModuleProvider.Get().Resolve<IFormulaParser>();
 
-			Agent ag = Environment.RegisteredAgents.FirstOrDefault (s => s.Name.Equals (agent_name));
+            Agent ag = Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(agent_name));
             ag.AddBelief(new IFormula[] { FormulaParser.Parse(statement) });
-			//ag.Workbench.AddStatement (FormulaParser.Parse (statement));
-			return true;
-    	}
+            //ag.Workbench.AddStatement (FormulaParser.Parse (statement));
+            return true;
+        }
 
         #endregion
     }
