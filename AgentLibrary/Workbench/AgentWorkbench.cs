@@ -97,11 +97,11 @@ namespace AgentLibrary
         /// </summary>
         public AgentWorkbench(Agent agent)
         {
-            parentAgent     = agent;
-            Statements      = new ObservableCollection<AtomicFormula>();
-            AssignmentSet   = new ObservableCollection<AssignmentType>();
+            parentAgent = agent;
+            Statements = new ObservableCollection<AtomicFormula>();
+            AssignmentSet = new ObservableCollection<AssignmentType>();
 
-            Statements.CollectionChanged    += on_workbench_changed;
+            Statements.CollectionChanged += on_workbench_changed;
             AssignmentSet.CollectionChanged += on_assignment_set_changed;
 
             /*logger = MusaConfig.GetLogger();*/
@@ -159,8 +159,9 @@ namespace AgentLibrary
         }
 
         /// <summary>
-        /// Add a statement to this workbench.
+        /// Add multiple statements to this workbench.
         /// </summary>
+        /// <param name="f">A list of AtomicFormula to be added</param>
         public void AddStatement(IList f)
         {
             foreach (AtomicFormula ff in f)
@@ -181,7 +182,7 @@ namespace AgentLibrary
             List<object> variableTerms = new List<object>();
             foreach (AtomicFormula ff in f)
             {
-                //Convert [ff] to a simple (non parametric) formula, and get its variable terms as list
+                //Convert ff to a simple (non parametric) formula, and get its variable terms as list
                 variableTerms = ff.ConvertToSimpleFormula();
 
                 //Continue if the statements set contains already the formula [ff]
@@ -239,6 +240,8 @@ namespace AgentLibrary
                     Statements.Remove(ff);
             }
         }
+
+        #region Test condition methods
 
         /// <summary>
         /// Test if a formula is verified into this workbench.
@@ -368,12 +371,16 @@ namespace AgentLibrary
             return false;
         }
 
+        #endregion Test condition methods
+
+        #region Assignment methods
+
         /// <summary>
         /// Set a value for a term by creating a specific assignment
         /// </summary>
         /// <param name="termName"></param>
         /// <param name="value"></param>
-        public void SetValueForTerm(string termName, object value)
+        public void AddAssignment(string termName, object value)
         {
             AssignmentType a = AssignmentType.CreateAssignmentForTerm(termName, value, value.GetType());
 
@@ -418,6 +425,55 @@ namespace AgentLibrary
             assignmentValue = null;
             return false;
         }
+
+        /// <summary>
+        /// Gets the assignment for the given term name. If no assignment exists, returns null.
+        /// </summary>
+        /// <returns>The assignment for term.</returns>
+        /// <param name="termName">Term name.</param>
+        public AssignmentType GetAssignmentForTerm(string termName)
+        {
+            foreach (object assignment in AssignmentSet)
+            {
+                if ((assignment as AssignmentType).Name.Equals(termName))
+                {
+                    Type varTermType = typeof(Assignment<>).MakeGenericType(assignment.GetType().GetGenericArguments()[0]);
+                    object assignmentValue = varTermType.GetProperty("Value").GetValue(assignment, null);
+
+                    return AssignmentType.CreateAssignmentForTerm(termName, assignmentValue, varTermType);
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Removes the assignment related to the given term name.
+        /// </summary>
+        /// <param name="termName">Term name.</param>
+        public void RemoveAssignment(string termName)
+        {
+            AssignmentType toRemove = GetAssignmentForTerm(termName);
+
+            if (toRemove != null)
+                AssignmentSet.Remove(toRemove);
+        }
+
+        /// <summary>
+        /// Updates an assignment's value.
+        /// </summary>
+        /// <param name="termName">Term name.</param>
+        /// <param name="newValue">New value.</param>
+        public void UpdateTermValue(string termName, object newValue)
+        {
+            //remove the old assignment, if exists
+            RemoveAssignment(termName);
+
+            //add the new assignment
+            AddAssignment(termName, newValue);
+        }
+
+        #endregion Assignment methods
 
         public void setAddFormulaPolicy(WorkbenchAddFormulaPolicy p)
         {

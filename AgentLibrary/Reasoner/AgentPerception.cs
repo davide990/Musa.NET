@@ -29,7 +29,7 @@ namespace AgentLibrary
 {
     /// <summary>
     /// A convinient enum to mark the changes that could occur within the 
-    /// environment
+    /// environment. These changes are perceived by the agents.
     /// </summary>
     public enum AgentPerception
     {
@@ -37,6 +37,7 @@ namespace AgentLibrary
         Null,                       //No changes occurred
         AddBelief,                  //A belief has been added
         RemoveBelief,               //A belief has been removed
+        UpdateBelief,               //A belief is updated. Corresponds to '-+bel' in agentspeak
         UpdateBeliefValue,          //A belief's value must be updated
         SetBeliefValue,             //A belief's value must be set
         UnSetBeliefValue,           //A belief's value must be unset

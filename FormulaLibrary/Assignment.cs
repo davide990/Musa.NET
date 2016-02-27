@@ -36,10 +36,10 @@ namespace FormulaLibrary
         /// Create a new assignment
         /// </summary>
         /// <returns></returns>
-        public static AssignmentType CreateAssignmentForTerm(string assignmentName, object value, Type type)
+        public static AssignmentType CreateAssignmentForTerm(string termName, object value, Type type)
         {
             Type varTermType = typeof(Assignment<>).MakeGenericType(type);
-            return (AssignmentType)Activator.CreateInstance(varTermType, assignmentName, value);
+            return (AssignmentType)Activator.CreateInstance(varTermType, termName, value);
         }
     }
 
@@ -54,11 +54,11 @@ namespace FormulaLibrary
         }
         private T value;
 
-        public Assignment(string name) : base(name)
+        public Assignment(string termName) : base(termName)
         {
         }
 
-        public Assignment(string name, T value) : base(name)
+        public Assignment(string termName, T value) : base(termName)
         {
             this.value = value;
         }

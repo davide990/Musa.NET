@@ -37,6 +37,8 @@ namespace AgentLibrary
 {
     public sealed class AgentReasoner
     {
+        #region Fields/Properties
+
         //TODO questi campi andranno rimossi in futuro
         private int currentReasoningCycle = 0;
         private readonly int ReasoningUpdateTime = 2000;
@@ -161,6 +163,10 @@ namespace AgentLibrary
         /// </summary>
         private readonly ILogger Logger;
 
+        #endregion Fields/Properties
+
+        #region Constructor
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AgentLibrary.AgentReasoner"/> class.
         /// </summary>
@@ -187,6 +193,10 @@ namespace AgentLibrary
             //Inject the logger
             Logger = ModuleProvider.Get().Resolve<ILogger>();
         }
+
+        #endregion Constructor
+
+        #region Methods
 
         internal void startReasoning()
         {
@@ -279,7 +289,7 @@ namespace AgentLibrary
             Tuple<AgentPassport, AgentMessage> last_message = parentAgent.MailBox.Pop();
             AgentPassport passport = last_message.Item1;
             AgentMessage msg = last_message.Item2;
-            //TODO [importante] bisogna capire qui se un evento è interno o esterno
+            //TODO [importante] bisogna capire qui se un evento è interno o esterno (vedi documentazione jason/agentspeak)
 
             Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Green);
 
@@ -308,6 +318,14 @@ namespace AgentLibrary
 
                     //Achieve the goal
                     achieveGoal(planToExecute, args);
+                    break;
+
+                case InformationType.AskOne:
+                    break;
+
+                case InformationType.AskAll:
+                    break;
+
             }
         }
 
@@ -370,6 +388,13 @@ namespace AgentLibrary
                     checkExternalEvents(changes_list, perception_type);
                     break;
 
+                case AgentPerception.UpdateBelief:
+
+                    //REMOVE THE OLD BELIEF (if exists)
+                    //ADD THE NEW BELIEF
+
+                    break;
+
                 case AgentPerception.SetBeliefValue:
 
                     //TODO
@@ -425,7 +450,7 @@ namespace AgentLibrary
             Type plan_to_execute = eventTuple.Item3;
 
             Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Cyan);
-            Logger.Log(LogLevel.Debug, "[" + parentAgent.Name + "] Triggering event {" + formula + "->" + perception_type + "->" + plan_to_execute.Name + "}");
+            Logger.Log(LogLevel.Debug, String.Format( "[{0}] Triggering event {" ) "[" + parentAgent.Name + "] Triggering event {" + formula + "->" + perception_type + "->" + plan_to_execute.Name + "}");
 
             //Try get values related to this event
             AgentEventArgs args = null;
@@ -475,5 +500,7 @@ namespace AgentLibrary
             //Add the event's args
             EventsArgs.Add(the_key, Args);
         }
+
+        #endregion Methods
     }
 }
