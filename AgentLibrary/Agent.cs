@@ -680,6 +680,45 @@ namespace AgentLibrary
             }
         }
 
+
+        /// <summary>
+        /// Updates the beliefs to this agent's workbench. Each formula is added 
+        /// as a unique agent perception.
+        /// </summary>
+        public void UpdateBelief(params AtomicFormula[] formula)
+        {
+            foreach (AtomicFormula ff in formula)
+            {
+                Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
+                Logger.Log(LogLevel.Debug, "[" + Name + "] Updating belief " + ff);
+                PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(new List<AtomicFormula>{ ff }, AgentPerception.UpdateBelief));
+            }
+        }
+
+        public void UpdateBelief(params IFormula[] formula)
+        {
+            foreach (IFormula af in formula)
+            {
+                Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
+                Logger.Log(LogLevel.Debug, "[" + Name + "] Updating belief " + af);
+                PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.UpdateBelief));
+            }
+        }
+
+        public void UpdateBelief(IList formula_list)
+        {
+            foreach (IFormula af in formula_list)
+            {
+                Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
+                Logger.Log(LogLevel.Debug, "[" + Name + "] Updating belief " + af);
+                PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.UpdateBelief));
+            }
+        }
+
+
+
+
+
         #endregion
 
         public bool TestCondition(IFormula formula)

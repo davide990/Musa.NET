@@ -179,7 +179,8 @@ namespace AgentLibrary
         /// </summary>
         public void AddStatement(params AtomicFormula[] f)
         {
-            List<object> variableTerms = new List<object>();
+            addOrUpdateStatement(false, f);
+            /*List<object> variableTerms = new List<object>();
             foreach (AtomicFormula ff in f)
             {
                 //Convert ff to a simple (non parametric) formula, and get its variable terms as list
@@ -201,7 +202,43 @@ namespace AgentLibrary
                     value = Convert.ChangeType(value, varTerm.GetType().GetGenericArguments()[0]);
 
                     //Add the assignment to the assignment set
-                    AssignmentSet.Add(AssignmentType.CreateAssignmentForTerm((string)name, value, varTerm.GetType().GetGenericArguments()[0]));
+                    AddAssignment((string)name, value);
+                    //AssignmentSet.Add(AssignmentType.CreateAssignmentForTerm((string)name, value, varTerm.GetType().GetGenericArguments()[0]));
+                }
+
+                //Add the formula to this workbench
+                Statements.Add(ff);
+            }*/
+        }
+
+        private void addOrUpdateStatement(bool update = false, params AtomicFormula[] f)
+        {
+            List<object> variableTerms = new List<object>();
+            foreach (AtomicFormula ff in f)
+            {
+                //Convert ff to a simple (non parametric) formula, and get its variable terms as list
+                variableTerms = ff.ConvertToSimpleFormula();
+
+                if (Statements.Contains(ff) && update)
+                    RemoveStatement(ff);
+
+                //Iterate the formula's variable terms
+                foreach (object varTerm in variableTerms)
+                {
+                    //get the type info for the current term
+                    Type variableTermType = typeof(VariableTerm<>).MakeGenericType(varTerm.GetType().GetGenericArguments()[0]);
+
+                    //get the value of the current term
+                    object name = Convert.ChangeType(variableTermType.GetProperty("Name").GetValue(varTerm), typeof(string));
+                    object value = variableTermType.GetProperty("Value").GetValue(varTerm);
+                    value = Convert.ChangeType(value, varTerm.GetType().GetGenericArguments()[0]);
+
+                    //Add the assignment to the assignment set
+                    if (update)
+                        UpdateAssignment((string)name, value);
+                    else
+                        AddAssignment((string)name, value);
+                    //AssignmentSet.Add(AssignmentType.CreateAssignmentForTerm((string)name, value, varTerm.GetType().GetGenericArguments()[0]));
                 }
 
                 //Add the formula to this workbench
@@ -239,6 +276,27 @@ namespace AgentLibrary
                 if (Statements.Contains(ff))
                     Statements.Remove(ff);
             }
+        }
+
+        /// <summary>
+        /// Add multiple statements to this workbench.
+        /// </summary>
+        /// <param name="f">A list of AtomicFormula to be added</param>
+        public void UpdateStatement(IList f)
+        {
+            foreach (AtomicFormula ff in f)
+                UpdateStatement(ff);
+        }
+
+        public void UpdateStatement(params IFormula[] f)
+        {
+            foreach (IFormula ff in f)
+                UpdateStatement(FormulaUtils.UnrollFormula(ff));
+        }
+
+        public void UpdateStatement(params AtomicFormula[] f)
+        {
+            addOrUpdateStatement(true, f);
         }
 
         #region Test condition methods
@@ -464,7 +522,7 @@ namespace AgentLibrary
         /// </summary>
         /// <param name="termName">Term name.</param>
         /// <param name="newValue">New value.</param>
-        public void UpdateTermValue(string termName, object newValue)
+        public void UpdateAssignment(string termName, object newValue)
         {
             //remove the old assignment, if exists
             RemoveAssignment(termName);

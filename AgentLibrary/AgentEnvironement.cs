@@ -276,15 +276,15 @@ namespace AgentLibrary
         {
             var ae = MusaConfig.GetConfig().Agents;
             List<Type> external_plans = GetPlansFromExternalLibraries();
+            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaParser>();
 
             foreach (AgentEntry ag in ae)
             {
                 Agent new_agent = new Agent(ag.Name);
 
-                foreach (string belief in ag.BeliefBase)
+                foreach (BeliefEntry belief in ag.BeliefBase)
                 {
-                    var FormulaParser = ModuleProvider.Get().Resolve<IFormulaParser>();
-                    var formula = FormulaParser.Parse(belief);
+                    var formula = FormulaParser.Parse(belief.Value);
                     var unrolled_formula = FormulaUtils.UnrollFormula(formula).ToArray();
                     new_agent.AddBelief(unrolled_formula);
                 }
@@ -294,7 +294,7 @@ namespace AgentLibrary
                     try
                     {
                         var the_plan = external_plans.Find(x => x.Name.Equals(plan));
-                        if(the_plan != null)
+                        if (the_plan != null)
                             new_agent.AddPlan(the_plan);
                     }
                     catch (Exception e)
@@ -396,7 +396,9 @@ namespace AgentLibrary
 
                 foreach (AtomicFormula ff in a.Beliefs)
                 {
-                    ae.BeliefBase.Add(ff.ToString());
+                    var the_belief = new BeliefEntry();
+                    the_belief.Value = ff.ToString();
+                    ae.BeliefBase.Add(the_belief);
                 }
 
                 //agent's assignment?

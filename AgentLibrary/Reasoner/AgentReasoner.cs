@@ -389,6 +389,7 @@ namespace AgentLibrary
                     break;
 
                 case AgentPerception.UpdateBelief:
+                    parentAgent.Workbench.UpdateStatement(changes_list);
 
                     //REMOVE THE OLD BELIEF (if exists)
                     //ADD THE NEW BELIEF
@@ -450,7 +451,7 @@ namespace AgentLibrary
             Type plan_to_execute = eventTuple.Item3;
 
             Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Cyan);
-            Logger.Log(LogLevel.Debug, String.Format( "[{0}] Triggering event {" ) "[" + parentAgent.Name + "] Triggering event {" + formula + "->" + perception_type + "->" + plan_to_execute.Name + "}");
+            Logger.Log(LogLevel.Debug, "[{0}] Triggering event {" + "[" + parentAgent.Name + "] Triggering event {" + formula + "->" + perception_type + "->" + plan_to_execute.Name + "}");
 
             //Try get values related to this event
             AgentEventArgs args = null;

@@ -5,7 +5,7 @@
   <NetworkingEnabled>true</NetworkingEnabled>
 
   <PlanLibraries>
-  	<PlanLibrary>/home/davide/musa_libtest.dll</PlanLibrary>
+  	<!--<PlanLibrary>/home/davide/musa_libtest.dll</PlanLibrary>-->
   </PlanLibraries>
 
   <Logging>
@@ -20,7 +20,11 @@
         <Plan>PlanExample1</Plan>
         <!--<Plan>PlanForEvent</Plan>-->
       </Plans>
-      <BeliefBase />
+      <BeliefBase>
+      	<Belief value="f(x)"/>
+      	<Belief value="h(x)"/>
+      	<Belief value="g(x<-int(3))"/>
+      </BeliefBase>
       <Events>
         <Event Formula="f(x)" Plan="PlanExample1" Perception="AddBelief">
           <EventArgs>

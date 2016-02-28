@@ -37,6 +37,7 @@
     <Compile Include="AgentConfig\AgentEntry.cs" />
     <Compile Include="AgentConfig\EventEntry.cs" />
     <Compile Include="AgentConfig\EventArgEntry.cs" />
+    <Compile Include="AgentConfig\BeliefEntry.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

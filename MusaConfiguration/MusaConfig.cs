@@ -5,6 +5,10 @@ using System.Collections.Generic;
 using MusaLogger;
 using System.Reflection;
 using MusaCommon;
+using System.Text;
+using System.Xml;
+using System.Text.RegularExpressions;
+using System.Security;
 
 namespace MusaConfiguration
 {
@@ -197,6 +201,8 @@ namespace MusaConfiguration
 
         }
 
+        #region Logger methods
+
         public void AddLoggerFragment(object loggerFragment)
         {
 			
@@ -226,6 +232,8 @@ namespace MusaConfiguration
             ModuleProvider.Get().Resolve<ILogger>().AddFragment(instance.LoggerFragments);
         }
 
+        #endregion Logger methods
+
         /// <summary>
         /// Gets the MUSA configuration.
         /// </summary>
@@ -233,11 +241,64 @@ namespace MusaConfiguration
         {
             if (instance == null)
             {
+                //Initialize a new musa configuration
                 instance = new MusaConfig();
+
+                //Create a default console logger
                 instance.LoggerFragments = new List<LoggerFragment>{ new ConsoleLogger() };
             }
 			
             return instance;
+        }
+
+        /// <summary>
+        /// Replaces the invalid XML chars in a given regular expression match.
+        /// </summary>
+        /// <returns>The string representation of the match without the XML invalid chars.</returns>
+        /// <param name="m">M.</param>
+        private static string ReplaceInvalidXMLChars(Match m)
+        {
+            var the_string = m.ToString();
+            the_string = the_string.Replace("\"", "");
+            the_string = SecurityElement.Escape(the_string);
+            return string.Format("\"{0}\"", the_string);
+        }
+
+        /// <summary>
+        /// Preprocesses the xml configuration document by replacing invalid xml character. Since parametric statements 
+        /// may contains '<' symbol, these are replaced with the UTF-8 corresponding symbols.
+        /// </summary>
+        /// <returns>The processed xml document.</returns>
+        /// <param name="filename">Filename.</param>
+        private static StringReader PreprocessXmlDocument(string filename)
+        {
+            FileStream fs = null;
+            try
+            {
+                fs = new FileStream(filename, FileMode.Open);    
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.WriteLine("Cannot read configuration file '" + filename + "'.\nError: " + ex);
+                fs.Close();
+                return null;
+            }
+
+            StreamReader reader = new StreamReader(fs);
+            string[] content = reader.ReadToEnd().Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+
+            StringBuilder sb = new StringBuilder();
+            foreach (string s in content)
+            {
+                string result = Regex.Replace(s, @"\""[^\""]*\""",
+                                              new MatchEvaluator(ReplaceInvalidXMLChars));
+                sb.Append(result);
+                sb.Append("\n");
+            }
+
+            fs.Close();
+
+            return new StringReader(sb.ToString());
         }
 
         /// <summary>
@@ -249,26 +310,19 @@ namespace MusaConfiguration
             // specifies the type of object to be deserialized.
             XmlSerializer serializer = new XmlSerializer(typeof(MusaConfig));
 
-            // A FileStream is needed to read the XML document.
-            FileStream fs = null;
-            try
-            {
-                fs = new FileStream(filename, FileMode.Open);    
-            }
-            catch (FileNotFoundException ex)
-            {
-                Console.WriteLine("Cannot read configuration file '" + filename + "'.\nError: " + ex);
-            }
-			
             // Declares an object variable of the type to be deserialized.
             // Uses the Deserialize method to restore the object's state 
             // with data from the XML document. */
             try
             {
-                instance = (MusaConfig)serializer.Deserialize(fs);
+                //Deserialize the XML configuration file
+                //instance = (MusaConfig)serializer.Deserialize(fs);
+                instance = (MusaConfig)serializer.Deserialize(PreprocessXmlDocument(filename));
 
+                //Setup the logger
                 setupLogger();
 
+                //Read the specified plan libraries dlls
                 ReadExternalPlanLibraries();
             }
             catch (InvalidOperationException ex)
@@ -302,7 +356,7 @@ namespace MusaConfiguration
                 {
                     //TODO log or not log?
                     ModuleProvider.Get().Resolve<ILogger>().Log(LogLevel.Fatal, 
-                        "Unable to load plan library at '" + s + "': file not found.\n");
+                                                                "Unable to load plan library at '" + s + "': file not found.\n");
                 }
             }
         }
@@ -328,8 +382,7 @@ namespace MusaConfiguration
         //TODO implementami
         private void SaveAgentEnvironment()
         {
-            //...
-
+            throw new NotImplementedException();
         }
 
         public override string ToString()

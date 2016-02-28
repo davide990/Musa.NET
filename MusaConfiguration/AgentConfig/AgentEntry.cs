@@ -13,8 +13,8 @@ namespace MusaConfiguration
 		public List<string> Plans { get; set; }
 
 		[XmlArray("BeliefBase")]
-		[XmlArrayItem("Belief", typeof(string))]
-		public List<string> BeliefBase { get; set; }
+        [XmlArrayItem("Belief", typeof(BeliefEntry))]
+        public List<BeliefEntry> BeliefBase { get; set; }
 
 		[XmlArray("Events")]
 		[XmlArrayItem("Event", typeof(EventEntry))]
@@ -23,7 +23,7 @@ namespace MusaConfiguration
 		public AgentEntry ()
 		{
 			Plans = new List<string>();
-			BeliefBase = new List<string>();
+            BeliefBase = new List<BeliefEntry>();
 			Events = new List<EventEntry> ();
 		}
 
