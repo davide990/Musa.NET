@@ -17,7 +17,7 @@
     <Agent Name="agent_1">
       <Plans>
         <!--<Plan>PlanExample</Plan>-->
-        <Plan>PlanExample11</Plan>
+        <Plan>PlanExample1</Plan>
         <!--<Plan>PlanForEvent</Plan>-->
       </Plans>
       <BeliefBase>

@@ -31,8 +31,6 @@ using MusaCommon;
 
 namespace MusaCommon
 {
-    //TODO RINOMINA QUESTA CLASSE
-
     /// <summary>
     /// Event arguments.
     /// </summary>
@@ -41,6 +39,44 @@ namespace MusaCommon
         readonly Dictionary<string,object> internalDict = new Dictionary<string,object>();
 
         public String Name { get; set; }
+
+
+        #region Custom methods
+
+        public T GetArg<T>(string key)
+        {
+            object the_value;
+            TryGetValue(key, out the_value);
+            return (T)the_value;
+        }
+
+        public object GetArg(string key)
+        {
+            object the_value;
+            TryGetValue(key, out the_value);
+            return the_value;
+        }
+
+        public bool ExistsArg(string key)
+        {
+            return ContainsKey(key);
+        }
+
+        public Type TypeOfArg(string key)
+        {
+            if (!ExistsArg(key))
+                return null;
+
+            return GetArg(key).GetType();
+            
+        }
+
+        public ICollection<object> GetAllArgs()
+        {
+            return Values;   
+        }
+
+        #endregion Custom methods
 
         public void Add(string key, object value)
         {
