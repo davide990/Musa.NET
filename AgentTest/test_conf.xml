@@ -5,7 +5,7 @@
   <NetworkingEnabled>true</NetworkingEnabled>
 
   <PlanLibraries>
-  	<!--<PlanLibrary>/home/davide/musa_libtest.dll</PlanLibrary>-->
+  	<PlanLibrary>/home/davide/Projects/Test Projects/PlanLibExample/PlanLibExample/bin/Debug/PlanLibExample.dll</PlanLibrary>
   </PlanLibraries>
 
   <Logging>
@@ -17,7 +17,7 @@
     <Agent Name="agent_1">
       <Plans>
         <!--<Plan>PlanExample</Plan>-->
-        <Plan>PlanExample1</Plan>
+        <Plan>PlanExample11</Plan>
         <!--<Plan>PlanForEvent</Plan>-->
       </Plans>
       <BeliefBase>
@@ -29,11 +29,14 @@
         <Event Formula="f(x)" Plan="PlanExample1" Perception="AddBelief">
           <EventArgs>
             <EventArg Name="nome" Value="davide"/>
+            <EventArg Name="eta" Value="25" Type="int"/>
           </EventArgs>
         </Event>
-        <Event Formula="f(x)" Plan="PlanExample1" Perception="RemoveBelief">
-          <EventArgs Name="il_mio_parametro" Value="31"/>
-        </Event>
+        <!--<Event Formula="f(x)" Plan="PlanExample1" Perception="RemoveBelief">
+        	<EventArgs>
+          		<EventArg Name="il_mio_parametro" Value="31" Type="int"/>
+          	</EventArgs>
+        </Event>-->
       </Events>
     </Agent>
   </Agents>

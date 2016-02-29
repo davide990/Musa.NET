@@ -41,7 +41,7 @@ namespace PlanLibraryExample
         [PlanEntryPoint]
         void entry_point(IAgentEventArgs args)
         {
-            string a;
+            object a;
             args.TryGetValue ("nome",out a);
 
             Console.WriteLine ("Hello from " + EntryPointName + " to " + a.ToString());
@@ -56,7 +56,7 @@ namespace PlanLibraryExample
         [PlanEntryPoint]
         void wella(IAgentEventArgs args)
         {
-            string a;
+            object a;
             args.TryGetValue ("nome",out a);
 
             //log (LogLevel.Info, "Ciao LOGGERRRRRRRRRRRRRRRRRRR");
@@ -100,7 +100,7 @@ namespace PlanLibraryExample
         [PlanStep]
         void wella(IAgentEventArgs args)
         {
-            string a;
+            object a;
             args.TryGetValue ("nome",out a);
 
             Console.WriteLine ("working...");

@@ -274,9 +274,14 @@ namespace AgentLibrary
         /// </summary>
         public void RegisterAgentFromConfiguration()
         {
-            var ae = MusaConfig.GetConfig().Agents;
-            List<Type> external_plans = GetPlansFromExternalLibraries();
+            //Inject the logger
             var FormulaParser = ModuleProvider.Get().Resolve<IFormulaParser>();
+
+            //Get the agents configuration
+            var ae = MusaConfig.GetConfig().Agents;
+
+            //Load all the plans from the specified plan libraries dll in the config xml file
+            List<Type> external_plans = GetPlansFromExternalLibraries();
 
             foreach (AgentEntry ag in ae)
             {
@@ -294,12 +299,14 @@ namespace AgentLibrary
                     try
                     {
                         var the_plan = external_plans.Find(x => x.Name.Equals(plan));
-                        if (the_plan != null)
-                            new_agent.AddPlan(the_plan);
+                        if (the_plan == null)
+                            throw new Exception();
+                        new_agent.AddPlan(the_plan);
                     }
-                    catch (Exception e)
+                    catch
                     {
-                        logger.Log(LogLevel.Error, "Failed to load plan '" + plan + "' for agent '" + ag.Name + "'.\n Error: " + e.Message + "\nStackTrace: " + e.StackTrace);
+                        logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkRed);
+                        logger.Log(LogLevel.Error, "Failed to load plan '" + plan + "' for agent '" + ag.Name + "'. Make sure you have specified the correct path to the plan library dll (in the config xml) where to find this plan.\n");
                     }
                 }
 
@@ -340,10 +347,6 @@ namespace AgentLibrary
         {
             MusaConfig conf = new MusaConfig();
             conf.NetworkingEnabled = NetworkingEnabled;
-
-            //conf.LoggerFragments = logger.Fragments;
-
-            //conf.LoggerFragments.AddRange(logger.GetFragments());
             conf.AddLoggerFragment(logger.GetFragments());
             conf.MusaAddress = IPAddress;
             conf.MusaAddressPort = Port;
@@ -379,13 +382,11 @@ namespace AgentLibrary
                         continue;
                     }
 
-                    foreach (KeyValuePair<string, string> arg in eventArgs)
+                    foreach (KeyValuePair<string, object> arg in eventArgs)
                     {
                         var the_arg = new EventArgEntry();
                         the_arg.Name = arg.Key;
-                        the_arg.Value = arg.Value;
-
-
+                        the_arg.Value = arg.Value as string;
 
                         ek.EventArgs.Add(the_arg);
                     }
@@ -431,7 +432,10 @@ namespace AgentLibrary
                 {
                     event_args = new PlanArgs();
                     foreach (EventArgEntry arg_entry in ev.EventArgs)
-                        event_args.Add(arg_entry.Name, arg_entry.Value);
+                    {
+                        object the_value = Convert.ChangeType(arg_entry.Value, arg_entry.ValueType);
+                        event_args.Add(arg_entry.Name, the_value);
+                    }
                 }
 
                 try

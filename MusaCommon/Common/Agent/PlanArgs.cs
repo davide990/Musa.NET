@@ -5,12 +5,12 @@
 //         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
 //         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 //
-//  EventArgs.cs
+//  PlanArgs.cs
 //
 //  Author:
 //       Davide Guastella <davide.guastella90@gmail.com>
 //
-//  Copyright (c) 2015 Davide Guastella
+//  Copyright (c) 2016 Davide Guastella
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
@@ -24,6 +24,7 @@
 //
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 using System;
 using System.Collections.Generic;
 using MusaCommon;
@@ -37,11 +38,11 @@ namespace MusaCommon
     /// </summary>
     public class PlanArgs : IAgentEventArgs
     {
-        readonly Dictionary<string,string> internalDict = new Dictionary<string,string>();
+        readonly Dictionary<string,object> internalDict = new Dictionary<string,object>();
 
         public String Name { get; set; }
 
-        public void Add(string key, string value)
+        public void Add(string key, object value)
         {
             internalDict.Add(key, value);
         }
@@ -61,17 +62,17 @@ namespace MusaCommon
             return internalDict.Remove(key);
         }
 
-        public bool TryGetValue(string key, out string value)
+        public bool TryGetValue(string key, out object value)
         {
             return internalDict.TryGetValue(key, out value);
         }
 
-        public ICollection<string> Values
+        public ICollection<object> Values
         {
             get { return internalDict.Values; }
         }
 
-        public string this [string key]
+        public object this [string key]
         {
             get
             {
@@ -95,7 +96,7 @@ namespace MusaCommon
         /// <param name="item">The item to be added to this collection. The key
         /// represents the unique name of the argument, while the string is the
         /// value of the argument.</param>
-        public void Add(KeyValuePair<string, string> item)
+        public void Add(KeyValuePair<string, object> item)
         {
             internalDict.Add(item.Key, item.Value);
         }
@@ -105,7 +106,7 @@ namespace MusaCommon
             internalDict.Clear();
         }
 
-        public bool Contains(KeyValuePair<string, string> item)
+        public bool Contains(KeyValuePair<string, object> item)
         {
             return (internalDict.ContainsKey(item.Key) && internalDict.ContainsValue(item.Value));
         }
@@ -120,16 +121,16 @@ namespace MusaCommon
             get { return false; }
         }
 
-        public bool Remove(KeyValuePair<string, string> item)
+        public bool Remove(KeyValuePair<string, object> item)
         {
             throw new NotImplementedException();
         }
 
         #endregion
 
-        #region IEnumerable<KeyValuePair<string,string>> Members
+        #region IEnumerable<KeyValuePair<string,object>> Members
 
-        public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
+        public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
         {    
             return internalDict.GetEnumerator();
         }
@@ -151,11 +152,11 @@ namespace MusaCommon
         /// <param name="args">Arguments.</param>
         public void Merge(PlanArgs args)
         {
-            foreach (KeyValuePair<string, string> kvp in args)
+            foreach (KeyValuePair<string, object> kvp in args)
                 Add(kvp);
         }
 
-        public void CopyTo(KeyValuePair<string, string>[] array, int arrayIndex)
+        public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
         {
             throw new NotImplementedException();
         }

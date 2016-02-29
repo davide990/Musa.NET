@@ -139,7 +139,7 @@ namespace AgentTest
         [PlanEntryPoint]
         void entry_point(PlanArgs args)
         {
-            string a;
+            object a;
             args.TryGetValue("nome", out a);
 
             Console.WriteLine("Hello from " + EntryPointName + " to " + a);
@@ -163,7 +163,7 @@ namespace AgentTest
         [PlanEntryPoint]
         void wella(PlanArgs args)
         {
-            string a;
+            object a;
             args.TryGetValue("nome", out a);
 
             Console.WriteLine("ECCOMI, MALEDIZIONE");
@@ -209,7 +209,7 @@ namespace AgentTest
         [PlanStep]
         void wella(PlanArgs args)
         {
-            string a;
+            object a;
             args.TryGetValue("nome", out a);
 
             Console.WriteLine("working...");
