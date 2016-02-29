@@ -570,7 +570,7 @@ namespace AgentLibrary
         /// </summary>
         /// <param name="PlanModel">Plan.</param>
         /// <param name="args">Arguments.</param>
-        internal void ExecutePlan(Type PlanModel, IAgentEventArgs args = null)
+        internal void ExecutePlan(Type PlanModel, IPlanArgs args = null)
         {
             if (Busy)
                 throw new Exception("Agent [" + Name + "] is currently executing plan " + CurrentExecutingPlan);

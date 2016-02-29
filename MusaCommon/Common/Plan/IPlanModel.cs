@@ -31,7 +31,7 @@ namespace MusaCommon
     {
         void RegisterResult(string result);
 
-        void ExecuteStep(string step_name, IAgentEventArgs args = null);
+        void ExecuteStep(string step_name, IPlanArgs args = null);
 
         string GetEntryPointName();
 

@@ -33,7 +33,7 @@ namespace PlanLibraryExample
     public class PlanLib2 : PlanModel
     {
         [PlanEntryPoint]
-        void wella(IAgentEventArgs args)
+        void wella(IPlanArgs args)
         {
         }
     }

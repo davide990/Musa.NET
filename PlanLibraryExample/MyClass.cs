@@ -39,7 +39,7 @@ namespace PlanLibraryExample
     public class PlanForEvent : PlanModel
     {
         [PlanEntryPoint]
-        void entry_point(IAgentEventArgs args)
+        void entry_point(IPlanArgs args)
         {
             object a;
             args.TryGetValue ("nome",out a);
@@ -54,7 +54,7 @@ namespace PlanLibraryExample
     public class PlanExample2 : PlanModel
     {
         [PlanEntryPoint]
-        void wella(IAgentEventArgs args)
+        void wella(IPlanArgs args)
         {
             object a;
             args.TryGetValue ("nome",out a);
@@ -84,7 +84,7 @@ namespace PlanLibraryExample
     class PlanExample : PlanModel
     {
         [PlanEntryPoint]
-        void entry_point(IAgentEventArgs args)
+        void entry_point(IPlanArgs args)
         {
             //object a;
             //args.TryGetValue ("nome",out a);
@@ -98,7 +98,7 @@ namespace PlanLibraryExample
         }
 
         [PlanStep]
-        void wella(IAgentEventArgs args)
+        void wella(IPlanArgs args)
         {
             object a;
             args.TryGetValue ("nome",out a);

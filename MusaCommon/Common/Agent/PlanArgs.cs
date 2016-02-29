@@ -34,7 +34,7 @@ namespace MusaCommon
     /// <summary>
     /// Event arguments.
     /// </summary>
-    public class PlanArgs : IAgentEventArgs
+    public class PlanArgs : IPlanArgs
     {
         readonly Dictionary<string,object> internalDict = new Dictionary<string,object>();
 

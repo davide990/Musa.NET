@@ -73,7 +73,7 @@ namespace PlanLibrary
         /// method.
         /// </summary>
         /// <value>The arguments.</value>
-        public IAgentEventArgs Args
+        public IPlanArgs Args
         {
             get;
             internal set;
@@ -221,15 +221,15 @@ namespace PlanLibrary
 
             //Check for entry point method parameter
             if (planEntryPointMethod.GetParameters().Length < 1)
-                throw new Exception("In plan " + GetType().Name + ": entry point method '" + planEntryPointMethod.Name + "' must include a parameter of type " + typeof(IAgentEventArgs).Name);
+                throw new Exception("In plan " + GetType().Name + ": entry point method '" + planEntryPointMethod.Name + "' must include a parameter of type " + typeof(IPlanArgs).Name);
             if (planEntryPointMethod.GetParameters().Length > 1)
-                throw new Exception("In plan " + GetType().Name + ": entry point method '" + planEntryPointMethod.Name + "' must include only one parameter of type " + typeof(IAgentEventArgs).Name);
+                throw new Exception("In plan " + GetType().Name + ": entry point method '" + planEntryPointMethod.Name + "' must include only one parameter of type " + typeof(IPlanArgs).Name);
 
             var entryPointFirstArgType = planEntryPointMethod.GetParameters()[0].ParameterType;
 
             //if (!.IsEquivalentTo(typeof(IAgentEventArgs)))
-            if (!(typeof(IAgentEventArgs).IsAssignableFrom(entryPointFirstArgType)))
-                throw new Exception("In plan " + GetType().Name + ": entry point method's parameter must be of type " + typeof(IAgentEventArgs).Name);
+            if (!(typeof(IPlanArgs).IsAssignableFrom(entryPointFirstArgType)))
+                throw new Exception("In plan " + GetType().Name + ": entry point method's parameter must be of type " + typeof(IPlanArgs).Name);
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace PlanLibrary
         /// <param name="step_name">The step name to be executed. It is the name of a method decorated with
         /// [PlanStep] atttribute.</param>
         /// <param name="args">The step arguments.</param>
-        public void ExecuteStep(string step_name, IAgentEventArgs args = null)
+        public void ExecuteStep(string step_name, IPlanArgs args = null)
         {
             bool plan_found = false;
 

@@ -58,12 +58,12 @@
     <Compile Include="MusaModule\ModuleProvider\ModuleProvider.cs" />
     <Compile Include="Common\Plan\IPlanInstance.cs" />
     <Compile Include="Common\Plan\IPlanModel.cs" />
-    <Compile Include="Common\Agent\IAgentEventArgs.cs" />
     <Compile Include="Common\Plan\IPlanFacade.cs" />
     <Compile Include="Common\Plan\IPlanCollection.cs" />
     <Compile Include="Common\IFormulaParser.cs" />
     <Compile Include="Common\Agent\PlanArgs.cs" />
     <Compile Include="TypesMapping.cs" />
+    <Compile Include="Common\Agent\IPlanArgs.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

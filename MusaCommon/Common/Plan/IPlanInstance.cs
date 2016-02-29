@@ -47,7 +47,7 @@ namespace MusaCommon
         /// <summary>
         /// Execute this plan.
         /// </summary>
-        void Execute(IAgentEventArgs args = null);
+        void Execute(IPlanArgs args = null);
 
         /// <summary>
         /// Determines whether this plan is atomic.

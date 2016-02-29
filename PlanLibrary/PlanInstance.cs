@@ -234,7 +234,7 @@ namespace PlanLibrary
                 throw new Exception("In plan " + Name + ": invalid entry point method.");
 
             //Takes the plan's arguments
-            IAgentEventArgs args = e.Argument as IAgentEventArgs;
+            IPlanArgs args = e.Argument as IPlanArgs;
 
             //If the plan step method has parameters
             if (EntryPointMethod.GetParameters().Length > 0)
@@ -244,7 +244,7 @@ namespace PlanLibrary
                 {
                     //Check if the parameter is of type IAgentEventArgs
                     var EntryPointMethodArgType = EntryPointMethod.GetParameters()[0].ParameterType;
-                    if (!(typeof(IAgentEventArgs).IsAssignableFrom(EntryPointMethodArgType)))
+                    if (!(typeof(IPlanArgs).IsAssignableFrom(EntryPointMethodArgType)))
                         throw new Exception("In plan step" + Name + ": plan steps supports only a maximum of 1 parameter of type IAgentEventArgs.");
 
                     //Invoke the method
@@ -253,7 +253,7 @@ namespace PlanLibrary
                 else
                 {
                     //If the passed args are null, invoke the method with an empty dictionary
-                    InvokePlan(new object[]{ new object() as IAgentEventArgs });
+                    InvokePlan(new object[]{ new object() as IPlanArgs });
                 }
             }
             else
@@ -275,7 +275,7 @@ namespace PlanLibrary
         /// </summary>
         /// <param name="the_step">The plan step to be executed.</param>
         /// <param name="args">The arguments passed to the plan step (optional).</param>
-        private void onExecuteStep(PlanStep the_step, IAgentEventArgs args = null)
+        private void onExecuteStep(PlanStep the_step, IPlanArgs args = null)
         {
             //If the plan is in pause, wait until it is resumed
             _busy.WaitOne();
@@ -287,7 +287,7 @@ namespace PlanLibrary
         /// <summary>
         /// Execute this plan.
         /// </summary>
-        public void Execute(IAgentEventArgs args = null)
+        public void Execute(IPlanArgs args = null)
         {
             if (background_worker == null)
                 initializeBackgroundWorker();

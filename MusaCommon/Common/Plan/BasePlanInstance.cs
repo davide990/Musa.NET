@@ -37,7 +37,7 @@ namespace MusaCommon
 
         public abstract bool IsAtomic();
 
-        public abstract void Execute(IAgentEventArgs args = null);
+        public abstract void Execute(IPlanArgs args = null);
     }
 }
 

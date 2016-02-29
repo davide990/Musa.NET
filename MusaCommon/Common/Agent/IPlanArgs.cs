@@ -30,7 +30,7 @@ using System.Collections.Generic;
 
 namespace MusaCommon
 {
-    public interface IAgentEventArgs : IDictionary<string, object>
+    public interface IPlanArgs : IDictionary<string, object>
     {
     }
 }
