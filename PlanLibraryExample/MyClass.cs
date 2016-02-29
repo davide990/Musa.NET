@@ -92,7 +92,7 @@ namespace PlanLibraryExample
             //Console.WriteLine ("Hello from " + EntryPointName + " to " + a.ToString());
             Console.WriteLine ("Hello plan =)");
 
-            var the_args = new AgentEventArgs (){ { "nome", "davide" } };
+            var the_args = new PlanArgs (){ { "nome", "davide" } };
 
             ExecuteStep ("wella", the_args);
         }

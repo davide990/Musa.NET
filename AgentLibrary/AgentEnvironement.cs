@@ -370,7 +370,7 @@ namespace AgentLibrary
                     ek.perception = kvp.Key.Perception.ToString();
                     ek.plan = kvp.Value.Name;
 
-                    AgentEventArgs eventArgs = null;
+                    PlanArgs eventArgs = null;
                     a.EventsArgs.TryGetValue(kvp.Key, out eventArgs);
 
                     if (eventArgs == null)
@@ -424,10 +424,10 @@ namespace AgentLibrary
             foreach (EventEntry ev in ag.Events)
             {
                 //Parse event args
-                AgentEventArgs event_args = null;
+                PlanArgs event_args = null;
                 if (ev.EventArgs.Count > 0)
                 {
-                    event_args = new AgentEventArgs();
+                    event_args = new PlanArgs();
                     foreach (EventArgEntry arg_entry in ev.EventArgs)
                         event_args.Add(arg_entry.Name, arg_entry.Value);
                 }

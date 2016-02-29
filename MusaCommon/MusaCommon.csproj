@@ -51,7 +51,6 @@
     <Compile Include="Common\Logger\ILogger.cs" />
     <Compile Include="Common\Logger\ILoggerFragment.cs" />
     <Compile Include="Common\Logger\LogLevel.cs" />
-    <Compile Include="Common\Agent\AgentEventArgs.cs" />
     <Compile Include="Common\Plan\BasePlanInstance.cs" />
     <Compile Include="MusaModule\ModuleProvider\Attributes\DependencyAttribute.cs" />
     <Compile Include="MusaModule\ModuleProvider\Attributes\InjectAttribute.cs" />
@@ -63,6 +62,7 @@
     <Compile Include="Common\Plan\IPlanFacade.cs" />
     <Compile Include="Common\Plan\IPlanCollection.cs" />
     <Compile Include="Common\IFormulaParser.cs" />
+    <Compile Include="Common\Agent\PlanArgs.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

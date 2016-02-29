@@ -498,7 +498,7 @@ namespace AgentLibrary
                     Type varTermType = typeof(Assignment<>).MakeGenericType(assignment.GetType().GetGenericArguments()[0]);
                     object assignmentValue = varTermType.GetProperty("Value").GetValue(assignment, null);
 
-                    return AssignmentType.CreateAssignmentForTerm(termName, assignmentValue, varTermType);
+                    return AssignmentType.CreateAssignmentForTerm(termName, assignmentValue, assignmentValue.GetType());
                 }
             }
 

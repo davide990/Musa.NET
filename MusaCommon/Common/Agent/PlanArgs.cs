@@ -35,7 +35,7 @@ namespace MusaCommon
     /// <summary>
     /// Event arguments.
     /// </summary>
-    public class AgentEventArgs : IAgentEventArgs
+    public class PlanArgs : IAgentEventArgs
     {
         readonly Dictionary<string,string> internalDict = new Dictionary<string,string>();
 
@@ -149,7 +149,7 @@ namespace MusaCommon
         /// Merge all items in the input AgentEventArgs object to this collection.
         /// </summary>
         /// <param name="args">Arguments.</param>
-        public void Merge(AgentEventArgs args)
+        public void Merge(PlanArgs args)
         {
             foreach (KeyValuePair<string, string> kvp in args)
                 Add(kvp);

@@ -74,9 +74,10 @@ namespace AgentLibrary
         /// <summary>
         /// The collection of arguments that have to be passed to events when 
         /// these are triggered. It associates an event key (a formula-perception pair)
-        /// with a collection of arguments related to the event specified by the key.
+        /// with a collection of arguments that are passed to the plan invoked by
+        /// the event.
         /// </summary>
-        public Dictionary<AgentEventKey, AgentEventArgs> EventsArgs
+        public Dictionary<AgentEventKey, PlanArgs> EventsArgs
         {
             get { return events_args; }
             private set
@@ -88,7 +89,7 @@ namespace AgentLibrary
             }
         }
 
-        private Dictionary<AgentEventKey, AgentEventArgs> events_args;
+        private Dictionary<AgentEventKey, PlanArgs> events_args;
         private object events_args_lock;
 
         /// <summary>
@@ -180,7 +181,7 @@ namespace AgentLibrary
 
             EventsCatalogue = new Dictionary<AgentEventKey, Type>();
             PerceivedEvents = new Stack<Tuple<string, AgentPerception, Type>>();
-            EventsArgs = new Dictionary<AgentEventKey, AgentEventArgs>();
+            EventsArgs = new Dictionary<AgentEventKey, PlanArgs>();
 
             Paused = false;
             pause_requested = false;
@@ -314,7 +315,7 @@ namespace AgentLibrary
 
                     Type planToExecute = parentAgent.Plans.Find(x => x.Name.Equals(msg.Message as string));
                     //TODO i parametri do stanno?
-                    AgentEventArgs args = null;
+                    PlanArgs args = null;
 
                     //Achieve the goal
                     achieveGoal(planToExecute, args);
@@ -334,12 +335,12 @@ namespace AgentLibrary
         /// </summary>
         /// <param name="planToExecute">Plan to execute.</param>
         /// <param name="args">Arguments.</param>
-        private void achieveGoal(Type planToExecute, AgentEventArgs args = null)
+        private void achieveGoal(Type planToExecute, PlanArgs args = null)
         {
             //Check if user has been set any default argument to be passed when the agent perceive 
             //an Achieve type perception togheter with the specified plan. If any argument is found, is added
             //to the input argument list.
-            AgentEventArgs defaultArgs;
+            PlanArgs defaultArgs;
             EventsArgs.TryGetValue(new AgentEventKey(planToExecute.Name, AgentPerception.Achieve), out defaultArgs);
 
             //Merge the input args and the default args
@@ -390,21 +391,10 @@ namespace AgentLibrary
 
                 case AgentPerception.UpdateBelief:
                     parentAgent.Workbench.UpdateStatement(changes_list);
-
-                    //REMOVE THE OLD BELIEF (if exists)
-                    //ADD THE NEW BELIEF
-
                     break;
 
-                case AgentPerception.SetBeliefValue:
-
-                    //TODO
-                    //parentAgent.Workbench.SetValueForTerm
-
-                    break;
-                case AgentPerception.UnSetBeliefValue:
-                case AgentPerception.UpdateBeliefValue:
                 case AgentPerception.Null:
+                default:
                     throw new NotImplementedException();
             }
         }
@@ -454,7 +444,7 @@ namespace AgentLibrary
             Logger.Log(LogLevel.Debug, "[{0}] Triggering event {" + "[" + parentAgent.Name + "] Triggering event {" + formula + "->" + perception_type + "->" + plan_to_execute.Name + "}");
 
             //Try get values related to this event
-            AgentEventArgs args = null;
+            PlanArgs args = null;
             EventsArgs.TryGetValue(new AgentEventKey(formula, perception_type), out args);
 
             //Execute the plan (if exists)
@@ -480,7 +470,7 @@ namespace AgentLibrary
         /// <param name="Plan">The plan to execute.</param>
         /// <param name="Args">The arguments to be passed to the plan invoked
         /// when this event is being triggered.</param>
-        public void AddEvent(string formula, AgentPerception perception, Type Plan, AgentEventArgs Args = null)
+        public void AddEvent(string formula, AgentPerception perception, Type Plan, PlanArgs Args = null)
         {
             //If Plan is not of type PlanModel, then throw an exception
             if (!(typeof(IPlanModel).IsAssignableFrom(Plan)))

@@ -60,8 +60,14 @@ namespace AgentLibrary
         /// <value>The event key.</value>
         public AgentEventKey EventKey
         {
-            get { return new AgentEventKey(Formula, Perception); }
+            get
+            { 
+                if (eventKey == null)
+                    eventKey = new AgentEventKey(Formula, Perception); 
+                return eventKey;
+            }
         }
+        private AgentEventKey eventKey;
 
         /// <summary>
         /// Gets the plan that is invoked when this event is triggered
@@ -78,13 +84,13 @@ namespace AgentLibrary
         /// plan.
         /// </summary>
         /// <value>The arguments.</value>
-        public AgentEventArgs Args
+        public PlanArgs Args
         {
             get;
             private set;
         }
 
-        public AgentEvent(AgentEventKey key, Type plan, AgentEventArgs args = null)
+        public AgentEvent(AgentEventKey key, Type plan, PlanArgs args = null)
         {
             Formula = key.Formula;
             Perception = key.Perception;
@@ -93,7 +99,7 @@ namespace AgentLibrary
         }
 
         public AgentEvent(string formula, AgentPerception perception, Type plan,
-                          AgentEventArgs args = null)
+                          PlanArgs args = null)
         {
             Formula = formula;
             Perception = perception;

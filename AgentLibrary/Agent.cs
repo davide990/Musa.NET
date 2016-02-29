@@ -155,7 +155,7 @@ namespace AgentLibrary
         /// Gets the events arguments.
         /// </summary>
         /// <value>The events arguments.</value>
-        public Dictionary<AgentEventKey, AgentEventArgs> EventsArgs
+        public Dictionary<AgentEventKey, PlanArgs> EventsArgs
         {
             get { return reasoner.EventsArgs; }
         }
@@ -609,7 +609,7 @@ namespace AgentLibrary
         /// <summary>
         /// Tell this agent to achieve a goal by executing a specified plan
         /// </summary>
-        public void AchieveGoal(Type Plan, AgentEventArgs Args = null)
+        public void AchieveGoal(Type Plan, PlanArgs Args = null)
         {
             if (Plan == null)
                 throw new ArgumentNullException("Plan", "Argument #1 'Plan' cannot be null.");
@@ -632,7 +632,7 @@ namespace AgentLibrary
         /// triggered.</param>
         /// <param name="Args">The argument to be passed to the invoked plan
         /// when the event is triggered.</param>
-        public void AddEvent(string formula, AgentPerception perception, Type Plan, AgentEventArgs Args = null)
+        public void AddEvent(string formula, AgentPerception perception, Type Plan, PlanArgs Args = null)
         {
             reasoner.AddEvent(formula, perception, Plan, Args);
         }

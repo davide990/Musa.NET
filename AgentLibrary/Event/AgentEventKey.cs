@@ -58,12 +58,12 @@ namespace AgentLibrary
         /// </summary>
         /// <param name="Formula">The formula which the event that has this key reacts to.</param>
         /// <param name="Perception">The perception which the event that has this key reacts to.</param>
-        public AgentEventKey(string Formula, AgentPerception Perception) 
+        public AgentEventKey(string Formula, AgentPerception Perception)
         {
-            this.Formula        = Formula;
-            this.Perception     = Perception;
+            this.Formula = Formula;
+            this.Perception = Perception;
         }
-        
+
         public override bool Equals(object obj)
         {
             if (!(obj is AgentEventKey))

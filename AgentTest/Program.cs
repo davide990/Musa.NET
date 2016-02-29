@@ -58,10 +58,8 @@ namespace AgentTest
             a.AddPlan(typeof(PlanForEvent));
             a.AddPlan(typeof(HelloWorldPlan));
 
-            var argss = new AgentEventArgs { { "nome", "davide" } };
+            var argss = new PlanArgs { { "nome", "davide" } };
             a.AddEvent("f(x)", AgentPerception.AddBelief, typeof(PlanExample2), argss);
-
-
 
             //a.AddEvent ("f(x)", AgentPerception.RemoveBelief, typeof(PlanExample2));
             env.RegisterAgent(a);
@@ -98,25 +96,27 @@ namespace AgentTest
 
 
             env.RegisterAgentFromConfiguration();
-            env.WaitForAgents();
+
 
             //env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
             //env.RegisterStatement (new AtomicFormula ("f", new VariableTerm<int>("l",3)));
 
             //env.WaitForAgents();
 
-            /*
+
             BackgroundWorker wk = new BackgroundWorker();
             wk.DoWork += delegate
             {
-                Thread.Sleep(10000);
+                Thread.Sleep(15000);
                 var ag = env.RegisteredAgents[0];
-                //ag.UpdateBelief()
+                var fp = ModuleProvider.Get().Resolve<IFormulaParser>();
+                var formula = fp.Parse("g(x<-int(13))");
+                ag.UpdateBelief(formula as AtomicFormula);
             };
             wk.RunWorkerAsync();
-*/
+
 			
-			
+            env.WaitForAgents();
             /*
             AgentEnvironement env = AgentEnvironement.GetInstance();
             env.RegisterAgentFromConfiguration();
@@ -137,7 +137,7 @@ namespace AgentTest
     class PlanForEvent : PlanModel
     {
         [PlanEntryPoint]
-        void entry_point(AgentEventArgs args)
+        void entry_point(PlanArgs args)
         {
             string a;
             args.TryGetValue("nome", out a);
@@ -150,7 +150,7 @@ namespace AgentTest
     public class HelloWorldPlan : PlanModel
     {
         [PlanEntryPoint]
-        void hello(AgentEventArgs args)
+        void hello(PlanArgs args)
         {
             log(LogLevel.Info, "~~~~~~HELLO WORLD~~~~~~");
         }
@@ -161,7 +161,7 @@ namespace AgentTest
     public class PlanExample2 : PlanModel
     {
         [PlanEntryPoint]
-        void wella(AgentEventArgs args)
+        void wella(PlanArgs args)
         {
             string a;
             args.TryGetValue("nome", out a);
@@ -193,21 +193,21 @@ namespace AgentTest
     class PlanExample : PlanModel
     {
         [PlanEntryPoint]
-        void entry_point(AgentEventArgs args)
+        void entry_point(PlanArgs args)
         {
             //object a;
             //args.TryGetValue ("nome",out a);
 
             Console.WriteLine("Hello plan =)");
 
-            var the_args = new AgentEventArgs(){ { "nome", "davide" } };
+            var the_args = new PlanArgs(){ { "nome", "davide" } };
 
 
             ExecuteStep("wella", the_args);
         }
 
         [PlanStep]
-        void wella(AgentEventArgs args)
+        void wella(PlanArgs args)
         {
             string a;
             args.TryGetValue("nome", out a);
