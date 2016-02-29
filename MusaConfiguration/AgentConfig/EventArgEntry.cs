@@ -25,6 +25,8 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System.Xml.Serialization;
+using System;
+using MusaCommon;
 
 namespace MusaConfiguration
 {
@@ -43,6 +45,29 @@ namespace MusaConfiguration
         /// <value>The value.</value>
         [XmlAttribute("Value")]
         public string Value { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type of the value for this event arg.
+        /// </summary>
+        /// <value>The type.</value>
+        [XmlAttribute("Type")]
+        public string Type { get; set; }
+
+        /// <summary>
+        /// Gets the data type of the value.
+        /// </summary>
+        /// <value>The type of the value.</value>
+        [XmlIgnore]
+        public Type ValueType
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Type))
+                    return typeof(string);
+                else
+                    return System.Type.GetType(TypesMapping.getCompleteTypeName(Type.ToLower()));
+            }
+        }
     }
 }
 

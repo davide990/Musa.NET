@@ -28,11 +28,11 @@
       <Events>
         <Event Formula="f(x)" Plan="PlanExample1" Perception="AddBelief">
           <EventArgs>
-            <EventArg Name="nome" Value="davide" />
+            <EventArg Name="nome" Value="davide"/>
           </EventArgs>
         </Event>
         <Event Formula="f(x)" Plan="PlanExample1" Perception="RemoveBelief">
-          <EventArgs />
+          <EventArgs Name="il_mio_parametro" Value="31"/>
         </Event>
       </Events>
     </Agent>
