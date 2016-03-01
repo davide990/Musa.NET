@@ -188,7 +188,7 @@ namespace MusaConfiguration
         /// <summary>
         /// Initializes a new instance of the <see cref="MusaConfiguration.MusaConfig"/> class.
         /// </summary>
-        public MusaConfig()
+        private MusaConfig()
         {
             LoggerFragments = new List<LoggerFragment>();
             Agents = new List<AgentEntry>();
@@ -237,15 +237,21 @@ namespace MusaConfiguration
         /// <summary>
         /// Gets the MUSA configuration.
         /// </summary>
-        public static MusaConfig GetConfig()
+        /// <returns>The config.</returns>
+        /// <param name="addDefaultConsoleLogger">If set to <c>true</c> add the default console logger.</param>
+        public static MusaConfig GetConfig(bool addDefaultConsoleLogger = true)
         {
             if (instance == null)
             {
                 //Initialize a new musa configuration
                 instance = new MusaConfig();
 
+                //Initialize the logger fragments list
+                instance.LoggerFragments = new List<LoggerFragment>();
+
                 //Create a default console logger
-                instance.LoggerFragments = new List<LoggerFragment>{ new ConsoleLogger() };
+                if (addDefaultConsoleLogger)
+                    instance.LoggerFragments.Add(new ConsoleLogger());
             }
 			
             return instance;
@@ -291,7 +297,7 @@ namespace MusaConfiguration
             foreach (string s in content)
             {
                 string result = Regex.Replace(s, @"\""[^\""]*\""",
-                                              new MatchEvaluator(ReplaceInvalidXMLChars));
+                                    new MatchEvaluator(ReplaceInvalidXMLChars));
                 sb.Append(result);
                 sb.Append("\n");
             }
@@ -356,7 +362,7 @@ namespace MusaConfiguration
                 {
                     //TODO log or not log?
                     ModuleProvider.Get().Resolve<ILogger>().Log(LogLevel.Fatal, 
-                                                                "Unable to load plan library at '" + s + "': file not found.\n");
+                        "Unable to load plan library at '" + s + "': file not found.\n");
                 }
             }
         }

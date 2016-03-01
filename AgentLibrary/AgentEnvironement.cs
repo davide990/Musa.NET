@@ -35,6 +35,7 @@ using MusaConfiguration;
 using System.Reflection;
 using MusaCommon;
 using System.Linq;
+using System.IO;
 
 namespace AgentLibrary
 {
@@ -329,8 +330,18 @@ namespace AgentLibrary
             //For each plan library
             foreach (string assembly_path in MusaConfig.GetConfig().PlanLibrariesPath)
             {
-                //Load the assembly
-                var assembly = Assembly.LoadFrom(assembly_path);
+                Assembly assembly = null;
+                try
+                {
+                    //Load the assembly
+                    assembly = Assembly.LoadFrom(assembly_path);
+                }
+                catch (FileNotFoundException)
+                {
+                    logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkRed);
+                    logger.Log(LogLevel.Error, "Failed to load assembly '" + assembly_path + "'. Make sure the path is right.");
+                    continue;
+                }
 
                 //Get all types, from the loaded assembly, which implement IPlanModel interface
                 var this_assembly_plans = assembly.GetTypes().Where(x => typeof(IPlanModel).IsAssignableFrom(x));
@@ -345,7 +356,7 @@ namespace AgentLibrary
 
         public MusaConfig Serialize()
         {
-            MusaConfig conf = new MusaConfig();
+            MusaConfig conf = MusaConfig.GetConfig(false);
             conf.NetworkingEnabled = NetworkingEnabled;
             conf.AddLoggerFragment(logger.GetFragments());
             conf.MusaAddress = IPAddress;
@@ -445,12 +456,15 @@ namespace AgentLibrary
 
                     //Parse the plan that must be invoked when this event is triggered
                     var the_plan = ag_plans.Find(x => x.Name.Equals(ev.plan));
-                    if (the_plan != null)
-                        events.Add(new AgentEvent(ev.formula, perception, the_plan, event_args));
+                   
+                    if (the_plan == null)
+                        throw new Exception();
+                    events.Add(new AgentEvent(ev.formula, perception, the_plan, event_args));
                 }
-                catch (Exception e)
+                catch
                 {
-                    logger.Log(LogLevel.Error, "An error occurred while parsing event '" + ev + "' for agent '" + ag.Name + "'.\n Error: " + e.Message + "\nStackTrace: " + e.StackTrace);
+                    logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkRed);
+                    logger.Log(LogLevel.Error, "An error occurred while parsing event '" + ev + "' for agent '" + ag.Name + "'.\n Error: plan '" + ev.plan + "' not found.\n");
                 }
             }
             return events;
@@ -474,7 +488,7 @@ namespace AgentLibrary
                 foreach (object varTerm in variableTerms)
                 {
                     //get the type info for the current term
-                    Type variableTermType = VariableTermFacace.GetVariableTermFor(varTerm.GetType().GetGenericArguments()[0]);
+                    //Type variableTermType = VariableTermFacace.GetVariableTermFor(varTerm.GetType().GetGenericArguments()[0]);
                     object varTermName = VariableTermFacace.GetNameOfVariableTerm(varTerm);
                     object varTermValue = VariableTermFacace.GetValueOfVariableTerm(varTerm);
 
@@ -503,7 +517,7 @@ namespace AgentLibrary
                 foreach (object varTerm in variableTerms)
                 {
                     //get the type info for varTerm
-                    Type variableTermType = VariableTermFacace.GetVariableTermFor(varTerm.GetType().GetGenericArguments()[0]);
+                    //Type variableTermType = VariableTermFacace.GetVariableTermFor(varTerm.GetType().GetGenericArguments()[0]);
                     object varTermName = VariableTermFacace.GetNameOfVariableTerm(varTerm);
                     object varTermValue = VariableTermFacace.GetValueOfVariableTerm(varTerm);
 
