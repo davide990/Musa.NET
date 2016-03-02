@@ -384,7 +384,8 @@ namespace AgentLibrary
                         if (b.GetType().IsGenericType)
                         {
                             //a and b are both variable 
-                            //se sono uguali i valori procedi, altrimenti le formule sono diverse per contenuto. Esci
+                            //se sono uguali i valori procedi, altrimenti le formule sono diverse per contenuto, continua
+                            //con il prossimo termine
                             Type type_of_b = b.GetType();
                             object b_value = type_of_b.GetProperty("Value").GetValue(b);
                             if (a_value.Equals(b_value))

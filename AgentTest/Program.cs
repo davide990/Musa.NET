@@ -42,7 +42,7 @@ namespace AgentTest
             BackgroundWorker wk = new BackgroundWorker();
             wk.DoWork += delegate
             {
-                Thread.Sleep(3000);
+                Thread.Sleep(5000);
                 Console.WriteLine("Add f(x)");
                 env.RegisterStatement(new AtomicFormula("f", new LiteralTerm("x")));
 
@@ -53,13 +53,13 @@ namespace AgentTest
             };
             wk.RunWorkerAsync();
 
-            a.AddPlan(typeof(PlanExample));
+            /*a.AddPlan(typeof(PlanExample));
             a.AddPlan(typeof(PlanExample2));
-            a.AddPlan(typeof(PlanForEvent));
+            a.AddPlan(typeof(PlanForEvent));*/
             a.AddPlan(typeof(HelloWorldPlan));
 
             var argss = new PlanArgs { { "nome", "davide" } };
-            a.AddEvent("f(x)", AgentPerception.AddBelief, typeof(PlanExample2), argss);
+            a.AddEvent("f(x)", AgentPerception.AddBelief, typeof(HelloWorldPlan), argss);
 
             //a.AddEvent ("f(x)", AgentPerception.RemoveBelief, typeof(PlanExample2));
             env.RegisterAgent(a);
@@ -91,11 +91,12 @@ namespace AgentTest
             //startMUSA();
 
             MusaInitializer.MusaInitializer.Initialize();
+
             MusaConfig.ReadFromFile("../../test_conf.xml");
             AgentEnvironement env = AgentEnvironement.GetInstance();
 
 
-            env.RegisterAgentFromConfiguration();
+            //env.RegisterAgentFromConfiguration();
 
 
             //env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
@@ -104,7 +105,7 @@ namespace AgentTest
             //env.WaitForAgents();
 
 
-            BackgroundWorker wk = new BackgroundWorker();
+            /*BackgroundWorker wk = new BackgroundWorker();
             wk.DoWork += delegate
             {
                 Thread.Sleep(15000);
@@ -116,14 +117,14 @@ namespace AgentTest
             wk.RunWorkerAsync();
 
 			
-            env.WaitForAgents();
+            env.WaitForAgents();*/
             /*
             AgentEnvironement env = AgentEnvironement.GetInstance();
             env.RegisterAgentFromConfiguration();
             var a = env.RegisteredAgents;
             */
 
-            //configureAndStartMusa();
+            configureAndStartMusa();
         }
 
         static void A_RegisterResult(string result)
@@ -147,12 +148,31 @@ namespace AgentTest
     }
 
     [Plan]
+    [PlanStepsOrder("hello4","hello2","hello3")]
     public class HelloWorldPlan : PlanModel
     {
         [PlanEntryPoint]
         void hello(PlanArgs args)
         {
             log(LogLevel.Info, "~~~~~~HELLO WORLD~~~~~~");
+        }
+
+        [PlanStep]
+        void hello2(PlanArgs args)
+        {
+            log(LogLevel.Info, "~~~~~~HELLO WORLD2~~~~~~");
+        }
+
+        [PlanStep]
+        void hello3(PlanArgs args)
+        {
+            log(LogLevel.Info, "~~~~~~HELLO WORLD3~~~~~~");
+        }
+
+        [PlanStep]
+        void hello4(PlanArgs args)
+        {
+            log(LogLevel.Info, "~~~~~~HELLO WORLD4~~~~~~");
         }
     }
 

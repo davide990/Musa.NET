@@ -51,6 +51,16 @@ namespace PlanLibrary
         }
 
         /// <summary>
+        /// Gets the steps execution order. Each string is a step name.
+        /// </summary>
+        /// <value>The steps order.</value>
+        public List<string> StepsOrder
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Gets this plan's name.
         /// </summary>
         public string Name
@@ -130,17 +140,18 @@ namespace PlanLibrary
         {
             AllowedRoles = new HashSet<string>();
             Steps = new List<PlanStep>();
+            StepsOrder = new List<string>();
 
             try
             {
                 checkAtomicPlan();
-                parsePlanAttributes();
+                parseAttributes();
                 setPlanSteps();
                 setEntryPointMethod();
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine(e.ToString());
             }
         }
 
@@ -159,20 +170,26 @@ namespace PlanLibrary
         /// <summary>
         /// Sets the plan attributes.
         /// </summary>
-        private void parsePlanAttributes()
+        private void parseAttributes()
+        {
+            parsePlanAttribute();
+            parsePlanStepsOrderAttribute();
+        }
+
+        private void parsePlanAttribute()
         {
             //Retrieve the plan attribute (if any)
             var plan_attribute = from t in GetType().GetCustomAttributes(typeof(PlanAttribute), true)
                                           let attributes = t as PlanAttribute
                                           where t != null
-                                          select new { 	AllowedRoles = attributes.AllowedRoles, 
-												        TriggerCondition = attributes.TriggerCondition,
-												        ExpectedResult = attributes.ExpectedResult};
-
+                                          select new {    AllowedRoles = attributes.AllowedRoles, 
+                TriggerCondition = attributes.TriggerCondition,
+                ExpectedResult = attributes.ExpectedResult};
+            
             //Raise an exception if the class/plan is not decorated with [Plan] attribute
             if (plan_attribute.ToList().Count <= 0)
                 throw new Exception("Class " + GetType().Name + " is not decorated with [Plan] attribute.");
-			
+
             TriggerCondition = plan_attribute.ToList()[0].TriggerCondition;
             ExpectedResult = plan_attribute.ToList()[0].ExpectedResult;
 
@@ -181,6 +198,20 @@ namespace PlanLibrary
                 foreach (string role in v.AllowedRoles)
                     AllowedRoles.Add(role);
             }
+        }
+
+        private void parsePlanStepsOrderAttribute()
+        {
+            var steps_order = from t in GetType().GetCustomAttributes(typeof(PlanStepsOrderAttribute), true)
+                                       let attributes = t as PlanStepsOrderAttribute
+                                       where t != null
+                                       select new {    StepsOrder = attributes.StepsName};
+            
+            if (steps_order.ToList().Count <= 0)
+                return;
+            
+            foreach (var v in steps_order.First().StepsOrder)
+                StepsOrder.Add(v);
         }
 
         /// <summary>
@@ -240,6 +271,13 @@ namespace PlanLibrary
         /// <param name="args">The step arguments.</param>
         public void ExecuteStep(string step_name, IPlanArgs args = null)
         {
+            //Step execution is ignored if an execution order has been specified
+            if (StepsOrder.Count > 0)
+            {
+                log(LogLevel.Warn, " In plan '" + Name + "', ExecuteStep(" + step_name + ") has been ignored since plan has a steps execution order specified.");
+                return;
+            }
+
             bool plan_found = false;
 
             foreach (PlanStep step in Steps)

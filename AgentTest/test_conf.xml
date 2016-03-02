@@ -5,7 +5,7 @@
   <NetworkingEnabled>true</NetworkingEnabled>
 
   <PlanLibraries>
-  	<PlanLibrary>/home/davide/Projects/Test Projects/PlanLibExample/PlanLibExample/bin/Debug/PlanLibExample.dll</PlanLibrary>
+  	<!--<PlanLibrary>/home/davide/Projects/Test Projects/PlanLibExample/PlanLibExample/bin/Debug/PlanLibExample.dll</PlanLibrary>-->
   </PlanLibraries>
 
   <Logging>
@@ -17,21 +17,21 @@
     <Agent Name="agent_1">
       <Plans>
         <!--<Plan>PlanExample</Plan>-->
-        <Plan>PlanExample1</Plan>
+        <!--<Plan>PlanExample1</Plan>-->
         <!--<Plan>PlanForEvent</Plan>-->
       </Plans>
       <BeliefBase>
-      	<Belief value="f(x)"/>
+      	<!--<Belief value="f(x)"/>
       	<Belief value="h(x)"/>
-      	<Belief value="g(x<-int(3))"/>
+      	<Belief value="g(x<-int(3))"/>-->
       </BeliefBase>
       <Events>
-        <Event Formula="f(x)" Plan="PlanExample1" Perception="AddBelief">
+        <!--<Event Formula="f(x)" Plan="PlanExample1" Perception="AddBelief">
           <EventArgs>
             <EventArg Name="nome" Value="davide"/>
             <EventArg Name="eta" Value="25" Type="int"/>
           </EventArgs>
-        </Event>
+        </Event>-->
         <!--<Event Formula="f(x)" Plan="PlanExample1" Perception="RemoveBelief">
         	<EventArgs>
           		<EventArg Name="il_mio_parametro" Value="31" Type="int"/>

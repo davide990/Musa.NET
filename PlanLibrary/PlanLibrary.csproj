@@ -44,6 +44,7 @@
     <Compile Include="Attributes\PlanStepAttribute.cs" />
     <Compile Include="PlanFacade.cs" />
     <Compile Include="PlanLibraryInitializer.cs" />
+    <Compile Include="Attributes\PlanStepsOrderAttribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

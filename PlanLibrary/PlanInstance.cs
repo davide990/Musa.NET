@@ -343,6 +343,13 @@ namespace PlanLibrary
             try
             {
                 EntryPointMethod.Invoke(plan_model, args);
+
+                for (ushort i=0; i < plan_model.StepsOrder.Count; i++)
+                {
+                    var the_name = plan_model.StepsOrder[i];
+                    var the_step = plan_model.Steps.Find(x => x.Name.Equals(the_name));
+                    the_step.Execute();
+                }
             }
             catch (Exception e)
             {
