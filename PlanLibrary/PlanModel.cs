@@ -31,10 +31,10 @@ namespace PlanLibrary
         }
 
         /// <summary>
-        /// Gets the trigger conditions.
+        /// Gets the trigger condition for this plan model.
         /// </summary>
-        /// <value>The trigger conditions.</value>
-        public string TriggerCondition
+        /// <value>The trigger condition.</value>
+        internal IFormula TriggerCondition
         {
             get;
             private set;
@@ -151,6 +151,7 @@ namespace PlanLibrary
             }
             catch (Exception e)
             {
+                //TODO logger necessario qui
                 Console.WriteLine(e.ToString());
             }
         }
@@ -190,7 +191,13 @@ namespace PlanLibrary
             if (plan_attribute.ToList().Count <= 0)
                 throw new Exception("Class " + GetType().Name + " is not decorated with [Plan] attribute.");
 
-            TriggerCondition = plan_attribute.ToList()[0].TriggerCondition;
+            //Get the trigger condition
+            var triggerCondition = plan_attribute.ToList()[0].TriggerCondition;
+
+            //Convert the string trigger condition to a IFormula object
+            parseTriggerCondition(triggerCondition);
+
+            //Get the expected result
             ExpectedResult = plan_attribute.ToList()[0].ExpectedResult;
 
             foreach (var v in plan_attribute)
@@ -200,16 +207,35 @@ namespace PlanLibrary
             }
         }
 
+        /// <summary>
+        /// Parses the trigger condition provided in this plan model's attribute, and convert it from
+        /// string to a IFormula object.
+        /// </summary>
+        private void parseTriggerCondition(string triggerCondition)
+        {
+            if (string.IsNullOrEmpty(triggerCondition))
+                return;
+
+            var fp = ModuleProvider.Get().Resolve<IFormulaParser>();
+            if (fp == null)
+                throw new Exception("Unable to parse trigger condition '" + triggerCondition + "' in plan '" + Name + "'. Formula Parser not avaible.\n");
+
+            TriggerCondition = fp.Parse(triggerCondition);
+        }
+
         private void parsePlanStepsOrderAttribute()
         {
+            //Get the steps order from the attribute PlanStepOrder
             var steps_order = from t in GetType().GetCustomAttributes(typeof(PlanStepsOrderAttribute), true)
                                        let attributes = t as PlanStepsOrderAttribute
                                        where t != null
                                        select new {    StepsOrder = attributes.StepsName};
-            
+
+            //Check if actually any step order has been specified
             if (steps_order.ToList().Count <= 0)
                 return;
-            
+
+            //then, add the order to a list
             foreach (var v in steps_order.First().StepsOrder)
                 StepsOrder.Add(v);
         }

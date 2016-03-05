@@ -48,15 +48,6 @@ namespace PlanLibrary
         #region Fields/Properties
 
         /// <summary>
-        /// The trigger condition necessary to activate this plan.
-        /// </summary>
-        public IFormula TriggerCondition
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
         /// The plan model this instance references to.
         /// </summary>
         private readonly PlanModel plan_model;
@@ -145,48 +136,10 @@ namespace PlanLibrary
             //add an event handler for step's execution
             foreach (PlanStep step in plan_model.Steps)
                 step.ExecuteStep += onExecuteStep;
-
-            //Parse the trigger condition of the plan model
-            string trigger_condition = plan_model.TriggerCondition;
-
-            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaParser>();
-            Logger = ModuleProvider.Get().Resolve<ILogger>();
-
-            if (!string.IsNullOrEmpty(trigger_condition))
-            {
-                try
-                {
-                    TriggerCondition = FormulaParser.Parse(trigger_condition);
-                }
-                catch (Exception e)
-                {
-                    Logger.Log(LogLevel.Error, "Unable to parse plan's trigger condition '" + trigger_condition + "'.\nError: " + e.Message);
-                    throw new Exception("Unable to parse plan's trigger condition '" + trigger_condition + "'.\nError: " + e.Message);
-                }
-            }
-				
+            	
             //Initialize the ManualResetEvent object
             _busy = new ManualResetEvent(true);
         }
-
-
-        private void Log(int level, string message)
-        {
-            Logger.Log(level, message);
-        }
-
-        /// <summary>
-        /// Raised when a result has be be registered after the invocation of RegisterResult(...) within a plan step.
-        /// </summary>
-        /// <param name="result">The result to be registered. It is a formula.</param>
-        private void OnRegisterResult(string result)
-        {
-            if (RegisterResult != null)
-                RegisterResult(result);
-            else
-                throw new Exception("No agent is registered to catch this plan's results.");
-        }
-
 
         /// <summary>
         /// Initializes the background worker for this plan.
@@ -204,6 +157,23 @@ namespace PlanLibrary
         }
 
         #endregion Constructor and initialization methods
+
+        private void Log(int level, string message)
+        {
+            Logger.Log(level, message);
+        }
+
+        /// <summary>
+        /// Raised when a result has be be registered after the invocation of RegisterResult(...) within a plan step.
+        /// </summary>
+        /// <param name="result">The result to be registered. It is a formula.</param>
+        private void OnRegisterResult(string result)
+        {
+            if (RegisterResult != null)
+                RegisterResult(result);
+            else
+                throw new Exception("No agent is registered to catch this plan's results.");
+        }
 
         #region Background worker methods
 
@@ -344,7 +314,10 @@ namespace PlanLibrary
             {
                 EntryPointMethod.Invoke(plan_model, args);
 
-                for (ushort i=0; i < plan_model.StepsOrder.Count; i++)
+                if (plan_model.StepsOrder.Count == 0)
+                    return;
+
+                for (ushort i = 0; i < plan_model.StepsOrder.Count; i++)
                 {
                     var the_name = plan_model.StepsOrder[i];
                     var the_step = plan_model.Steps.Find(x => x.Name.Equals(the_name));
@@ -379,6 +352,11 @@ namespace PlanLibrary
         public bool IsAtomic()
         {
             return plan_model.IsAtomic;
+        }
+
+        public IFormula GetTriggerCondition()
+        {
+            return plan_model.TriggerCondition;
         }
 
         #endregion IPlanInstance inherithed methods

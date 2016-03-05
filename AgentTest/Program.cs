@@ -147,7 +147,7 @@ namespace AgentTest
         }
     }
 
-    [Plan]
+    [Plan("f(x)")]
     [PlanStepsOrder("hello4","hello2","hello3")]
     public class HelloWorldPlan : PlanModel
     {

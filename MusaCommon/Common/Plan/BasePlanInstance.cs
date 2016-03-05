@@ -37,6 +37,8 @@ namespace MusaCommon
 
         public abstract bool IsAtomic();
 
+        public abstract IFormula GetTriggerCondition();
+
         public abstract void Execute(IPlanArgs args = null);
     }
 }

@@ -50,6 +50,12 @@ namespace MusaCommon
         void Execute(IPlanArgs args = null);
 
         /// <summary>
+        /// Gets the plan's trigger condition, necessary for invoking this plan.
+        /// </summary>
+        /// <returns>The trigger condition.</returns>
+        IFormula GetTriggerCondition();
+
+        /// <summary>
         /// Determines whether this plan is atomic.
         /// </summary>
         bool IsAtomic();
