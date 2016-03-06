@@ -56,6 +56,12 @@ namespace MusaCommon
         IFormula GetTriggerCondition();
 
         /// <summary>
+        /// Sets the agent workbench in which the conditions of this plan must be satisfied.
+        /// </summary>
+        void SetAgentWorkbench(IAgentWorkbench wb);
+
+
+        /// <summary>
         /// Determines whether this plan is atomic.
         /// </summary>
         bool IsAtomic();

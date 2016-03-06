@@ -113,6 +113,17 @@ namespace PlanLibrary
             private set;
         }
 
+        /// <summary>
+        /// Gets or sets the workbench of the agent that owns this plan instance. This is used to
+        /// test trigger conditions of the plan steps.
+        /// </summary>
+        /// <value>The agent workbench.</value>
+        private IAgentWorkbench AgentWorkbench
+        {
+            get;
+            set;
+        }
+
         #endregion Fields/Properties
 
         #region Events
@@ -251,8 +262,17 @@ namespace PlanLibrary
                                       where attribute != null
                                       select new {Method = mm, TriggerCondition = attribute.TriggerCondition};
 
+            var fp = ModuleProvider.Get().Resolve<IFormulaParser>();
+            if (fp == null)
+                throw new Exception("In plan '" + Name + "': Formula Parser not avaible.\n");
+            
             foreach (var vv in plan_steps)
-                Steps.Add(new PlanStep(this, vv.Method, vv.TriggerCondition));
+            {
+                if (string.IsNullOrEmpty(vv.TriggerCondition))
+                    Steps.Add(new PlanStep(this, vv.Method));
+                else
+                    Steps.Add(new PlanStep(this, vv.Method, fp.Parse(vv.TriggerCondition)));
+            }
         }
 
         /// <summary>
@@ -313,6 +333,15 @@ namespace PlanLibrary
 
                 plan_found = true;
 
+                if (step.TriggerCondition != null)
+                {
+                    if (!AgentWorkbench.TestCondition(step.TriggerCondition))
+                    {
+                        Log(LogLevel.Error, "Plan step'" + step.Name + "' cannot be executed: trigger condition '" + step.TriggerCondition + "' not satisfied in agent belief base.");
+                        return;
+                    }
+                }
+
                 //TODO log internal event?
                 //Internal event
                 step.Execute(args);
@@ -335,6 +364,11 @@ namespace PlanLibrary
         public void RegisterResult(string result)
         {
             RegisterResultEvent(result);
+        }
+
+        internal void SetAgentWorkbench(IAgentWorkbench wb)
+        {
+            AgentWorkbench = wb;
         }
 
         /// <summary>

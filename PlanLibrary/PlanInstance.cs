@@ -108,6 +108,17 @@ namespace PlanLibrary
             private set;
         }
 
+        /// <summary>
+        /// Gets or sets the workbench of the agent that owns this plan instance. When the agent executes
+        /// this plan, the workbench is used to test plan's condition.
+        /// </summary>
+        /// <value>The agent workbench.</value>
+        private IAgentWorkbench AgentWorkbench
+        {
+            get;
+            set;
+        }
+
         #endregion Fields/Properties
 
         #region Events
@@ -310,6 +321,14 @@ namespace PlanLibrary
         /// </summary>
         private void InvokePlan(object[] args)
         {
+            //Check if plan's trigger condition is satisfied in invoking's parent workbench
+            if (!checkTriggerCondition(GetTriggerCondition()))
+            {
+                Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkRed);
+                Logger.Log(LogLevel.Error, "Plan '" + Name + "' cannot be executed: trigger condition '" + GetTriggerCondition() + "' not satisfied in agent belief base.");
+                return;
+            }
+
             try
             {
                 EntryPointMethod.Invoke(plan_model, args);
@@ -321,7 +340,17 @@ namespace PlanLibrary
                 {
                     var the_name = plan_model.StepsOrder[i];
                     var the_step = plan_model.Steps.Find(x => x.Name.Equals(the_name));
-                    the_step.Execute();
+
+                    if (checkTriggerCondition(the_step.TriggerCondition))
+                        the_step.Execute();
+                    else
+                    {
+                        //TODO COSA FARE SE UNO STEP NON PUÒ ESSERE RAGGIUNTO?
+
+                        Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkRed);
+                        Logger.Log(LogLevel.Error, "Plan step'" + the_name + "' cannot be executed: trigger condition '" + the_step.TriggerCondition + "' not satisfied in agent belief base.");
+                        return;
+                    }
                 }
             }
             catch (Exception e)
@@ -331,6 +360,21 @@ namespace PlanLibrary
                 else
                     Console.WriteLine("Error while executing plan " + Name + "\n" + e.ToString());
             }
+        }
+
+        /// <summary>
+        /// Checks the plan or plan step trigger condition within this agent's workbench.
+        /// If the provided trigger condition is satisfied, true is returned.
+        /// </summary>
+        private bool checkTriggerCondition(IFormula tc)
+        {
+            if (tc != null)
+                return AgentWorkbench.TestCondition(tc);
+
+            //In case the trigger condition is null, it has been not specified by user. So, the plan
+            //has no trigger condition. In this case, true is returned, as the plan can be always
+            //executed unconditionally
+            return true;
         }
 
         /// <summary>
@@ -357,6 +401,12 @@ namespace PlanLibrary
         public IFormula GetTriggerCondition()
         {
             return plan_model.TriggerCondition;
+        }
+
+        public void SetAgentWorkbench(IAgentWorkbench wb)
+        {
+            AgentWorkbench = wb;
+            plan_model.SetAgentWorkbench(wb);
         }
 
         #endregion IPlanInstance inherithed methods

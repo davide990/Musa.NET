@@ -64,6 +64,7 @@
     <Compile Include="Common\Agent\PlanArgs.cs" />
     <Compile Include="TypesMapping.cs" />
     <Compile Include="Common\Agent\IPlanArgs.cs" />
+    <Compile Include="Common\Agent\IAgentWorkbench.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

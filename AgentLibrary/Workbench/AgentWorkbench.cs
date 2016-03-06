@@ -59,7 +59,7 @@ namespace AgentLibrary
     /// 
     /// </summary>
     [DataContract]
-    public class AgentWorkbench
+    public class AgentWorkbench : IAgentWorkbench
     {
         WorkbenchAddFormulaPolicy add_policy = WorkbenchAddFormulaPolicy.NoAction;
         WorkbenchRemoveFormulaPolicy remove_policy = WorkbenchRemoveFormulaPolicy.NoAction;

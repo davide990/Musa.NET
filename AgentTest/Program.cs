@@ -147,7 +147,7 @@ namespace AgentTest
         }
     }
 
-    [Plan("f(x)")]
+    [Plan]
     [PlanStepsOrder("hello4","hello2","hello3")]
     public class HelloWorldPlan : PlanModel
     {
@@ -157,7 +157,7 @@ namespace AgentTest
             log(LogLevel.Info, "~~~~~~HELLO WORLD~~~~~~");
         }
 
-        [PlanStep]
+        [PlanStep("g(x,o)|f(x)")]
         void hello2(PlanArgs args)
         {
             log(LogLevel.Info, "~~~~~~HELLO WORLD2~~~~~~");

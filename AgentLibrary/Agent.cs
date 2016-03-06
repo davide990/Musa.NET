@@ -479,6 +479,9 @@ namespace AgentLibrary
             //Create a new plan instance
             var plan_instance = PlanFacade.CreatePlanInstance(PlanModel, this, RegisterResultHandler, PlanFinishedHandler, Logger);
 
+            //Set the workbench where the plan's condition will be tested.
+            plan_instance.SetAgentWorkbench(Workbench);
+
             //Add the plan to the agent's plan collection
             PlansCollection.Add(PlanModel, plan_instance);
         }
@@ -584,15 +587,6 @@ namespace AgentLibrary
             //Search for the plan instance that match the specified model PlanModel
             PlansCollection.TryGetValue(PlanModel, out the_plan);
 
-            //Check if plan's trigger condition is satisfied within this agent's workbench
-            bool tc_satisfied = checkPlanTriggerCondition(the_plan);
-            if (!tc_satisfied)
-            {
-                Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkRed);
-                Logger.Log(LogLevel.Error, "Plan '" + the_plan.GetName() + "' cannot be executed: trigger condition '" + the_plan.GetTriggerCondition() + "' not satisfied in agent belief base.");
-                return;
-            }
-
             //If the input plan has not been found within the agent's plans collection, throw an exception
             if (the_plan == null)
                 throw new Exception("Plan '" + PlanModel.Name + "' not found in agent [" + Name + "] plans collection.");
@@ -614,25 +608,6 @@ namespace AgentLibrary
             while (Busy)
                 ;
         }
-
-        /// <summary>
-        /// Checks the plan trigger condition within this agent's workbench.
-        /// If the provided plan's trigger condition is satisfied, true is returned.
-        /// </summary>
-        private bool checkPlanTriggerCondition(IPlanInstance plan_model)
-        {
-            IFormula tc = plan_model.GetTriggerCondition();
-
-            if (tc != null)
-                return Workbench.TestCondition(tc);
-
-            //In case the trigger condition is null, it has been not specified by user. So, the plan
-            //has no trigger condition. In this case, true is returned, as the plan can be always
-            //executed unconditionally
-            return true;
-        }
-
-
 
         /// <summary>
         /// Tell this agent to achieve a goal by executing a specified plan
