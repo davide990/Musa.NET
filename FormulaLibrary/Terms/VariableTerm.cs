@@ -37,11 +37,9 @@ namespace FormulaLibrary
         /// </summary>
         public T Value
         {
-            get { return value; }
-            private set { this.value = value; }
+            get;
+            private set;
         }
-
-        private T value;
 
         /// <summary>
         /// Create a new variable term
@@ -107,6 +105,21 @@ namespace FormulaLibrary
                 return false;
 
             return Equals(obj as VariableTerm<T>);
+        }
+
+        public override bool IsLiteral()
+        {
+            return false;
+        }
+
+        public override object GetValue()
+        {
+            return Value;
+        }
+
+        public override string GetName()
+        {
+            return Name;
         }
     }
 }

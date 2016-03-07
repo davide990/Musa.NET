@@ -1,5 +1,4 @@
 ﻿using AgentLibrary;
-using FormulaLibrary.ANTLR;
 using FormulaLibrary;
 using NUnit.Framework;
 using MusaCommon;
@@ -19,14 +18,14 @@ namespace AgentLibraryTest
         [Test]
         public bool test_simple(string formula)
         {
-            var FormulaParser = new FormulaParser();
+            var FormulaUtils = new FormulaUtils();
             AgentWorkbench wb = new AgentWorkbench(null);
-            wb.AddStatement(FormulaParser.Parse("y(x<-int(3))") as AtomicFormula,
-                            FormulaParser.Parse("f(x)") as AtomicFormula,
-                            FormulaParser.Parse("h(s,o,a<-string(\"ciao mondo\"))") as AtomicFormula,
-                            FormulaParser.Parse("o(m,s<-char('d')") as AtomicFormula);
+            wb.AddStatement(FormulaUtils.Parse("y(x<-int(3))") as AtomicFormula,
+                            FormulaUtils.Parse("f(x)") as AtomicFormula,
+                            FormulaUtils.Parse("h(s,o,a<-string(\"ciao mondo\"))") as AtomicFormula,
+                            FormulaUtils.Parse("o(m,s<-char('d')") as AtomicFormula);
 
-            AtomicFormula test = FormulaParser.Parse(formula) as AtomicFormula;
+            AtomicFormula test = FormulaUtils.Parse(formula) as AtomicFormula;
             
             return wb.TestCondition(test);
         }
@@ -40,14 +39,14 @@ namespace AgentLibraryTest
         [Test]
         public bool test_composite(string formula)
         {
-            var FormulaParser = new FormulaParser();
+            var FormulaUtils = new FormulaUtils();
             AgentWorkbench wb = new AgentWorkbench(null);
-            wb.AddStatement(FormulaParser.Parse("y(x<-int(3))") as AtomicFormula,
-                            FormulaParser.Parse("f(x)") as AtomicFormula,
-                            FormulaParser.Parse("h(s,o,a<-string(\"ciao mondo\"))") as AtomicFormula,
-                            FormulaParser.Parse("o(m,s<-char('d')") as AtomicFormula);
+            wb.AddStatement(FormulaUtils.Parse("y(x<-int(3))") as AtomicFormula,
+                            FormulaUtils.Parse("f(x)") as AtomicFormula,
+                            FormulaUtils.Parse("h(s,o,a<-string(\"ciao mondo\"))") as AtomicFormula,
+                            FormulaUtils.Parse("o(m,s<-char('d')") as AtomicFormula);
 
-            IFormula test = FormulaParser.Parse(formula);
+            IFormula test = FormulaUtils.Parse(formula);
 
             return wb.TestCondition(test);
         }
@@ -72,9 +71,9 @@ namespace AgentLibraryTest
         [Test]
         public int unroll_formula_test(string formula)
         {
-            var FormulaParser = new FormulaParser();
+            var FormulaUtils = new FormulaUtils();
             AgentWorkbench wb = new AgentWorkbench(null);
-            wb.AddStatement(FormulaParser.Parse(formula));
+            wb.AddStatement(FormulaUtils.Parse(formula));
             return wb.Statements.Count;
         }
     }

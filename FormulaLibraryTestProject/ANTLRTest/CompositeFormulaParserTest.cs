@@ -38,10 +38,10 @@ namespace FormulaLibraryTestProject
         [Test]
         public bool formula_test_0()
         {
-            var FormulaParser = new FormulaParser();
+            var FormulaUtils = new FormulaUtils();
             string formula = "!f(x)";
 
-            IFormula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaUtils.Parse(formula);
 
             Formula n = new AtomicFormula("f", new LiteralTerm("x"));
             Formula expectedFormula = new NotFormula(n);
@@ -53,10 +53,10 @@ namespace FormulaLibraryTestProject
         [Test]
         public bool formula_test_1()
         {
-            var FormulaParser = new FormulaParser();
+            var FormulaUtils = new FormulaUtils();
             string formula = "f(x)|h(s)";
 
-            IFormula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaUtils.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula b = new AtomicFormula("h", new LiteralTerm("s"));
@@ -69,10 +69,10 @@ namespace FormulaLibraryTestProject
         [Test]
         public bool formula_test_2()
         {
-            var FormulaParser = new FormulaParser();
+            var FormulaUtils = new FormulaUtils();
             string formula = "f(x)&h(s)";
 
-            IFormula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaUtils.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula b = new AtomicFormula("h", new LiteralTerm("s"));
@@ -85,10 +85,10 @@ namespace FormulaLibraryTestProject
         [Test]
         public bool formula_test_3()
         {
-            var FormulaParser = new FormulaParser();
+            var FormulaUtils = new FormulaUtils();
             string formula = "f(x) &(!h(s))";
 
-            IFormula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaUtils.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula b = new AtomicFormula("h", new LiteralTerm("s"));
@@ -102,9 +102,9 @@ namespace FormulaLibraryTestProject
         [Test]
         public bool formula_test_4()
         {
-            var FormulaParser = new FormulaParser();
+            var FormulaUtils = new FormulaUtils();
             string formula = "(!f(x)   | h(s))";
-            IFormula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaUtils.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula a_n = new NotFormula(a);
@@ -119,10 +119,10 @@ namespace FormulaLibraryTestProject
         [Test]
         public bool formula_test_5()
         {
-            var FormulaParser = new FormulaParser();
+            var FormulaUtils = new FormulaUtils();
             string formula = "!(f(x)   | h(s))";
             
-            IFormula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaUtils.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula b = new AtomicFormula("h", new LiteralTerm("s"));
@@ -135,9 +135,9 @@ namespace FormulaLibraryTestProject
         [Test]
         public bool formula_test_6()
         {
-            var FormulaParser = new FormulaParser();
+            var FormulaUtils = new FormulaUtils();
             string formula = "!(f(x))   | h(s)";
-            IFormula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaUtils.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula b = new AtomicFormula("h", new LiteralTerm("s"));
@@ -150,9 +150,9 @@ namespace FormulaLibraryTestProject
         [Test]
         public bool formula_test_7()
         {
-            var FormulaParser = new FormulaParser();
+            var FormulaUtils = new FormulaUtils();
             string formula = "(!(f(x)) | h(s))";
-            IFormula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaUtils.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula b = new AtomicFormula("h", new LiteralTerm("s"));
@@ -168,9 +168,9 @@ namespace FormulaLibraryTestProject
         [Test]
         public bool formula_test_8()
         {
-            var FormulaParser = new FormulaParser();
+            var FormulaUtils = new FormulaUtils();
             string formula = "(f(x)|h(s))&o(m)";
-            IFormula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaUtils.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula b = new AtomicFormula("h", new LiteralTerm("s"));
@@ -186,9 +186,9 @@ namespace FormulaLibraryTestProject
         [Test]
         public bool formula_test_9()
         {
-            var FormulaParser = new FormulaParser();
+            var FormulaUtils = new FormulaUtils();
             string formula = "(f(x)&h(s))|o(m)";
-            IFormula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaUtils.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula b = new AtomicFormula("h", new LiteralTerm("s"));
@@ -203,9 +203,9 @@ namespace FormulaLibraryTestProject
         [Test]
         public bool formula_test_10()
         {
-            var FormulaParser = new FormulaParser();
+            var FormulaUtils = new FormulaUtils();
             string formula = "(f(x)&!h(s))|o(m)";
-            IFormula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaUtils.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula b = new NotFormula(new AtomicFormula("h", new LiteralTerm("s")));
@@ -219,9 +219,9 @@ namespace FormulaLibraryTestProject
         [Test]
         public bool formula_test_11()
         {
-            var FormulaParser = new FormulaParser();
+            var FormulaUtils = new FormulaUtils();
             string formula = "(f(x)&!h(s))|!o(m)";
-            IFormula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaUtils.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"));
             Formula b = new NotFormula(new AtomicFormula("h", new LiteralTerm("s")));
@@ -236,9 +236,9 @@ namespace FormulaLibraryTestProject
         [Test]
         public bool formula_test_12()
         {
-            var FormulaParser = new FormulaParser();
+            var FormulaUtils = new FormulaUtils();
             string formula = "(   f(x,k<-int(3))&!h(s,o,a<-string(\"ciao mondo\")))  |!o(m,s<-char('d'))";
-            IFormula generatedFormula = FormulaParser.Parse(formula);
+            IFormula generatedFormula = FormulaUtils.Parse(formula);
 
             Formula a = new AtomicFormula("f", new LiteralTerm("x"), new VariableTerm<int>("k", 3));
             Formula b = new NotFormula(new AtomicFormula("h", new LiteralTerm("s"), new LiteralTerm("o"), new VariableTerm<string>("a", "ciao mondo")));

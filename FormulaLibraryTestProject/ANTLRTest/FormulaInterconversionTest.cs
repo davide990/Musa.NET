@@ -141,7 +141,7 @@ namespace FormulaLibraryTestProject
         [Test]
         public bool interconversionTest(string formula)
         {
-            return new FormulaParser().Parse(formula) != null;
+            return new FormulaUtils().Parse(formula) != null;
         }
     }
 }

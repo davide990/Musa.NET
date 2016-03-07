@@ -79,10 +79,6 @@
       <Project>{3B8C5698-817C-4C05-87BF-2340C699CC1F}</Project>
       <Name>MusaCommon</Name>
     </ProjectReference>
-    <ProjectReference Include="..\FormulaLibrary\FormulaLibrary.csproj">
-      <Project>{2A2DD9B6-50F6-4D87-AF2E-B422E31A999C}</Project>
-      <Name>FormulaLibrary</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

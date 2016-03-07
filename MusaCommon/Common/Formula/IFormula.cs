@@ -5,12 +5,12 @@
 //         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
 //         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 //
-//  LiteralTerm.cs
+//  IFormula.cs
 //
 //  Author:
 //       Davide Guastella <davide.guastella90@gmail.com>
 //
-//  Copyright (c) 2016 Davide Guastella
+//  Copyright (c) 2015 Davide Guastella
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
@@ -24,48 +24,16 @@
 //
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 using System;
+using System.Collections.Generic;
 
-namespace FormulaLibrary
+namespace MusaCommon
 {
-    public class LiteralTerm : Term, IEquatable<LiteralTerm>
+    public interface IFormula
     {
-        public LiteralTerm(string name)
-            : base(name)
-        {
-        }
-
-        public bool Equals(LiteralTerm other)
-        {
-            return Name.Equals(other.Name);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if(obj is LiteralTerm)
-                return Equals((LiteralTerm)obj);
-            return false;
-        }
-        
-        public VariableTerm<type> toVariableTerm<type>(type value)
-        {
-            return new VariableTerm<type>(Name, value);
-        }       
-
-        public override bool IsLiteral()
-        {
-            return true;
-        }
-
-        public override object GetValue()
-        {
-            return null;
-        }
-
-        public override string GetName()
-        {
-            return Name;
-        }
+        List<object> ConvertToSimpleFormula();
+        FormulaType GetType();
+        bool IsAtomic();
     }
 }
+

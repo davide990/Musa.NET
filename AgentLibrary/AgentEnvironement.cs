@@ -26,7 +26,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using AgentLibrary;
-using FormulaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -46,12 +45,12 @@ namespace AgentLibrary
         /// <summary>
         /// The statements for this environment
         /// </summary>
-        private ObservableCollection<AtomicFormula> statements;
+        private ObservableCollection<IFormula> statements;
 
         /// <summary>
         /// The set of assignment for the statement contained in this environment
         /// </summary>
-        private ObservableCollection<AssignmentType> assignments;
+        private ObservableCollection<IAssignment> assignments;
 
         /// <summary>
         /// The agents registered to this environment
@@ -133,6 +132,10 @@ namespace AgentLibrary
         /// </summary>
         private ILogger logger;
 
+        private IVariableTermFacade VariableTermFacace;
+
+        private IAssignmentFactory AssignmentFactory;
+
         /// <summary>
         /// Get the unique agent environement for this MUSA.NET process instance.
         /// </summary>
@@ -156,6 +159,10 @@ namespace AgentLibrary
             //Inject the logger
             instance.logger = ModuleProvider.Get().Resolve<ILogger>();
 
+            instance.VariableTermFacace = ModuleProvider.Get().Resolve<IVariableTermFacade>();
+
+            instance.AssignmentFactory = ModuleProvider.Get().Resolve<IAssignmentFactory>();
+
             return instance;
         }
 
@@ -167,8 +174,8 @@ namespace AgentLibrary
         private AgentEnvironement()
         {
 			
-            statements = new ObservableCollection<AtomicFormula>();
-            assignments = new ObservableCollection<AssignmentType>();
+            statements = new ObservableCollection<IFormula>();
+            assignments = new ObservableCollection<IAssignment>();
             registeredAgents = new ObservableCollection<Agent>();
 
             CreationDate = DateTime.Now;
@@ -276,7 +283,7 @@ namespace AgentLibrary
         public void RegisterAgentFromConfiguration()
         {
             //Inject the logger
-            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaParser>();
+            var FormulaUtils = ModuleProvider.Get().Resolve<IFormulaUtils>();
 
             //Get the agents configuration
             var ae = MusaConfig.GetConfig().Agents;
@@ -290,7 +297,7 @@ namespace AgentLibrary
 
                 foreach (BeliefEntry belief in ag.BeliefBase)
                 {
-                    var formula = FormulaParser.Parse(belief.Value);
+                    var formula = FormulaUtils.Parse(belief.Value);
                     var unrolled_formula = FormulaUtils.UnrollFormula(formula).ToArray();
                     new_agent.AddBelief(unrolled_formula);
                 }
@@ -408,7 +415,7 @@ namespace AgentLibrary
                 foreach (Type plan in a.Plans)
                     ae.Plans.Add(plan.Name);
 
-                foreach (AtomicFormula ff in a.Beliefs)
+                foreach (IFormula ff in a.Beliefs)
                 {
                     var the_belief = new BeliefEntry();
                     the_belief.Value = ff.ToString();
@@ -475,10 +482,10 @@ namespace AgentLibrary
         /// Add a statement (as atomic formula) into this environment. The addition of the formula(s) is notified to 
         /// every registered agent (to this environment).
         /// </summary>
-        public void RegisterStatement(params AtomicFormula[] f)
+        public void RegisterStatement(params IFormula[] f)
         {
             List<object> variableTerms = new List<object>();
-            foreach (AtomicFormula ff in f)
+            foreach (IFormula ff in f)
             {
                 variableTerms = ff.ConvertToSimpleFormula();
 
@@ -492,7 +499,8 @@ namespace AgentLibrary
                     object varTermName = VariableTermFacace.GetNameOfVariableTerm(varTerm);
                     object varTermValue = VariableTermFacace.GetValueOfVariableTerm(varTerm);
 
-                    assignments.Add(AssignmentType.CreateAssignmentForTerm((string)varTermName, varTermValue, varTerm.GetType().GetGenericArguments()[0]));
+                    //assignments.Add(AssignmentFactory.CreateAssignment((string)varTermName, varTermValue, varTerm.GetType().GetGenericArguments()[0]));
+                    assignments.Add(AssignmentFactory.CreateAssignment((string)varTermName, varTermValue));
                 }
 
                 //Add the formula to this environment
@@ -504,10 +512,10 @@ namespace AgentLibrary
         /// Given a set of atomic formulas, this method removes the matching formulas from this environment and also its
         /// corresponding assignments.
         /// </summary>
-        public void DeleteStatementAndAssignment(params AtomicFormula[] f)
+        public void DeleteStatementAndAssignment(params IFormula[] f)
         {
             List<object> variableTerms = new List<object>();
-            foreach (AtomicFormula ff in f)
+            foreach (IFormula ff in f)
             {
                 variableTerms = ff.ConvertToSimpleFormula();
 
@@ -522,7 +530,8 @@ namespace AgentLibrary
                     object varTermValue = VariableTermFacace.GetValueOfVariableTerm(varTerm);
 
                     //remove the assignment
-                    assignments.Remove(AssignmentType.CreateAssignmentForTerm((string)varTermName, varTermValue, varTerm.GetType().GetGenericArguments()[0]));
+                    //assignments.Remove(AssignmentType.CreateAssignmentForTerm((string)varTermName, varTermValue, varTerm.GetType().GetGenericArguments()[0]));
+                    assignments.Remove(AssignmentFactory.CreateAssignment((string)varTermName, varTermValue));
                 }
 
                 //Remove the formula from this environment
@@ -533,9 +542,9 @@ namespace AgentLibrary
         /// <summary>
         /// Given a set of atomic formulas, this method removes the matching formulas from this environment.
         /// </summary>
-        public void DeleteStatement(params AtomicFormula[] f)
+        public void DeleteStatement(params IFormula[] f)
         {
-            foreach (AtomicFormula ff in f)
+            foreach (IFormula ff in f)
             {
                 //Convert the formula to a simple formula
                 ff.ConvertToSimpleFormula();

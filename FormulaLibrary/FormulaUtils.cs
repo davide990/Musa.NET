@@ -24,19 +24,26 @@
 //
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 using System.Collections.Generic;
 using MusaCommon;
+using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
+using FormulaLibrary.ANTLR.visitor;
+using System.IO;
+using System.Text;
 
 namespace FormulaLibrary
 {
-    public static class FormulaUtils
+    [Register(typeof(IFormulaUtils))]
+    public class FormulaUtils : MusaModule, IFormulaUtils
     {
         /// <summary>
         /// Given a generic formula, return its inner atomic formulas.
         /// </summary>
-        public static List<AtomicFormula> UnrollFormula(IFormula f)
+        public List<IAtomicFormula> UnrollFormula(IFormula f)
         {
-            List<AtomicFormula> unrolled_formula_list = new List<AtomicFormula>();
+            List<IAtomicFormula> unrolled_formula_list = new List<IAtomicFormula>();
 
             if (f is AndFormula)
             {
@@ -53,9 +60,59 @@ namespace FormulaLibrary
                 unrolled_formula_list.AddRange(UnrollFormula((f as NotFormula).Formula));
             }
             else
-                unrolled_formula_list.Add(f as AtomicFormula);
+                unrolled_formula_list.Add(f as IAtomicFormula);
 
             return unrolled_formula_list;
+        }
+
+        /// <summary>
+        /// Convert a formula in the form of string to a <typeparamref name="Formula"/>
+        /// </summary>
+        /// <param name="formula">a formula in the form of string</param>
+        /// <returns></returns>
+        public IFormula Parse(string formula)
+        {
+            // convert string to stream
+            byte[] byteArray = Encoding.ASCII.GetBytes(formula);
+
+            MemoryStream m_stream = new MemoryStream(byteArray);
+
+            // convert stream to string
+            StreamReader reader = new StreamReader(m_stream);
+            AntlrInputStream stream = new AntlrInputStream(reader);
+            ITokenSource lexer = new formula_grammarLexer(stream);
+            ITokenStream tokens = new CommonTokenStream(lexer);
+            formula_grammarParser parser = new formula_grammarParser(tokens);
+
+            //Invoke the parser
+            IParseTree tree = parser.disjunction(); 
+            /*
+            catch(Exception e)
+            {
+                if (e is InputMismatchException)
+                    Console.WriteLine ("Input '" + formula + "' is not a valid formula.\n" + e.Message);
+                if (e is RecognitionException)
+                    Console.WriteLine ("Recognition exception with formula '" + formula + "'.\n" + e.Message);
+
+                return null;
+            }                
+            */
+            Formula formulaObject;
+            using (FormulaVisitor vv = new FormulaVisitor())
+            {
+                //Visit the parse tree
+                formulaObject = vv.Visit(tree);      
+            }
+
+            stream.Reset();
+            parser.Reset();
+
+            return formulaObject;
+        }
+
+        public IFormula ConvertXMLtoFormula()
+        {
+            return null;
         }
     }
 }

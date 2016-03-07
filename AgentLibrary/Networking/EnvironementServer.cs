@@ -1,5 +1,4 @@
-﻿using FormulaLibrary;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
@@ -186,7 +185,7 @@ namespace AgentLibrary
         {
             List<string> outList = new List<string>();
 
-            foreach (Formula f in Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(agent.AgentName)).Beliefs)
+            foreach (IFormula f in Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(agent.AgentName)).Beliefs)
                 outList.Add(f.ToString());
 
             return outList;
@@ -207,7 +206,7 @@ namespace AgentLibrary
         {
             List<string> outList = new List<string>();
 
-            foreach (AssignmentType f in Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(agent.AgentName)).Assignments)
+            foreach (IAssignment f in Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(agent.AgentName)).Assignments)
                 outList.Add(f.ToString());
 
             return outList;
@@ -218,9 +217,14 @@ namespace AgentLibrary
             if (!AgentIsAuthorized(sender))
                 return false;
 
-            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaParser>();
+            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaUtils>();
             IFormula ff = FormulaParser.Parse(formula);
-            return Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(receiver.AgentName)).TestCondition(ff);
+            var receiver_agent = Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(receiver.AgentName));
+
+            if (receiver_agent != null)
+                return receiver_agent.TestCondition(ff);
+
+            return false;
         }
 
         public bool RegisterAgent(AgentPassport newAgent)
@@ -256,7 +260,7 @@ namespace AgentLibrary
 
         public bool AddStatement(string agent_name, string statement)
         {
-            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaParser>();
+            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaUtils>();
 
             Agent ag = Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(agent_name));
             ag.AddBelief(new IFormula[] { FormulaParser.Parse(statement) });

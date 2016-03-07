@@ -29,11 +29,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.3.0.1\lib\net45\nunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="Antlr4.Runtime">
       <HintPath>..\..\Antlr4.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -43,6 +43,7 @@
     <Compile Include="AtomicFormulaTest.cs" />
     <Compile Include="LiteralTermTest.cs" />
     <Compile Include="VariableTermTest.cs" />
+    <Compile Include="ConditionTest.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -53,6 +54,14 @@
     <ProjectReference Include="..\MusaCommon\MusaCommon.csproj">
       <Project>{3B8C5698-817C-4C05-87BF-2340C699CC1F}</Project>
       <Name>MusaCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AgentLibrary\AgentLibrary.csproj">
+      <Project>{0124CAC4-A805-459B-8434-27257B0F1E6E}</Project>
+      <Name>AgentLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MusaInitializer\MusaInitializer.csproj">
+      <Project>{CCAE3DAD-3075-451C-8BCE-B50F3A1B6128}</Project>
+      <Name>MusaInitializer</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

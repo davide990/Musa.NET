@@ -30,7 +30,6 @@ using System.Collections;
 using System.Threading;
 using System;
 using AgentLibrary;
-using FormulaLibrary;
 using MusaCommon;
 
 namespace AgentLibrary
@@ -288,13 +287,13 @@ namespace AgentLibrary
 			
             //Take the last message within the mail box
             Tuple<AgentPassport, AgentMessage> last_message = parentAgent.MailBox.Pop();
-            AgentPassport passport = last_message.Item1;
+            AgentPassport sender_agent_passport = last_message.Item1;
             AgentMessage msg = last_message.Item2;
             //TODO [importante] bisogna capire qui se un evento è interno o esterno (vedi documentazione jason/agentspeak)
 
             Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Green);
 
-            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaParser>();
+            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaUtils>();
 
             //process the message
             switch (msg.InfoType)
@@ -322,6 +321,10 @@ namespace AgentLibrary
                     break;
 
                 case InformationType.AskOne:
+                    //msg contiene una formula
+                    //formula --> IFormula
+                    //testa formula in workbench
+                    //manda risultato a sender_agent_passport
                     break;
 
                 case InformationType.AskAll:
@@ -410,7 +413,7 @@ namespace AgentLibrary
             Type plan_to_execute = null;
 
             //Iterate each agent's perceived change in the environment
-            foreach (AtomicFormula formula in changes_list)
+            foreach (IAtomicFormula formula in changes_list)
             {
                 //Check if an handler for the perceived change exists.
                 EventsCatalogue.TryGetValue(new AgentEventKey(formula.ToString(), perception_type), out plan_to_execute);

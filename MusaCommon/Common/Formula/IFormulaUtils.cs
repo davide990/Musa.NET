@@ -5,12 +5,12 @@
 //         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
 //         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 //
-//  IFormula.cs
+//  IFormulaUtils.cs
 //
 //  Author:
 //       Davide Guastella <davide.guastella90@gmail.com>
 //
-//  Copyright (c) 2015 Davide Guastella
+//  Copyright (c) 2016 Davide Guastella
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
@@ -25,11 +25,15 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using System.Collections.Generic;
 
 namespace MusaCommon
 {
-    public interface IFormula
+    public interface IFormulaUtils
     {
+        List<IAtomicFormula> UnrollFormula(IFormula f);
+        IFormula Parse(string formula);
+        IFormula ConvertXMLtoFormula();
     }
 }
 

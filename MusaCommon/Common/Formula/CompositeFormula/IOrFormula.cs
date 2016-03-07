@@ -5,7 +5,7 @@
 //         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
 //         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 //
-//  IFormulaParser.cs
+//  IOrFormula.cs
 //
 //  Author:
 //       Davide Guastella <davide.guastella90@gmail.com>
@@ -28,10 +28,10 @@ using System;
 
 namespace MusaCommon
 {
-    public interface IFormulaParser
+    public interface IOrFormula
     {
-        IFormula Parse(string formula);
-        IFormula ConvertXMLtoFormula();
+        IFormula GetLeft();
+        IFormula GetRight();
     }
 }
 

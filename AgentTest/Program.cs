@@ -66,13 +66,14 @@ namespace AgentTest
             //env.RegisterAgent (ag_b);
 
 
-            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaParser>();
+            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaUtils>();
 
             /*a.AddBelief(FormulaParser.Parse("f(x)"));*/
             a.AddBelief(FormulaParser.Parse("k(x)"), FormulaParser.Parse("p(y<-int(3))"));
 
             var ll = new List<IFormula>{ FormulaParser.Parse("w(x)"), FormulaParser.Parse("cc(x)") };
             a.AddBelief(ll);
+
 
             //env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
             //a.AchieveGoal (typeof(PlanExample2));
@@ -157,7 +158,7 @@ namespace AgentTest
             log(LogLevel.Info, "~~~~~~HELLO WORLD~~~~~~");
         }
 
-        [PlanStep("g(x,o)|f(x)")]
+        [PlanStep("g(x,o) & f(x)")]
         void hello2(PlanArgs args)
         {
             log(LogLevel.Info, "~~~~~~HELLO WORLD2~~~~~~");

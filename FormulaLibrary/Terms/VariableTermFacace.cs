@@ -30,11 +30,18 @@ using MusaCommon;
 
 namespace FormulaLibrary
 {
-    public static class VariableTermFacace
+    [Register(typeof(IVariableTermFacade))]
+    public class VariableTermFacace : MusaModule, IVariableTermFacade
     {
-        private static ILogger Logger
+        private ILogger Logger
         {
-            get { return ModuleProvider.Get().Resolve<ILogger>(); }
+            get;
+            set;
+        }
+
+        public VariableTermFacace()
+        {
+            Logger = ModuleProvider.Get().Resolve<ILogger>();
         }
 
         /// <summary>
@@ -42,7 +49,7 @@ namespace FormulaLibrary
         /// </summary>
         /// <returns>The variable term for type t.</returns>
         /// <param name="t">The type the variable term supports.</param>
-        public static Type GetVariableTermFor(Type t)
+        public Type GetVariableTermFor(Type t)
         {
             return typeof(VariableTerm<>).MakeGenericType(t);
         }
@@ -52,7 +59,7 @@ namespace FormulaLibrary
         /// </summary>
         /// <returns>The name of variable term.</returns>
         /// <param name="var_term">Variable term.</param>
-        public static object GetNameOfVariableTerm(object var_term)
+        public object GetNameOfVariableTerm(object var_term)
         {
             return GetValueFromGeneric(var_term, "Name");
         }
@@ -62,12 +69,12 @@ namespace FormulaLibrary
         /// </summary>
         /// <returns>The value of variable term.</returns>
         /// <param name="var_term">Variable term.</param>
-        public static object GetValueOfVariableTerm(object var_term)
+        public object GetValueOfVariableTerm(object var_term)
         {
             return GetValueFromGeneric(var_term, "Value");
         }
 
-        private static object GetValueFromGeneric(object var_term, string field_name)
+        private object GetValueFromGeneric(object var_term, string field_name)
         {
             Type var_term_type = var_term.GetType();
 
@@ -94,12 +101,14 @@ namespace FormulaLibrary
         /// </summary>
         /// <returns>The literal term corresponding to [var_term].</returns>
         /// <param name="var_term">The variable term to be converted.</param>
-        public static LiteralTerm ConvertToLiteralTerm(Term var_term)
+        //public  LiteralTerm ConvertToLiteralTerm(Term var_term)
+        public ITerm ConvertToLiteralTerm(ITerm var_term)
         {
-            if (!var_term.GetType().IsGenericType)
+            //if (!var_term.GetType().IsGenericType)
+            if (var_term.IsLiteral())
             {
                 Logger.Log(LogLevel.Warn, "Provided term [" + var_term + "] is not a variable term.");
-                return (LiteralTerm)var_term;
+                return var_term;
             }
 
             MethodInfo parse_method = var_term.GetType().GetMethod("toLiteralTerm");
@@ -112,7 +121,7 @@ namespace FormulaLibrary
         /// <returns>The variable term for.</returns>
         /// <param name="Name">The name of the variable term.</param>
         /// <param name="value">The value of the variable term.</param>
-        public static object CreateVariableTerm(string Name, object value)
+        public object CreateVariableTerm(string Name, object value)
         {
             //Get the type of the specified variable term value
             Type varTermValueType = value.GetType();
@@ -126,7 +135,7 @@ namespace FormulaLibrary
             return cinfo.Invoke(new[] { Name, value });
         }
 
-        public static object SetValueForVariableTerm(object varTerm, object value)
+        public object SetValueForVariableTerm(object varTerm, object value)
         {
             if (!varTerm.GetType().IsSubclassOf(typeof(Term)) || !varTerm.GetType().IsGenericType)
             {

@@ -25,7 +25,6 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using FormulaLibrary;
 using System.Collections.Generic;
 using System;
 using System.Collections.ObjectModel;
@@ -33,6 +32,7 @@ using System.Collections;
 using System.Text;
 using System.Runtime.Serialization;
 using MusaCommon;
+using System.Linq;
 
 
 namespace AgentLibrary
@@ -68,7 +68,7 @@ namespace AgentLibrary
         /// The set of formula
         /// </summary>
         [DataMember]
-        public ObservableCollection<AtomicFormula> Statements
+        public ObservableCollection<IFormula> Statements
         {
             get;
             private set;
@@ -78,7 +78,7 @@ namespace AgentLibrary
         /// The set of assignment
         /// </summary>
         [DataMember]
-        public ObservableCollection<AssignmentType> AssignmentSet
+        public ObservableCollection<IAssignment> AssignmentSet
         {
             get;
             private set;
@@ -91,6 +91,8 @@ namespace AgentLibrary
         private readonly Agent parentAgent;
         
         private ILogger logger;
+        private IAssignmentFactory assignmentFactory;
+        private IFormulaUtils FormulaUtils;
 
         /// <summary>
         /// Create a new agent workbench
@@ -98,14 +100,16 @@ namespace AgentLibrary
         public AgentWorkbench(Agent agent)
         {
             parentAgent = agent;
-            Statements = new ObservableCollection<AtomicFormula>();
-            AssignmentSet = new ObservableCollection<AssignmentType>();
+            Statements = new ObservableCollection<IFormula>();
+            AssignmentSet = new ObservableCollection<IAssignment>();
 
             Statements.CollectionChanged += on_workbench_changed;
             AssignmentSet.CollectionChanged += on_assignment_set_changed;
 
             /*logger = MusaConfig.GetLogger();*/
             logger = ModuleProvider.Get().Resolve<ILogger>();
+            assignmentFactory = ModuleProvider.Get().Resolve<IAssignmentFactory>();
+            FormulaUtils = ModuleProvider.Get().Resolve<IFormulaUtils>();
         }
 
         /// <summary>
@@ -153,7 +157,7 @@ namespace AgentLibrary
         /// <summary>
         /// Check if this workbench contains a specific atomic formula
         /// </summary>
-        public bool containsFormula(AtomicFormula f)
+        public bool containsFormula(IFormula f)
         {
             return Statements.Contains(f);
         }
@@ -164,22 +168,29 @@ namespace AgentLibrary
         /// <param name="f">A list of AtomicFormula to be added</param>
         public void AddStatement(IList f)
         {
-            foreach (AtomicFormula ff in f)
+            foreach (IFormula ff in f)
                 AddStatement(ff);
         }
 
-        public void AddStatement(params IFormula[] f)
+        /*        public void AddStatement(params IFormula[] f)
         {
             foreach (IFormula ff in f)
                 AddStatement(FormulaUtils.UnrollFormula(ff));
-        }
+        }*/
 
         /// <summary>
         /// Add a statement (as atomic formula) into this workbench.
         /// </summary>
-        public void AddStatement(params AtomicFormula[] f)
+        public void AddStatement(params IFormula[] f)
         {
-            addOrUpdateStatement(false, f);
+            foreach (IFormula ff in f)
+            {
+                if (!ff.IsAtomic())
+                    addOrUpdateStatement(false, FormulaUtils.UnrollFormula(ff).ToArray());
+                else
+                    addOrUpdateStatement(false, ff as IAtomicFormula);
+            }
+                
             /*List<object> variableTerms = new List<object>();
             foreach (AtomicFormula ff in f)
             {
@@ -211,10 +222,10 @@ namespace AgentLibrary
             }*/
         }
 
-        private void addOrUpdateStatement(bool update = false, params AtomicFormula[] f)
+        private void addOrUpdateStatement(bool update = false, params IAtomicFormula[] f)
         {
             List<object> variableTerms = new List<object>();
-            foreach (AtomicFormula ff in f)
+            foreach (IFormula ff in f)
             {
                 //Convert ff to a simple (non parametric) formula, and get its variable terms as list
                 variableTerms = ff.ConvertToSimpleFormula();
@@ -223,21 +234,25 @@ namespace AgentLibrary
                     RemoveStatement(ff);
 
                 //Iterate the formula's variable terms
-                foreach (object varTerm in variableTerms)
+                foreach (ITerm varTerm in variableTerms)
                 {
-                    //get the type info for the current term
+/*                    //get the type info for the current term
                     Type variableTermType = typeof(VariableTerm<>).MakeGenericType(varTerm.GetType().GetGenericArguments()[0]);
 
                     //get the value of the current term
                     object name = Convert.ChangeType(variableTermType.GetProperty("Name").GetValue(varTerm), typeof(string));
                     object value = variableTermType.GetProperty("Value").GetValue(varTerm);
                     value = Convert.ChangeType(value, varTerm.GetType().GetGenericArguments()[0]);
-
+*/
                     //Add the assignment to the assignment set
                     if (update)
+                        UpdateAssignment(varTerm.GetName(), varTerm.GetValue());
+                    else
+                        AddAssignment(varTerm.GetName(), varTerm.GetValue());
+                    /* if (update)
                         UpdateAssignment((string)name, value);
                     else
-                        AddAssignment((string)name, value);
+                        AddAssignment((string)name, value);*/
                     //AssignmentSet.Add(AssignmentType.CreateAssignmentForTerm((string)name, value, varTerm.GetType().GetGenericArguments()[0]));
                 }
 
@@ -251,20 +266,43 @@ namespace AgentLibrary
         /// </summary>
         public void RemoveStatement(IList f)
         {
-            foreach (AtomicFormula ff in f)
+            foreach (IFormula ff in f)
                 RemoveStatement(ff);
         }
 
         /// <summary>
         /// Remove a statement from this workbench
         /// </summary>
-        public void RemoveStatement(params Formula[] f)
+        public void RemoveStatement(params IFormula[] f)
         {
-            foreach (Formula ff in f)
-                RemoveStatement(FormulaUtils.UnrollFormula(ff));
+            foreach (IFormula ff in f)
+            {
+                var to_remove = ff;
+
+                if (!ff.IsAtomic())
+                {
+                    var unrolled = FormulaUtils.UnrollFormula(ff);
+
+                    foreach (IFormula unrolledFormula in unrolled)
+                    {
+                        unrolledFormula.ConvertToSimpleFormula();
+
+                        if (Statements.Contains(unrolledFormula))
+                            Statements.Remove(unrolledFormula);    
+                    }
+                    continue;
+                }
+                else
+                {
+                    ff.ConvertToSimpleFormula();
+
+                    if (Statements.Contains(ff))
+                        Statements.Remove(ff);
+                }    
+            }
         }
 
-        /// <summary>
+        /*        /// <summary>
         /// Remove a statement from this workbench
         /// </summary>
         public void RemoveStatement(params AtomicFormula[] f)
@@ -276,7 +314,7 @@ namespace AgentLibrary
                 if (Statements.Contains(ff))
                     Statements.Remove(ff);
             }
-        }
+        }*/
 
         /// <summary>
         /// Add multiple statements to this workbench.
@@ -284,20 +322,28 @@ namespace AgentLibrary
         /// <param name="f">A list of AtomicFormula to be added</param>
         public void UpdateStatement(IList f)
         {
-            foreach (AtomicFormula ff in f)
+            foreach (IFormula ff in f)
                 UpdateStatement(ff);
         }
 
         public void UpdateStatement(params IFormula[] f)
         {
             foreach (IFormula ff in f)
-                UpdateStatement(FormulaUtils.UnrollFormula(ff));
-        }
+            {
+                if (ff.IsAtomic())
+                {
+                    addOrUpdateStatement(true, ff as IAtomicFormula);
+                    continue;
+                }
 
-        public void UpdateStatement(params AtomicFormula[] f)
+                addOrUpdateStatement(true, FormulaUtils.UnrollFormula(ff).ToArray());
+            }
+        }
+        /*
+        public void UpdateStatement(params IFormula[] f)
         {
             addOrUpdateStatement(true, f);
-        }
+        }*/
 
         #region Test condition methods
 
@@ -305,31 +351,32 @@ namespace AgentLibrary
         /// Test if a formula is verified into this workbench.
         /// </summary>
         /// <returns>True if formula is satisfied in this workbench</returns>
-        public bool TestCondition(Formula formula, out List<AssignmentType> generatedAssignment)
+/*        public bool TestCondition(IFormula formula, out List<IAssignment> generatedAssignment)
         {
-            if (formula is NotFormula)
-                return !TestCondition((formula as NotFormula).Formula, out generatedAssignment);
-            else if (formula is OrFormula)
+            //if (formula is NotFormula)
+            if (formula.GetType() == FormulaType.NOT_FORMULA)
+                return !TestCondition((formula as INotFormula).GetFormula(), out generatedAssignment);
+            else if (formula.GetType() == FormulaType.OR_FORMULA)
             {
-                List<AssignmentType> l = null, r = null;
-                bool left_result = TestCondition((formula as OrFormula).Left, out l);
-                bool right_result = TestCondition((formula as OrFormula).Right, out r);
-                generatedAssignment = new List<AssignmentType>(l);
+                List<IAssignment> l = null, r = null;
+                bool left_result = TestCondition((formula as IOrFormula).GetLeft(), out l);
+                bool right_result = TestCondition((formula as IOrFormula).GetRight(), out r);
+                generatedAssignment = new List<IAssignment>(l);
                 generatedAssignment.AddRange(r);
                 return left_result | right_result;
             }
-            else if (formula is AndFormula)
+            else if (formula.GetType() == FormulaType.AND_FORMULA)
             {
-                List<AssignmentType> l = null, r = null;
-                bool left_result = TestCondition((formula as AndFormula).Left, out l);
-                bool right_result = TestCondition((formula as AndFormula).Right, out r);
-                generatedAssignment = new List<AssignmentType>(l);
+                List<IAssignment> l = null, r = null;
+                bool left_result = TestCondition((formula as IAndFormula).GetLeft(), out l);
+                bool right_result = TestCondition((formula as IAndFormula).GetRight(), out r);
+                generatedAssignment = new List<IAssignment>(l);
                 generatedAssignment.AddRange(r);
                 return left_result & right_result;
             }
             else
-                return testCondition(formula as AtomicFormula, out generatedAssignment);
-        }
+                return testCondition(formula, out generatedAssignment);
+        }*/
 
         /// <summary>
         /// Test if a formula is verified into this workbench.
@@ -337,16 +384,55 @@ namespace AgentLibrary
         /// <returns>True if formula is satisfied in this workbench</returns>
         public bool TestCondition(IFormula formula)
         {
-            if (formula is NotFormula)
-                return !TestCondition((formula as NotFormula).Formula);
-            else if (formula is OrFormula)
-                return TestCondition((formula as OrFormula).Left) | TestCondition((formula as OrFormula).Right);
-            else if (formula is AndFormula)
-                return TestCondition((formula as AndFormula).Left) & TestCondition((formula as AndFormula).Right);
+            if (formula.GetType() == FormulaType.NOT_FORMULA)
+            {
+                return !TestCondition((formula as INotFormula).GetFormula());
+            }
+            else if (formula.GetType() == FormulaType.OR_FORMULA)
+                return TestCondition((formula as IOrFormula).GetLeft()) | TestCondition((formula as IOrFormula).GetRight());
+            else if (formula.GetType() == FormulaType.AND_FORMULA)
+                return TestCondition((formula as IAndFormula).GetLeft()) & TestCondition((formula as IAndFormula).GetRight());
             else
             {
-                List<AssignmentType> l;
-                return testCondition(formula as AtomicFormula, out l);
+                List<IAssignment> l;
+                //here, formula is atomic
+                return testCondition(formula, out l);
+            }
+        }
+
+        /// <summary>
+        /// Test if a formula is verified into this workbench.
+        /// </summary>
+        /// <returns><c>true</c>, if condition was tested, <c>false</c> otherwise.</returns>
+        /// <param name="formula">Formula.</param>
+        /// <param name="generatedAssignment">Generated assignment.</param>
+        public bool TestCondition(IFormula formula, out List<IAssignment> generatedAssignment)
+        {
+            if (formula.GetType() == FormulaType.NOT_FORMULA)
+            {
+                return !TestCondition((formula as INotFormula).GetFormula(),out generatedAssignment);
+            }
+            else if (formula.GetType() == FormulaType.OR_FORMULA)
+            {
+                List<IAssignment> rightAssignment, leftAssignment;
+                bool leftResult = TestCondition((formula as IOrFormula).GetLeft(), out leftAssignment);
+                bool rightResult = TestCondition((formula as IOrFormula).GetRight(), out rightAssignment);
+                generatedAssignment = leftAssignment.Union(rightAssignment).ToList();
+                return leftResult | rightResult;
+            }
+            else if (formula.GetType() == FormulaType.AND_FORMULA)
+            {
+                List<IAssignment> rightAssignment, leftAssignment;
+                bool leftResult = TestCondition((formula as IAndFormula).GetLeft(), out leftAssignment);
+                bool rightResult = TestCondition((formula as IAndFormula).GetRight(), out rightAssignment);
+                generatedAssignment = leftAssignment.Union(rightAssignment).ToList();
+                return leftResult & rightResult;
+                //return TestCondition((formula as IAndFormula).GetLeft()) & TestCondition((formula as IAndFormula).GetRight());
+            }
+            else
+            {
+                //here, formula is atomic
+                return testCondition(formula, out generatedAssignment);
             }
         }
 
@@ -356,28 +442,33 @@ namespace AgentLibrary
         /// form of assignment, contained in this workbench.
         /// </summary>
         /// <returns>True if f is satisfied in this workbench</returns>
-        private bool testCondition(AtomicFormula f, out List<AssignmentType> generatedAssignment)
+        private bool testCondition(IFormula f, out List<IAssignment> generatedAssignment)
         {
-            Term a, b;
+            generatedAssignment = new List<IAssignment>();
+
+            if (!f.IsAtomic())
+                return false;
+
+            ITerm a, b;
             bool success = true;
-            generatedAssignment = new List<AssignmentType>();
-
             bool belief_term_has_assignment;
+            var input_formula = f as IAtomicFormula;
 
-            foreach (AtomicFormula belief in Statements)
+            foreach (IAtomicFormula belief in Statements)
             {
-                if (belief.TermsCount != f.TermsCount || !belief.Functor.Equals(f.Functor))
+                if (belief.GetTermsCount() != input_formula.GetTermsCount() || !belief.GetFunctor().Equals(input_formula.GetFunctor()))
                     continue;
 
                 generatedAssignment.Clear();
                 success = true;
-                for (int i = 0; i < belief.TermsCount; i++)
+
+                for (int i = 0; i < belief.GetTermsCount(); i++)
                 {
-                    a = belief.Terms[i];
-                    b = f.Terms[i];
+                    a = belief.GetTermAt(i);
+                    b = input_formula.GetTermAt(i);
 
                     object a_value = null;
-                    belief_term_has_assignment = ExistsAssignmentForTerm(a.Name, out a_value);
+                    belief_term_has_assignment = ExistsAssignmentForTerm(a.GetName(), out a_value);
 
                     if (belief_term_has_assignment)
                     {
@@ -386,9 +477,11 @@ namespace AgentLibrary
                             //a and b are both variable 
                             //se sono uguali i valori procedi, altrimenti le formule sono diverse per contenuto, continua
                             //con il prossimo termine
-                            Type type_of_b = b.GetType();
-                            object b_value = type_of_b.GetProperty("Value").GetValue(b);
-                            if (a_value.Equals(b_value))
+                            /*Type type_of_b = b.GetType();
+                            object b_value = type_of_b.GetProperty("Value").GetValue(b);*/
+
+                            //if (a_value.Equals(b_value))
+                            if (a_value.Equals(b.GetValue()))
                                 continue;
                             else
                             { 
@@ -399,12 +492,12 @@ namespace AgentLibrary
                         else
                         {
                             //a is variable term, b is literal - CREA ASSIGNMENT
-                            generatedAssignment.Add(AssignmentType.CreateAssignmentForTerm(b.Name, a_value, a_value.GetType()));
+                            generatedAssignment.Add(assignmentFactory.CreateAssignment(b.GetName(), a_value));
                         }
                     }
                     else
                     {
-                        if (b is LiteralTerm)
+                        if (b.IsLiteral())
                         {
                             //b and a are both literal
                             if (a.Equals(b))
@@ -418,9 +511,13 @@ namespace AgentLibrary
                         else
                         {
                             //b is variable, a is literal - CREA ASSIGNMENT
-                            Type type_of_b = b.GetType();
-                            object b_value = type_of_b.GetProperty("Value").GetValue(b);
-                            generatedAssignment.Add(AssignmentType.CreateAssignmentForTerm(a.Name, b_value, type_of_b.GetGenericArguments()[0]));
+
+                            /*Type type_of_b = b.GetType();
+                            object b_value = type_of_b.GetProperty("Value").GetValue(b);*/
+
+
+                            //generatedAssignment.Add(assignmentFactory.CreateAssignment(a.Name, b_value, type_of_b.GetGenericArguments()[0]));
+                            generatedAssignment.Add(assignmentFactory.CreateAssignment(a.GetName(), b.GetValue()));
                         }
                     }
                 }
@@ -441,7 +538,7 @@ namespace AgentLibrary
         /// <param name="value"></param>
         public void AddAssignment(string termName, object value)
         {
-            AssignmentType a = AssignmentType.CreateAssignmentForTerm(termName, value, value.GetType());
+            IAssignment a = assignmentFactory.CreateAssignment(termName, value);
 
             if (!AssignmentSet.Contains(a))
                 AssignmentSet.Add(a);
@@ -455,7 +552,7 @@ namespace AgentLibrary
         {
             foreach (var assignment in AssignmentSet)
             {
-                if (assignment.Name.Equals(termName))
+                if (assignment.GetName().Equals(termName))
                     return true;
             }
             return false;
@@ -472,11 +569,13 @@ namespace AgentLibrary
         {
             foreach (object assignment in AssignmentSet)
             {
-                if ((assignment as AssignmentType).Name.Equals(termName))
+                //TODO DA PROVARE [assignment]
+                //if ((assignment as AssignmentType).Name.Equals(termName))
+                if ((assignment as IAssignment).GetName().Equals(termName))
                 {
-                    Type varTermType = typeof(Assignment<>).MakeGenericType(assignment.GetType().GetGenericArguments()[0]);
-                    assignmentValue = varTermType.GetProperty("Value").GetValue(assignment, null);
-                    
+                    //Type varTermType = typeof(Assignment<>).MakeGenericType(assignment.GetType().GetGenericArguments()[0]);
+                    //assignmentValue = varTermType.GetProperty("Value").GetValue(assignment, null);
+                    assignmentValue = (assignment as IAssignment).GetValue();
                     return true;
                 }
             }
@@ -490,16 +589,19 @@ namespace AgentLibrary
         /// </summary>
         /// <returns>The assignment for term.</returns>
         /// <param name="termName">Term name.</param>
-        public AssignmentType GetAssignmentForTerm(string termName)
+        public IAssignment GetAssignmentForTerm(string termName)
         {
             foreach (object assignment in AssignmentSet)
             {
-                if ((assignment as AssignmentType).Name.Equals(termName))
+                //if ((assignment as AssignmentType).Name.Equals(termName))
+                if ((assignment as IAssignment).GetName().Equals(termName))
                 {
-                    Type varTermType = typeof(Assignment<>).MakeGenericType(assignment.GetType().GetGenericArguments()[0]);
+                    /*Type varTermType = typeof(Assignment<>).MakeGenericType(assignment.GetType().GetGenericArguments()[0]);
                     object assignmentValue = varTermType.GetProperty("Value").GetValue(assignment, null);
-
-                    return AssignmentType.CreateAssignmentForTerm(termName, assignmentValue, assignmentValue.GetType());
+*/
+                    //return AssignmentType.CreateAssignmentForTerm(termName, assignmentValue, assignmentValue.GetType());
+                    //return assignmentFactory.CreateAssignment(termName, assignmentValue);
+                    return assignment as IAssignment;
                 }
             }
 
@@ -512,7 +614,7 @@ namespace AgentLibrary
         /// <param name="termName">Term name.</param>
         public void RemoveAssignment(string termName)
         {
-            AssignmentType toRemove = GetAssignmentForTerm(termName);
+            IAssignment toRemove = GetAssignmentForTerm(termName);
 
             if (toRemove != null)
                 AssignmentSet.Remove(toRemove);

@@ -30,7 +30,6 @@ using System.Collections.Generic;
 using System.Collections;
 using AgentLibrary;
 using System.Reflection;
-using FormulaLibrary;
 using MusaCommon;
 
 namespace AgentLibrary
@@ -67,14 +66,14 @@ namespace AgentLibrary
         /// <summary>
         /// The belief set of this agent.
         /// </summary>
-        public List<AtomicFormula> Beliefs
+        public List<IFormula> Beliefs
         {
-            get{ return new List<AtomicFormula>(Workbench.Statements); }
+            get{ return new List<IFormula>(Workbench.Statements); }
         }
 
-        public List<AssignmentType> Assignments
+        public List<IAssignment> Assignments
         {
-            get { return new List<AssignmentType>(Workbench.AssignmentSet); }
+            get { return new List<IAssignment>(Workbench.AssignmentSet); }
         }
 
         /// <summary>
@@ -129,7 +128,7 @@ namespace AgentLibrary
         private object lock_mailBox = new object();
 
         /// <summary>
-        /// Gets the plans of this agent.
+        /// Gets the plans type that this agent is aware of.
         /// </summary>
         /// <value>The plans.</value>
         public List<Type> Plans
@@ -274,6 +273,12 @@ namespace AgentLibrary
             private set;
         }
 
+        private IFormulaUtils FormulaUtils
+        {
+            get;
+            set;
+        }
+
         #endregion
 
         /// <summary>
@@ -347,6 +352,8 @@ namespace AgentLibrary
 
             //Inject the PlanFacade 
             PlanFacade = ModuleProvider.Get().Resolve<IPlanFacade>();
+
+            FormulaUtils = ModuleProvider.Get().Resolve<IFormulaUtils>();
 
             //Create a PlanCollection object
             PlansCollection = PlanFacade.CreatePlanCollection();
@@ -554,7 +561,7 @@ namespace AgentLibrary
         /// <param name="result">Result.</param>
         private void onPlanInstanceRegisterResult(string result)
         {
-            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaParser>();
+            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaUtils>();
             IFormula resultFormula = FormulaParser.Parse(result);
 
             if (resultFormula != null)
@@ -653,7 +660,7 @@ namespace AgentLibrary
         /// Adds the beliefs to this agent's workbench. Each formula is added 
         /// as a unique agent perception.
         /// </summary>
-        public void AddBelief(params AtomicFormula[] formula)
+/*        public void AddBelief(params AtomicFormula[] formula)
         {
             foreach (AtomicFormula ff in formula)
             {
@@ -661,7 +668,7 @@ namespace AgentLibrary
                 Logger.Log(LogLevel.Debug, "[" + Name + "] Adding belief " + ff);
                 PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(new List<AtomicFormula>{ ff }, AgentPerception.AddBelief));
             }
-        }
+        }*/
 
         public void AddBelief(params IFormula[] formula)
         {
@@ -688,7 +695,7 @@ namespace AgentLibrary
         /// Updates the beliefs to this agent's workbench. Each formula is added 
         /// as a unique agent perception.
         /// </summary>
-        public void UpdateBelief(params AtomicFormula[] formula)
+/*        public void UpdateBelief(params AtomicFormula[] formula)
         {
             foreach (AtomicFormula ff in formula)
             {
@@ -696,7 +703,7 @@ namespace AgentLibrary
                 Logger.Log(LogLevel.Debug, "[" + Name + "] Updating belief " + ff);
                 PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(new List<AtomicFormula>{ ff }, AgentPerception.UpdateBelief));
             }
-        }
+        }*/
 
         public void UpdateBelief(params IFormula[] formula)
         {

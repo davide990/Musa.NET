@@ -49,7 +49,6 @@
     <Compile Include="ANTLR\formula_grammarListener.cs" />
     <Compile Include="ANTLR\formula_grammarParser.cs" />
     <Compile Include="ANTLR\formula_grammarVisitor.cs" />
-    <Compile Include="ANTLR\parser\FormulaParser.cs" />
     <Compile Include="ANTLR\visitor\FormulaVisitor.cs" />
     <Compile Include="ANTLR\visitor\PredicateVisitor.cs" />
     <Compile Include="CompositeFormula\AndFormula.cs" />
@@ -57,7 +56,6 @@
     <Compile Include="AtomicFormula.cs" />
     <Compile Include="Formula.cs" />
     <Compile Include="FormulaGenerator.cs" />
-    <Compile Include="FormulaType.cs" />
     <Compile Include="CompositeFormula\NotFormula.cs" />
     <Compile Include="CompositeFormula\OrFormula.cs" />
     <Compile Include="IUnifiable.cs" />
@@ -68,6 +66,7 @@
     <Compile Include="FormulaUtils.cs" />
     <Compile Include="Terms\VariableTermFacace.cs" />
     <Compile Include="FormulaLibraryInitializer.cs" />
+    <Compile Include="AssignmentFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ANTLR\formula_grammar.g" />

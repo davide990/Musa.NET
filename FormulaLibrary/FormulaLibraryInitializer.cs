@@ -33,8 +33,12 @@ namespace FormulaLibrary
     {
         public static void Initialize()
         {
-            var formula_parser_specification = Tuple.Create(typeof(FormulaParser), true, string.Empty);
-            new ModuleInitializer().InitializeThisModule(formula_parser_specification);
+            //var formula_parser_specification = Tuple.Create(typeof(FormulaParser), true, string.Empty);
+
+            var formula_utils_specification = Tuple.Create(typeof(FormulaUtils), true, string.Empty);
+            var assignment_factory_specification = Tuple.Create(typeof(AssignmentFactory), true, string.Empty);
+
+            new ModuleInitializer().InitializeThisModule(formula_utils_specification, assignment_factory_specification);
         }
     }
 }

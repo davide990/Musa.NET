@@ -5,7 +5,7 @@
 //         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
 //         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 //
-//  LiteralTerm.cs
+//  AssignmentFactory.cs
 //
 //  Author:
 //       Davide Guastella <davide.guastella90@gmail.com>
@@ -24,48 +24,20 @@
 //
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 using System;
+using MusaCommon;
 
 namespace FormulaLibrary
 {
-    public class LiteralTerm : Term, IEquatable<LiteralTerm>
+    [Register(typeof(IAssignmentFactory))]
+    public class AssignmentFactory : MusaModule, IAssignmentFactory
     {
-        public LiteralTerm(string name)
-            : base(name)
+        public IAssignment CreateAssignment(string termName, object value)
         {
+            Type varTermType = typeof(Assignment<>).MakeGenericType(value.GetType());
+            return (IAssignment)Activator.CreateInstance(varTermType, termName, value);
         }
-
-        public bool Equals(LiteralTerm other)
-        {
-            return Name.Equals(other.Name);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if(obj is LiteralTerm)
-                return Equals((LiteralTerm)obj);
-            return false;
-        }
-        
-        public VariableTerm<type> toVariableTerm<type>(type value)
-        {
-            return new VariableTerm<type>(Name, value);
-        }       
-
-        public override bool IsLiteral()
-        {
-            return true;
-        }
-
-        public override object GetValue()
-        {
-            return null;
-        }
-
-        public override string GetName()
-        {
-            return Name;
-        }
+            
     }
 }
+

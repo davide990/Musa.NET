@@ -29,6 +29,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using MusaCommon;
 
 namespace FormulaLibrary
 {
@@ -38,7 +39,7 @@ namespace FormulaLibrary
     /// - a functor, and
     /// - a list of Terms
     /// </summary>
-    public sealed class AtomicFormula : Formula, ICloneable
+    public sealed class AtomicFormula : Formula, IAtomicFormula, ICloneable
     {
         /// <summary>
         /// The functor of this formula
@@ -52,7 +53,7 @@ namespace FormulaLibrary
         /// <summary>
         /// The list of Terms of this formula
         /// </summary>
-        public List<Term> Terms
+        public List<ITerm> Terms
         {
             get;
             private set;
@@ -66,21 +67,28 @@ namespace FormulaLibrary
             get { return Terms.Count; }
         }
 
-        public AtomicFormula(string functor, params Term[] Terms)
+        public VariableTermFacace VariableTermFacace
         {
-            Functor = functor;
-            this.Terms = new List<Term>(Terms);
+            get;
+            private set;
         }
 
-        public AtomicFormula(string functor, IEnumerable<Term> Terms)
+        public AtomicFormula(string functor, params ITerm[] Terms)
         {
             Functor = functor;
-            this.Terms = new List<Term>(Terms);
-            //Terms.AddRange(Terms);
+            this.Terms = new List<ITerm>(Terms);
+            VariableTermFacace = new VariableTermFacace();
+        }
+
+        public AtomicFormula(string functor, IEnumerable<ITerm> Terms)
+        {
+            Functor = functor;
+            this.Terms = new List<ITerm>(Terms);
+            VariableTermFacace = new VariableTermFacace();
         }
 
 
-        public override FormulaType getType()
+        public override FormulaType GetType()
         {
             return FormulaType.ATOMIC_FORMULA;
         }
@@ -119,7 +127,7 @@ namespace FormulaLibrary
             b.Append("(");
             for (byte i = 0; i < Terms.Count; i++)
             {
-                b.Append(Terms[i].Name);
+                b.Append(Terms[i].GetName());
                 if (i != Terms.Count - 1)
                     b.Append(",");
             }
@@ -171,8 +179,8 @@ namespace FormulaLibrary
         /// contains any variable term, convert them to literal Terms. Found variable
         /// Terms are returned to the output list
         /// </summary>
-        /// <returns>a list containing the variable Terms this formula previously contained</returns>
-        public List<object> ConvertToSimpleFormula()
+        /// <returns>a list containing the variable terms this formula previously contained</returns>
+        public override List<object> ConvertToSimpleFormula()
         {
             List<object> variableTerms = new List<object>();
             
@@ -180,18 +188,24 @@ namespace FormulaLibrary
             for (int i = 0; i < Terms.Count; i++)
             {
                 //if a variable term occurs, convert each one to literal term
-                if (Terms[i].GetType().IsGenericType)
+                if (!Terms[i].IsLiteral())
                 {
                     //add the variable term to the output list
                     variableTerms.Add(Terms[i]);
 
                     //get the type info for the current term
-                    Type variableTermType = VariableTermFacace.GetVariableTermFor(Terms[i].GetType().GetGenericArguments()[0]);
+                    //Type variableTermType = VariableTermFacace.GetVariableTermFor(Terms[i].GetType().GetGenericArguments()[0]);
+
                     Terms[i] = VariableTermFacace.ConvertToLiteralTerm(Terms[i]);
                 }
             }
 
             return variableTerms;
+        }
+
+        public override bool IsAtomic()
+        {
+            return true;
         }
 
         /// <summary>
@@ -208,7 +222,7 @@ namespace FormulaLibrary
                 if (Terms[i].GetType().IsGenericType)
                 { 
                     //get the type info for the current term
-                    Type variableTermType = VariableTermFacace.GetVariableTermFor(Terms[i].GetType().GetGenericArguments()[0]);
+                    //Type variableTermType = VariableTermFacace.GetVariableTermFor(Terms[i].GetType().GetGenericArguments()[0]);
 
                     string name = (string)VariableTermFacace.GetNameOfVariableTerm(Terms[i]);
                     object value = VariableTermFacace.GetValueOfVariableTerm(Terms[i]);
@@ -219,11 +233,36 @@ namespace FormulaLibrary
                 }
                 else
                 {
-                    clone.Terms.Add(new LiteralTerm(Terms[i].Name));
+                    clone.Terms.Add(new LiteralTerm(Terms[i].GetName()));
                 }
             }
             return clone;
         }
+
+
+        #region IAtomicFormula members
+
+        public string GetFunctor()
+        {
+            return Functor;
+        }
+
+        public ITerm[] GetTerms()
+        {
+            return Terms.ToArray();
+        }
+
+        public ITerm GetTermAt(int i)
+        {
+            return Terms[i];
+        }
+
+        public int GetTermsCount()
+        {
+            return Terms.Count;
+        }
+
+        #endregion IAtomicFormula members
     }
 
     sealed internal class InvalidFormulaFormatException : Exception

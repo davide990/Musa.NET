@@ -46,12 +46,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MusaModule\ModuleInitializer.cs" />
     <Compile Include="MusaModule\MusaModule.cs" />
-    <Compile Include="Common\IFormula.cs" />
     <Compile Include="Common\IMusaConfig.cs" />
     <Compile Include="Common\Logger\ILogger.cs" />
     <Compile Include="Common\Logger\ILoggerFragment.cs" />
     <Compile Include="Common\Logger\LogLevel.cs" />
-    <Compile Include="Common\Plan\BasePlanInstance.cs" />
     <Compile Include="MusaModule\ModuleProvider\Attributes\DependencyAttribute.cs" />
     <Compile Include="MusaModule\ModuleProvider\Attributes\InjectAttribute.cs" />
     <Compile Include="MusaModule\ModuleProvider\Attributes\RegisterAttribute.cs" />
@@ -60,11 +58,21 @@
     <Compile Include="Common\Plan\IPlanModel.cs" />
     <Compile Include="Common\Plan\IPlanFacade.cs" />
     <Compile Include="Common\Plan\IPlanCollection.cs" />
-    <Compile Include="Common\IFormulaParser.cs" />
     <Compile Include="Common\Agent\PlanArgs.cs" />
     <Compile Include="TypesMapping.cs" />
     <Compile Include="Common\Agent\IPlanArgs.cs" />
     <Compile Include="Common\Agent\IAgentWorkbench.cs" />
+    <Compile Include="Common\Formula\IFormulaUtils.cs" />
+    <Compile Include="Common\Formula\IAssignment.cs" />
+    <Compile Include="Common\Formula\IAssignmentFactory.cs" />
+    <Compile Include="Common\Formula\IFormula.cs" />
+    <Compile Include="Common\Formula\FormulaType.cs" />
+    <Compile Include="Common\Formula\ITerm.cs" />
+    <Compile Include="Common\Formula\IVariableTermFacade.cs" />
+    <Compile Include="Common\Formula\CompositeFormula\IAndFormula.cs" />
+    <Compile Include="Common\Formula\CompositeFormula\IOrFormula.cs" />
+    <Compile Include="Common\Formula\CompositeFormula\INotFormula.cs" />
+    <Compile Include="Common\Formula\CompositeFormula\IAtomicFormula.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -74,6 +82,8 @@
     <Folder Include="Common\Agent\" />
     <Folder Include="Common\Plan\" />
     <Folder Include="MusaModule\ModuleProvider\" />
+    <Folder Include="Common\Formula\" />
+    <Folder Include="Common\Formula\CompositeFormula\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

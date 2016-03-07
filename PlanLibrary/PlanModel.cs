@@ -227,7 +227,7 @@ namespace PlanLibrary
             if (string.IsNullOrEmpty(triggerCondition))
                 return;
 
-            var fp = ModuleProvider.Get().Resolve<IFormulaParser>();
+            var fp = ModuleProvider.Get().Resolve<IFormulaUtils>();
             if (fp == null)
                 throw new Exception("Unable to parse trigger condition '" + triggerCondition + "' in plan '" + Name + "'. Formula Parser not avaible.\n");
 
@@ -262,7 +262,7 @@ namespace PlanLibrary
                                       where attribute != null
                                       select new {Method = mm, TriggerCondition = attribute.TriggerCondition};
 
-            var fp = ModuleProvider.Get().Resolve<IFormulaParser>();
+            var fp = ModuleProvider.Get().Resolve<IFormulaUtils>();
             if (fp == null)
                 throw new Exception("In plan '" + Name + "': Formula Parser not avaible.\n");
             
