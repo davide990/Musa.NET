@@ -43,12 +43,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ANTLR\formula_grammarBaseListener.cs" />
-    <Compile Include="ANTLR\formula_grammarBaseVisitor.cs" />
-    <Compile Include="ANTLR\formula_grammarLexer.cs" />
-    <Compile Include="ANTLR\formula_grammarListener.cs" />
-    <Compile Include="ANTLR\formula_grammarParser.cs" />
-    <Compile Include="ANTLR\formula_grammarVisitor.cs" />
     <Compile Include="ANTLR\visitor\FormulaVisitor.cs" />
     <Compile Include="ANTLR\visitor\PredicateVisitor.cs" />
     <Compile Include="CompositeFormula\AndFormula.cs" />
@@ -69,9 +63,6 @@
     <Compile Include="AssignmentFactory.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ANTLR\formula_grammar.g" />
-    <None Include="ANTLR\formula_grammar.tokens" />
-    <None Include="ANTLR\formula_grammarLexer.tokens" />
     <None Include="UML\FormulaLibrary.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
