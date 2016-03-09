@@ -44,11 +44,11 @@ namespace AgentTest
             {
                 Thread.Sleep(5000);
                 Console.WriteLine("Add f(x)");
-                env.RegisterStatement(new AtomicFormula("f", new LiteralTerm("x")));
-
-                //Thread.Sleep(2000);
-                //Console.WriteLine("Remove f(x)");
-                //env.DeleteStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
+                //env.RegisterStatement(new AtomicFormula("f", new LiteralTerm("x")));
+                env.RegisterStatement(new AtomicFormula("f", new ValuedTerm<int>(3)));
+                Thread.Sleep(4000);
+                Console.WriteLine("Remove f(x)");
+                env.DeleteStatement(new AtomicFormula("f", new ValuedTerm<int>(3)));
 
             };
             wk.RunWorkerAsync();
@@ -59,7 +59,7 @@ namespace AgentTest
             a.AddPlan(typeof(HelloWorldPlan));
 
             var argss = new PlanArgs { { "nome", "davide" } };
-            a.AddEvent("f(x)", AgentPerception.AddBelief, typeof(HelloWorldPlan), argss);
+            a.AddEvent("f(3)", AgentPerception.AddBelief, typeof(HelloWorldPlan), argss);
 
             //a.AddEvent ("f(x)", AgentPerception.RemoveBelief, typeof(PlanExample2));
             env.RegisterAgent(a);
@@ -149,7 +149,7 @@ namespace AgentTest
     }
 
     [Plan]
-    [PlanStepsOrder("hello4","hello2","hello3")]
+    [PlanStepsOrder("hello4", "hello2", "hello3")]
     public class HelloWorldPlan : PlanModel
     {
         [PlanEntryPoint]
@@ -158,7 +158,7 @@ namespace AgentTest
             log(LogLevel.Info, "~~~~~~HELLO WORLD~~~~~~");
         }
 
-        [PlanStep("g(x,o) & f(x)")]
+        [PlanStep("f(x)")]
         void hello2(PlanArgs args)
         {
             log(LogLevel.Info, "~~~~~~HELLO WORLD2~~~~~~");

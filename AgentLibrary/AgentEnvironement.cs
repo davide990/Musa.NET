@@ -45,26 +45,19 @@ namespace AgentLibrary
         /// <summary>
         /// The statements for this environment
         /// </summary>
-        private ObservableCollection<IFormula> statements;
-
-        /// <summary>
-        /// The set of assignment for the statement contained in this environment
-        /// </summary>
-        private ObservableCollection<IAssignment> assignments;
+        private ObservableCollection<IFormula> Statements
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// The agents registered to this environment
         /// </summary>
-        private ObservableCollection<Agent> registeredAgents;
-
         public ObservableCollection<Agent> RegisteredAgents
         {
-            get { return registeredAgents; }
-            set
-            {
-                if (value != null)
-                    registeredAgents = value;
-            }
+            get;
+            private set;
         }
 
         private static readonly ManualResetEvent mre = new ManualResetEvent(false);
@@ -132,10 +125,6 @@ namespace AgentLibrary
         /// </summary>
         private ILogger logger;
 
-        private IValuedTermFacade VariableTermFacace;
-
-        private IAssignmentFactory AssignmentFactory;
-
         /// <summary>
         /// Get the unique agent environement for this MUSA.NET process instance.
         /// </summary>
@@ -159,10 +148,6 @@ namespace AgentLibrary
             //Inject the logger
             instance.logger = ModuleProvider.Get().Resolve<ILogger>();
 
-            instance.VariableTermFacace = ModuleProvider.Get().Resolve<IValuedTermFacade>();
-
-            instance.AssignmentFactory = ModuleProvider.Get().Resolve<IAssignmentFactory>();
-
             return instance;
         }
 
@@ -174,16 +159,11 @@ namespace AgentLibrary
         private AgentEnvironement()
         {
 			
-            statements = new ObservableCollection<IFormula>();
-            assignments = new ObservableCollection<IAssignment>();
-            registeredAgents = new ObservableCollection<Agent>();
-
+            Statements = new ObservableCollection<IFormula>();
+            RegisteredAgents = new ObservableCollection<Agent>();
+            RegisteredAgents.CollectionChanged += RegisteredAgents_CollectionChanged;            
+            Statements.CollectionChanged += Statements_CollectionChanged;
             CreationDate = DateTime.Now;
-
-            registeredAgents.CollectionChanged += RegisteredAgents_CollectionChanged;
-            
-            statements.CollectionChanged += Statements_CollectionChanged;
-            assignments.CollectionChanged += Attributes_CollectionChanged;
         }
 
         private void RegisteredAgents_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -221,7 +201,7 @@ namespace AgentLibrary
         /// <param name="e"></param>
         private void Attributes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            foreach (Agent a in registeredAgents)
+            foreach (Agent a in RegisteredAgents)
             {
                 if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
                     a.notifyEnvironementChanges(AgentPerception.SetBeliefValue, e.NewItems);
@@ -238,7 +218,7 @@ namespace AgentLibrary
         /// </summary>
         private void Statements_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            foreach (Agent a in registeredAgents)
+            foreach (Agent a in RegisteredAgents)
             {
                 if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
                     a.notifyEnvironementChanges(AgentPerception.AddBelief, e.NewItems);
@@ -254,8 +234,8 @@ namespace AgentLibrary
         /// </summary>
         public void RegisterAgent(Agent a)
         {
-            if (!registeredAgents.Contains(a))
-                registeredAgents.Add(a);
+            if (!RegisteredAgents.Contains(a))
+                RegisteredAgents.Add(a);
         }
 
         /// <summary>
@@ -484,59 +464,18 @@ namespace AgentLibrary
         /// </summary>
         public void RegisterStatement(params IFormula[] f)
         {
-            List<object> variableTerms = new List<object>();
             foreach (IFormula ff in f)
             {
-                /*variableTerms = ff.ConvertToSimpleFormula();
-
-                if (statements.Contains(ff))
-                    continue;
-
-                foreach (object varTerm in variableTerms)
+                if (ff.IsAtomic())
+                    //Add the formula to this environment
+                    Statements.Add(ff);
+                else
                 {
-                    //get the type info for the current term
-                    //Type variableTermType = VariableTermFacace.GetVariableTermFor(varTerm.GetType().GetGenericArguments()[0]);
-                    object varTermName = VariableTermFacace.GetNameOfVariableTerm(varTerm);
-                    object varTermValue = VariableTermFacace.GetValueOfVariableTerm(varTerm);
-
-                    //assignments.Add(AssignmentFactory.CreateAssignment((string)varTermName, varTermValue, varTerm.GetType().GetGenericArguments()[0]));
-                    assignments.Add(AssignmentFactory.CreateAssignment((string)varTermName, varTermValue));
-                }*/
-
-                //Add the formula to this environment
-                statements.Add(ff);
-            }
-        }
-
-        //TODO DA ELIMINARE
-        /// <summary>
-        /// Given a set of atomic formulas, this method removes the matching formulas from this environment and also its
-        /// corresponding assignments.
-        /// </summary>
-        public void DeleteStatementAndAssignment(params IFormula[] f)
-        {
-            List<object> variableTerms = new List<object>();
-            foreach (IFormula ff in f)
-            {
-                /*variableTerms = ff.ConvertToSimpleFormula();
-
-                if (!statements.Contains(ff))
-                    continue;
-
-                foreach (object varTerm in variableTerms)
-                {
-                    //get the type info for varTerm
-                    //Type variableTermType = VariableTermFacace.GetVariableTermFor(varTerm.GetType().GetGenericArguments()[0]);
-                    object varTermName = VariableTermFacace.GetNameOfVariableTerm(varTerm);
-                    object varTermValue = VariableTermFacace.GetValueOfVariableTerm(varTerm);
-
-                    //remove the assignment
-                    //assignments.Remove(AssignmentType.CreateAssignmentForTerm((string)varTermName, varTermValue, varTerm.GetType().GetGenericArguments()[0]));
-                    assignments.Remove(AssignmentFactory.CreateAssignment((string)varTermName, varTermValue));
-                }*/
-
-                //Remove the formula from this environment
-                statements.Remove(ff);
+                    var unrolled = ModuleProvider.Get().Resolve<IFormulaUtils>().UnrollFormula(ff);
+                    foreach (IFormula uf in unrolled)
+                        Statements.Add(uf);
+                }
+                    
             }
         }
 
@@ -547,14 +486,8 @@ namespace AgentLibrary
         {
             foreach (IFormula ff in f)
             {
-                //Convert the formula to a simple formula
-                /*ff.ConvertToSimpleFormula();
-
-                if (!statements.Contains(ff))
-                    continue;
-*/
                 //Remove the formula from this environment
-                statements.Remove(ff);
+                Statements.Remove(ff);
             }
         }
 
@@ -563,7 +496,7 @@ namespace AgentLibrary
         /// </summary>
         public bool IsAgentRegistered(Agent a)
         {
-            return registeredAgents.Contains(a);
+            return RegisteredAgents.Contains(a);
         }
 
         public void SetAccessPolicy()

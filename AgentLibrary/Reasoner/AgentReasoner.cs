@@ -31,6 +31,7 @@ using System.Threading;
 using System;
 using AgentLibrary;
 using MusaCommon;
+using System.Text;
 
 namespace AgentLibrary
 {
@@ -388,7 +389,7 @@ namespace AgentLibrary
                     break;
 
                 case AgentPerception.RemoveBelief:
-                    parentAgent.Workbench.AddStatement(changes_list);
+                    parentAgent.Workbench.RemoveStatement(changes_list);
                     checkExternalEvents(changes_list, perception_type);
                     break;
 

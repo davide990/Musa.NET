@@ -26,7 +26,7 @@ using IToken = Antlr4.Runtime.IToken;
 /// <see cref="formula_grammarParser"/>.
 /// </summary>
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.3")]
-[System.CLSCompliant(false)]
+//[System.CLSCompliant(false)]
 public interface Iformula_grammarListener : IParseTreeListener {
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="formula_grammarParser.identifier"/>.

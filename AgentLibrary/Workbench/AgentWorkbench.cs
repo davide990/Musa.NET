@@ -93,7 +93,6 @@ namespace AgentLibrary
 
             Statements.CollectionChanged += on_workbench_changed;
 
-            /*logger = MusaConfig.GetLogger();*/
             logger = ModuleProvider.Get().Resolve<ILogger>();
             assignmentFactory = ModuleProvider.Get().Resolve<IAssignmentFactory>();
             FormulaUtils = ModuleProvider.Get().Resolve<IFormulaUtils>();
@@ -175,7 +174,6 @@ namespace AgentLibrary
 
         private void addOrUpdateStatement(bool update = false, params IAtomicFormula[] f)
         {
-            List<object> variableTerms = new List<object>();
             foreach (IFormula ff in f)
             {
                 if (Statements.Contains(ff) && update)
@@ -202,8 +200,6 @@ namespace AgentLibrary
         {
             foreach (IFormula ff in f)
             {
-                var to_remove = ff;
-
                 if (!ff.IsAtomic())
                 {
                     var unrolled = FormulaUtils.UnrollFormula(ff);
@@ -255,10 +251,9 @@ namespace AgentLibrary
         /// <returns>True if formula is satisfied in this workbench</returns>
         public bool TestCondition(IFormula formula)
         {
+            //logger.Log(LogLevel.Trace, "Testing condition '" + formula + "'");
             if (formula.GetFormulaType() == FormulaType.NOT_FORMULA)
-            {
                 return !TestCondition((formula as INotFormula).GetFormula());
-            }
             else if (formula.GetFormulaType() == FormulaType.OR_FORMULA)
                 return TestCondition((formula as IOrFormula).GetLeft()) | TestCondition((formula as IOrFormula).GetRight());
             else if (formula.GetFormulaType() == FormulaType.AND_FORMULA)
@@ -280,9 +275,7 @@ namespace AgentLibrary
         public bool TestCondition(IFormula formula, out List<IAssignment> generatedAssignment)
         {
             if (formula.GetFormulaType() == FormulaType.NOT_FORMULA)
-            {
                 return !TestCondition((formula as INotFormula).GetFormula(), out generatedAssignment);
-            }
             else if (formula.GetFormulaType() == FormulaType.OR_FORMULA)
             {
                 List<IAssignment> rightAssignment, leftAssignment;
@@ -350,7 +343,7 @@ namespace AgentLibrary
                             //a and b are both variable 
                             if (a_value.Equals(b.GetValue()))
                                 //if both valued terms have equal values, proceed with the next couple of terms
-                                continue;   
+                                continue;
                             else
                             { 
                                 //terms are both valued but they have different values. The test fails here.

@@ -28,7 +28,7 @@ using System.Collections.Generic;
 using DFA = Antlr4.Runtime.Dfa.DFA;
 
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.3")]
-[System.CLSCompliant(false)]
+//[System.CLSCompliant(false)]
 public partial class formula_grammarParser : Parser {
 	public const int
 		T__2=1, T__1=2, T__0=3, ID=4, INT=5, FLOAT=6, WS=7, String=8, CHAR=9, 

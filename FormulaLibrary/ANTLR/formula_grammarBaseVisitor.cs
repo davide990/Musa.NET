@@ -29,7 +29,7 @@ using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 /// </summary>
 /// <typeparam name="Result">The return type of the visit operation.</typeparam>
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.3")]
-[System.CLSCompliant(false)]
+//[System.CLSCompliant(false)]
 public partial class formula_grammarBaseVisitor<Result> : AbstractParseTreeVisitor<Result>, Iformula_grammarVisitor<Result> {
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="formula_grammarParser.identifier"/>.

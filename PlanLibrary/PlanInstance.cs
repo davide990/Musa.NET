@@ -36,6 +36,7 @@ using MusaCommon;
 
 /*using FormulaLibrary;
 using FormulaLibrary.ANTLR;*/
+using System.Text;
 
 
 namespace PlanLibrary
@@ -368,13 +369,21 @@ namespace PlanLibrary
         /// </summary>
         private bool checkTriggerCondition(IFormula tc)
         {
-            if (tc != null)
-                return AgentWorkbench.TestCondition(tc);
+            if (tc == null)
+                return true;
+
+            List<IAssignment> generatedAssignment;
+            bool test_condition = AgentWorkbench.TestCondition(tc, out generatedAssignment);
+
+            var sb = new StringBuilder();
+            sb.Append("Condition '" + tc + "' satisfied in agent's workbench. Generated assignments :");
+            generatedAssignment.ForEach(x => sb.Append(x.ToString() + " "));
+            Log(LogLevel.Trace, sb.ToString());
 
             //In case the trigger condition is null, it has been not specified by user. So, the plan
             //has no trigger condition. In this case, true is returned, as the plan can be always
             //executed unconditionally
-            return true;
+            return test_condition;
         }
 
         /// <summary>

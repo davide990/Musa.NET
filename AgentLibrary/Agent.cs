@@ -651,20 +651,6 @@ namespace AgentLibrary
             reasoner.AddEvent(ev.Formula, ev.Perception, ev.Plan, ev.Args);
         }
 
-        /// <summary>
-        /// Adds the beliefs to this agent's workbench. Each formula is added 
-        /// as a unique agent perception.
-        /// </summary>
-/*        public void AddBelief(params AtomicFormula[] formula)
-        {
-            foreach (AtomicFormula ff in formula)
-            {
-                Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
-                Logger.Log(LogLevel.Debug, "[" + Name + "] Adding belief " + ff);
-                PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(new List<AtomicFormula>{ ff }, AgentPerception.AddBelief));
-            }
-        }*/
-
         public void AddBelief(params IFormula[] formula)
         {
             foreach (IFormula af in formula)
@@ -685,21 +671,6 @@ namespace AgentLibrary
             }
         }
 
-
-        /// <summary>
-        /// Updates the beliefs to this agent's workbench. Each formula is added 
-        /// as a unique agent perception.
-        /// </summary>
-/*        public void UpdateBelief(params AtomicFormula[] formula)
-        {
-            foreach (AtomicFormula ff in formula)
-            {
-                Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
-                Logger.Log(LogLevel.Debug, "[" + Name + "] Updating belief " + ff);
-                PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(new List<AtomicFormula>{ ff }, AgentPerception.UpdateBelief));
-            }
-        }*/
-
         public void UpdateBelief(params IFormula[] formula)
         {
             foreach (IFormula af in formula)
@@ -719,10 +690,6 @@ namespace AgentLibrary
                 PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.UpdateBelief));
             }
         }
-
-
-
-
 
         #endregion
 

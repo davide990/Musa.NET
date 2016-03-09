@@ -25,6 +25,7 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System.Collections;
+using System.Collections.Generic;
 
 namespace MusaCommon
 {
@@ -34,6 +35,7 @@ namespace MusaCommon
         void RemoveStatement(IList f);
         void UpdateStatement(IList f);
         bool TestCondition(IFormula formula);
+        bool TestCondition(IFormula formula, out List<IAssignment> assignments);
     }
 }
 

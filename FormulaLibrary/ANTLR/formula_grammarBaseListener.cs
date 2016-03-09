@@ -30,7 +30,7 @@ using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 /// of the available methods.
 /// </summary>
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.3")]
-[System.CLSCompliant(false)]
+//[System.CLSCompliant(false)]
 public partial class formula_grammarBaseListener : Iformula_grammarListener {
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="formula_grammarParser.identifier"/>.

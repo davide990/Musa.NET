@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System;
 using MusaCommon;
+using System.Text;
 
 namespace PlanLibrary
 {
@@ -335,11 +336,18 @@ namespace PlanLibrary
 
                 if (step.TriggerCondition != null)
                 {
-                    if (!AgentWorkbench.TestCondition(step.TriggerCondition))
+                    List<IAssignment> generatedAssignment;
+                    bool test_condition = AgentWorkbench.TestCondition(step.TriggerCondition, out generatedAssignment);
+                    if (!test_condition)
                     {
                         Log(LogLevel.Error, "Plan step'" + step.Name + "' cannot be executed: trigger condition '" + step.TriggerCondition + "' not satisfied in agent belief base.");
                         return;
                     }
+
+                    var sb = new StringBuilder();
+                    sb.Append("Condition '" + step.TriggerCondition + "' satisfied in agent's workbench. Generated assignments :");
+                    generatedAssignment.ForEach(x => sb.Append(x + " "));
+                    Log(LogLevel.Trace, sb.ToString());
                 }
 
                 //TODO log internal event?
@@ -370,18 +378,7 @@ namespace PlanLibrary
         {
             AgentWorkbench = wb;
         }
-
-        /// <summary>
-        /// Log the specified message.
-        /// </summary>
-        /*protected void log(LogLevel level, string message)
-        {
-            //Raise an event that will be catched from the PlanInstance instance this model is related to. As it's 
-            //catched, the PlanInstance's logger will log the requested message.
-            if (Log != null)
-                Log(level, message);
-        }*/
-
+            
         #endregion Methods
 
         public string GetEntryPointName()

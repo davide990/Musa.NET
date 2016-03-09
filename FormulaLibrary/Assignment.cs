@@ -67,8 +67,7 @@ namespace FormulaLibrary
         /// </summary>
         public override string ToString()
         {
-            return Value.ToString();
-            //return "assign(" + Name + "," + Value + ")";
+            return "assign(" + Name + "," + Value + ")";
         }
 
         /// <summary>
