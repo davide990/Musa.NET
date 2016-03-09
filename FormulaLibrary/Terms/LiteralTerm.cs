@@ -29,7 +29,7 @@ using System;
 
 namespace FormulaLibrary
 {
-    public class LiteralTerm : Term, IEquatable<LiteralTerm>
+    public class LiteralTerm : Term, IUnifiable, IEquatable<LiteralTerm>
     {
         public LiteralTerm(string name)
             : base(name)
@@ -43,15 +43,15 @@ namespace FormulaLibrary
 
         public override bool Equals(object obj)
         {
-            if(obj is LiteralTerm)
+            if (obj is LiteralTerm)
                 return Equals((LiteralTerm)obj);
             return false;
         }
-        
-        public VariableTerm<type> toVariableTerm<type>(type value)
+
+        public ValuedTerm<T> Unify<T>(Assignment<T> a)
         {
-            return new VariableTerm<type>(Name, value);
-        }       
+            return new ValuedTerm<T>(a.Value);
+        }
 
         public override bool IsLiteral()
         {

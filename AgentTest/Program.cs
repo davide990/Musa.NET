@@ -69,9 +69,9 @@ namespace AgentTest
             var FormulaParser = ModuleProvider.Get().Resolve<IFormulaUtils>();
 
             /*a.AddBelief(FormulaParser.Parse("f(x)"));*/
-            a.AddBelief(FormulaParser.Parse("k(x)"), FormulaParser.Parse("p(y<-int(3))"));
+            a.AddBelief(FormulaParser.Parse("k(x)"), FormulaParser.Parse("p(3)"));
 
-            var ll = new List<IFormula>{ FormulaParser.Parse("w(x)"), FormulaParser.Parse("cc(x)") };
+            var ll = new List<IFormula>{ FormulaParser.Parse("w(\"hello\")"), FormulaParser.Parse("w(x)"), FormulaParser.Parse("cc(x)") };
             a.AddBelief(ll);
 
 

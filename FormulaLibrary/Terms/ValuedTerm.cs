@@ -26,11 +26,10 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using MusaCommon;
 
 namespace FormulaLibrary
 {
-    public class VariableTerm<T> : Term, IUnifiable<T>, IEquatable<VariableTerm<T>>
+    public class ValuedTerm<T> : Term, IEquatable<ValuedTerm<T>>
     {
         /// <summary>
         /// The value of this term
@@ -45,66 +44,30 @@ namespace FormulaLibrary
         /// Create a new variable term
         /// </summary>
         /// <param name="name"></param>
-        public VariableTerm(string name)
-            : base(name)
-        {
-        }
-
-        /// <summary>
-        /// Create a new variable term
-        /// </summary>
-        /// <param name="name"></param>
         /// <param name="value"></param>
-        public VariableTerm(string name, T value)
-            : base(name)
+        public ValuedTerm(T value)
+            : base("")
         {
             Value = value;
         }
 
-        /// <summary>
-        /// Return an equivalent literal term.
-        /// </summary>
-        public LiteralTerm toLiteralTerm()
-        {
-            return new LiteralTerm(Name);
-        }
-
-        /// <summary>
-        /// Unify the value of this term with the given assignment. The unification
-        /// succeeds only if the assignment's name is equal to the name of this term.
-        /// </summary>
-        public bool unify(Assignment<T> a)
-        {
-            if (!a.Name.Equals(Name))
-                return false;
-            
-            Value = a.Value;
-            return true;            
-        }
-
         public override string ToString()
         {
-            string shortTypeName = TypesMapping.getShortTypeName(Value.GetType().FullName);
-            
-            if (!shortTypeName.Equals("string") && !shortTypeName.Equals("bool"))
-                return Name + "<-" + shortTypeName + "(" + Value.ToString() + ")";
-            else
-                return Name + "<-" + shortTypeName + "(\"" + Value.ToString().ToLower() + "\")";
+            return Value.ToString();
 
         }
 
-        public bool Equals(VariableTerm<T> other)
+        public bool Equals(ValuedTerm<T> other)
         {
-            return  Name.Equals(other.Name) &&
-            Value.Equals(other.Value);
+            return Value.Equals(other.Value);
         }
 
         public override bool Equals(object obj)
         {
-            if (!obj.GetType().Equals(typeof(VariableTerm<T>)))
+            if (!obj.GetType().Equals(typeof(ValuedTerm<T>)))
                 return false;
 
-            return Equals(obj as VariableTerm<T>);
+            return Equals(obj as ValuedTerm<T>);
         }
 
         public override bool IsLiteral()

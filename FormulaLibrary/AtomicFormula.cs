@@ -27,7 +27,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
 using MusaCommon;
 
@@ -67,7 +66,7 @@ namespace FormulaLibrary
             get { return Terms.Count; }
         }
 
-        public VariableTermFacace VariableTermFacace
+        public ValuedTermFacace ValuedTermFacace
         {
             get;
             private set;
@@ -77,18 +76,18 @@ namespace FormulaLibrary
         {
             Functor = functor;
             this.Terms = new List<ITerm>(Terms);
-            VariableTermFacace = new VariableTermFacace();
+            ValuedTermFacace = new ValuedTermFacace();
         }
 
         public AtomicFormula(string functor, IEnumerable<ITerm> Terms)
         {
             Functor = functor;
             this.Terms = new List<ITerm>(Terms);
-            VariableTermFacace = new VariableTermFacace();
+            ValuedTermFacace = new ValuedTermFacace();
         }
 
 
-        public override FormulaType GetType()
+        public override FormulaType GetFormulaType()
         {
             return FormulaType.ATOMIC_FORMULA;
         }
@@ -105,33 +104,6 @@ namespace FormulaLibrary
                     b.Append(",");
             }
             
-            b.Append(")");
-            return b.ToString();
-        }
-
-        /// <summary>
-        /// Return a string representation for this formula, i.e.
-        ///
-        /// f(x,y,z)
-        /// 
-        /// If compactVisualization is true, then each term's name is printed. Otherwise,
-        /// for each variable term is printed also its value.
-        /// </summary>
-        public string ToString(bool compactVisualization)
-        {
-            if (!compactVisualization)
-                return ToString();
-
-            StringBuilder b = new StringBuilder();
-            b.Append(Functor);
-            b.Append("(");
-            for (byte i = 0; i < Terms.Count; i++)
-            {
-                b.Append(Terms[i].GetName());
-                if (i != Terms.Count - 1)
-                    b.Append(",");
-            }
-
             b.Append(")");
             return b.ToString();
         }
@@ -180,7 +152,7 @@ namespace FormulaLibrary
         /// Terms are returned to the output list
         /// </summary>
         /// <returns>a list containing the variable terms this formula previously contained</returns>
-        public override List<object> ConvertToSimpleFormula()
+        /*public override List<object> ConvertToSimpleFormula()
         {
             List<object> variableTerms = new List<object>();
             
@@ -201,7 +173,7 @@ namespace FormulaLibrary
             }
 
             return variableTerms;
-        }
+        }*/
 
         public override bool IsAtomic()
         {
@@ -219,14 +191,14 @@ namespace FormulaLibrary
             for (int i = 0; i < Terms.Count; i++)
             {
                 //if a variable term occurs
-                if (Terms[i].GetType().IsGenericType)
+                if (!Terms[i].IsLiteral())
                 { 
                     //get the type info for the current term
                     //Type variableTermType = VariableTermFacace.GetVariableTermFor(Terms[i].GetType().GetGenericArguments()[0]);
 
-                    string name = (string)VariableTermFacace.GetNameOfVariableTerm(Terms[i]);
-                    object value = VariableTermFacace.GetValueOfVariableTerm(Terms[i]);
-                    object varTerm = VariableTermFacace.CreateVariableTerm(name, value);
+                    //string name = (string)VariableTermFacace.GetNameOfVariableTerm(Terms[i]);
+                    //object value = ValuedTermFacace.GetValueOfVariableTerm(Terms[i]);
+                    object varTerm = ValuedTermFacace.CreateValuedTerm((Terms[i] as ITerm).GetValue());
 
                     //add the new instance to the cloned formula
                     clone.Terms.Add((Term)varTerm);

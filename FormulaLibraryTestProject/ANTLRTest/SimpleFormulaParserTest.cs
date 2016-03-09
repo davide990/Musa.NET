@@ -89,7 +89,7 @@ namespace FormulaLibraryTestProject
             string formula = "f(x<-int(2))";
 
             IFormula generatedFormula = new FormulaUtils().Parse(formula);
-            Formula expectedFormula = new AtomicFormula("f", new VariableTerm<int>("x", 2));
+            Formula expectedFormula = new AtomicFormula("f", new ValuedTerm<int>(2));
 
             return generatedFormula.Equals(expectedFormula);
         }
@@ -101,7 +101,7 @@ namespace FormulaLibraryTestProject
             string formula = "f(x<-float(2.9))";
             
             IFormula generatedFormula = new FormulaUtils().Parse(formula);
-            Formula expectedFormula = new AtomicFormula("f", new VariableTerm<float>("x", 2.9f));
+            Formula expectedFormula = new AtomicFormula("f", new ValuedTerm<float>(2.9f));
 
             return generatedFormula.Equals(expectedFormula);
         }
@@ -113,7 +113,7 @@ namespace FormulaLibraryTestProject
             string formula = "f(x<-byte(128))";
 
             IFormula generatedFormula = new FormulaUtils().Parse(formula);
-            Formula expectedFormula = new AtomicFormula("f", new VariableTerm<byte>("x", 128));
+            Formula expectedFormula = new AtomicFormula("f", new ValuedTerm<byte>(128));
 
             return generatedFormula.Equals(expectedFormula);
         }
@@ -125,7 +125,7 @@ namespace FormulaLibraryTestProject
             string formula = "f(x<-double(128.3282732),l,k)";
 
             IFormula generatedFormula = new FormulaUtils().Parse(formula);
-            Formula expectedFormula = new AtomicFormula("f", new VariableTerm<double>("x", 128.3282732), new LiteralTerm("l"), new LiteralTerm("k"));
+            Formula expectedFormula = new AtomicFormula("f", new ValuedTerm<double>(128.3282732), new LiteralTerm("l"), new LiteralTerm("k"));
 
             return generatedFormula.Equals(expectedFormula);
         }
@@ -136,7 +136,7 @@ namespace FormulaLibraryTestProject
             string formula = "f(x<-string(\"hi\"))";
 
             IFormula generatedFormula = new FormulaUtils().Parse(formula);
-            Formula expectedFormula = new AtomicFormula("f", new VariableTerm<string>("x", "hi"));
+            Formula expectedFormula = new AtomicFormula("f", new ValuedTerm<string>("hi"));
 
             return generatedFormula.Equals(expectedFormula);
         }
@@ -149,7 +149,7 @@ namespace FormulaLibraryTestProject
 
             
             IFormula generatedFormula = new FormulaUtils().Parse(formula);
-            Formula expectedFormula = new AtomicFormula("f", new VariableTerm<char>("x", 'c'));
+            Formula expectedFormula = new AtomicFormula("f", new ValuedTerm<char>('c'));
 
             return generatedFormula.Equals(expectedFormula);
         }
@@ -161,7 +161,7 @@ namespace FormulaLibraryTestProject
             string formula = "f(x<-decimal(99.9m))";
 
             IFormula generatedFormula = new FormulaUtils().Parse(formula);
-            Formula expectedFormula = new AtomicFormula("f", new VariableTerm<decimal>("x", 99.9m));
+            Formula expectedFormula = new AtomicFormula("f", new ValuedTerm<decimal>(99.9m));
 
             return generatedFormula.Equals(expectedFormula);
         }
@@ -174,7 +174,7 @@ namespace FormulaLibraryTestProject
             string formula = "f(x<-string(\"hi mate\"))";
 
             IFormula generatedFormula = new FormulaUtils().Parse(formula);
-            Formula expectedFormula = new AtomicFormula("f", new VariableTerm<string>("x", "hi mate"));
+            Formula expectedFormula = new AtomicFormula("f", new ValuedTerm<string>("hi mate"));
 
             return generatedFormula.Equals(expectedFormula);
         }
@@ -186,7 +186,7 @@ namespace FormulaLibraryTestProject
             string formula = "f(k,x<-bool(\"true\"))";
 
             IFormula generatedFormula = new FormulaUtils().Parse(formula);
-            Formula expectedFormula = new AtomicFormula("f", new LiteralTerm("k"), new VariableTerm<bool>("x", true));
+            Formula expectedFormula = new AtomicFormula("f", new LiteralTerm("k"), new ValuedTerm<bool>(true));
 
             return generatedFormula.Equals(expectedFormula);
         }
@@ -198,7 +198,7 @@ namespace FormulaLibraryTestProject
             string formula = "f(k,x<-bool(\"false\"),p)";
 
             IFormula generatedFormula = new FormulaUtils().Parse(formula);
-            Formula expectedFormula = new AtomicFormula("f", new LiteralTerm("k"), new VariableTerm<bool>("x", false), new LiteralTerm("p"));
+            Formula expectedFormula = new AtomicFormula("f", new LiteralTerm("k"), new ValuedTerm<bool>(false), new LiteralTerm("p"));
 
             return generatedFormula.Equals(expectedFormula);
         }

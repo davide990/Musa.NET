@@ -38,8 +38,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="Antlr4.Runtime">
-      <HintPath>..\..\Antlr4.Runtime.dll</HintPath>
+    <Reference Include="Antlr4.Runtime.net45">
+      <HintPath>..\packages\Antlr4.Runtime.4.3.0\lib\net45\Antlr4.Runtime.net45.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -56,16 +56,28 @@
     <Compile Include="Terms\LiteralTerm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Terms\Term.cs" />
-    <Compile Include="Terms\VariableTerm.cs" />
     <Compile Include="FormulaUtils.cs" />
-    <Compile Include="Terms\VariableTermFacace.cs" />
     <Compile Include="FormulaLibraryInitializer.cs" />
     <Compile Include="AssignmentFactory.cs" />
+    <Compile Include="ANTLR\formula_grammarBaseListener.cs" />
+    <Compile Include="ANTLR\formula_grammarBaseVisitor.cs" />
+    <Compile Include="ANTLR\formula_grammarLexer.cs" />
+    <Compile Include="ANTLR\formula_grammarListener.cs" />
+    <Compile Include="ANTLR\formula_grammarParser.cs" />
+    <Compile Include="ANTLR\formula_grammarVisitor.cs" />
+    <Compile Include="Terms\ValuedTerm.cs" />
+    <Compile Include="Terms\ValuedTermFacace.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="UML\FormulaLibrary.cd" />
+    <None Include="ANTLR\formula_grammar.g" />
+    <None Include="ANTLR\formula_grammar.tokens" />
+    <None Include="ANTLR\formula_grammarLexer.tokens" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Antlr4.4.3.0\build\Antlr4.props" Condition="Exists('..\packages\Antlr4.4.3.0\build\Antlr4.props')" />
+  <Import Project="..\packages\Antlr4.4.3.0\build\Antlr4.targets" Condition="Exists('..\packages\Antlr4.4.3.0\build\Antlr4.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

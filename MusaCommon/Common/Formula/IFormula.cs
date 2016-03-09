@@ -31,8 +31,7 @@ namespace MusaCommon
 {
     public interface IFormula
     {
-        List<object> ConvertToSimpleFormula();
-        FormulaType GetType();
+        FormulaType GetFormulaType();
         bool IsAtomic();
     }
 }

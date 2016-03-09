@@ -25,32 +25,10 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using System;
 using MusaCommon;
 
 namespace FormulaLibrary
 {
-    /* /// <summary>
-    /// The only purpose of this class is to make possible to create containers of assignment of different types. In fact, since
-    /// Assignment is a template class, is not possible to create directly lists or other containes objects containing them. So,
-    /// by doing this separation between Assignment and AssignmentType it is possible to create a list of AssignmentType, and adding
-    /// to it any assignment.
-    /// </summary>
-    public abstract class AssignmentType
-    {
-
-        /// <summary>
-        /// Create a new assignment
-        /// </summary>
-        /// <returns></returns>
-        public static AssignmentType CreateAssignmentForTerm(string termName, object value, Type type)
-        {
-            Type varTermType = typeof(Assignment<>).MakeGenericType(type);
-            return (AssignmentType)Activator.CreateInstance(varTermType, termName, value);
-        }
-    }*/
-
-    //public sealed class Assignment<T> : AssignmentType
     public sealed class Assignment<T> : IAssignment
     {
         /// <summary>
@@ -89,7 +67,8 @@ namespace FormulaLibrary
         /// </summary>
         public override string ToString()
         {
-            return "assign(" + Name + "," + Value + ")";
+            return Value.ToString();
+            //return "assign(" + Name + "," + Value + ")";
         }
 
         /// <summary>

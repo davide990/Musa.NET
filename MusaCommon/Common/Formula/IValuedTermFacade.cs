@@ -5,7 +5,7 @@
 //         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
 //         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 //
-//  LiteralTermTest.cs
+//  IVariableTermFacade.cs
 //
 //  Author:
 //       Davide Guastella <davide.guastella90@gmail.com>
@@ -24,34 +24,15 @@
 //
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+using System;
 
-using NUnit.Framework;
-using FormulaLibrary;
-
-namespace FormulaLibraryTestProject
+namespace MusaCommon
 {
-    [TestFixture]
-    public class LiteralTermTest
+    public interface IValuedTermFacade
     {
-        [Test]
-        public void createSampleLiteralTerm()
-        {
-            LiteralTerm a = new LiteralTerm("dummy");
-
-            Assert.IsNotNull(a, "Test Literal term constructor has failed its execution");
-            Assert.That(string.IsNullOrEmpty(a.Name), Is.False, "Literal term has no name associated");
-        }
-
-        [TestCase("a", "a", ExpectedResult = true)]
-        [TestCase("a", "b", ExpectedResult = false)]
-        [Test]
-        public bool literalTermsEqualsTest(string term_a_name, string term_b_name)
-        {
-            LiteralTerm a = new LiteralTerm(term_a_name);
-            LiteralTerm b = new LiteralTerm(term_b_name);
-
-            return a.Equals(b);
-
-        }
+        Type GetVariableTermFor(Type t);
+        object GetValueOfVariableTerm(ITerm term);
+        ITerm CreateValuedTerm(object value);
     }
 }
+

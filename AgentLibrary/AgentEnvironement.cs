@@ -132,7 +132,7 @@ namespace AgentLibrary
         /// </summary>
         private ILogger logger;
 
-        private IVariableTermFacade VariableTermFacace;
+        private IValuedTermFacade VariableTermFacace;
 
         private IAssignmentFactory AssignmentFactory;
 
@@ -159,7 +159,7 @@ namespace AgentLibrary
             //Inject the logger
             instance.logger = ModuleProvider.Get().Resolve<ILogger>();
 
-            instance.VariableTermFacace = ModuleProvider.Get().Resolve<IVariableTermFacade>();
+            instance.VariableTermFacace = ModuleProvider.Get().Resolve<IValuedTermFacade>();
 
             instance.AssignmentFactory = ModuleProvider.Get().Resolve<IAssignmentFactory>();
 
@@ -487,7 +487,7 @@ namespace AgentLibrary
             List<object> variableTerms = new List<object>();
             foreach (IFormula ff in f)
             {
-                variableTerms = ff.ConvertToSimpleFormula();
+                /*variableTerms = ff.ConvertToSimpleFormula();
 
                 if (statements.Contains(ff))
                     continue;
@@ -501,13 +501,14 @@ namespace AgentLibrary
 
                     //assignments.Add(AssignmentFactory.CreateAssignment((string)varTermName, varTermValue, varTerm.GetType().GetGenericArguments()[0]));
                     assignments.Add(AssignmentFactory.CreateAssignment((string)varTermName, varTermValue));
-                }
+                }*/
 
                 //Add the formula to this environment
                 statements.Add(ff);
             }
         }
 
+        //TODO DA ELIMINARE
         /// <summary>
         /// Given a set of atomic formulas, this method removes the matching formulas from this environment and also its
         /// corresponding assignments.
@@ -517,7 +518,7 @@ namespace AgentLibrary
             List<object> variableTerms = new List<object>();
             foreach (IFormula ff in f)
             {
-                variableTerms = ff.ConvertToSimpleFormula();
+                /*variableTerms = ff.ConvertToSimpleFormula();
 
                 if (!statements.Contains(ff))
                     continue;
@@ -532,7 +533,7 @@ namespace AgentLibrary
                     //remove the assignment
                     //assignments.Remove(AssignmentType.CreateAssignmentForTerm((string)varTermName, varTermValue, varTerm.GetType().GetGenericArguments()[0]));
                     assignments.Remove(AssignmentFactory.CreateAssignment((string)varTermName, varTermValue));
-                }
+                }*/
 
                 //Remove the formula from this environment
                 statements.Remove(ff);
@@ -547,11 +548,11 @@ namespace AgentLibrary
             foreach (IFormula ff in f)
             {
                 //Convert the formula to a simple formula
-                ff.ConvertToSimpleFormula();
+                /*ff.ConvertToSimpleFormula();
 
                 if (!statements.Contains(ff))
                     continue;
-
+*/
                 //Remove the formula from this environment
                 statements.Remove(ff);
             }

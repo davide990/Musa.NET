@@ -71,11 +71,6 @@ namespace AgentLibrary
             get{ return new List<IFormula>(Workbench.Statements); }
         }
 
-        public List<IAssignment> Assignments
-        {
-            get { return new List<IAssignment>(Workbench.AssignmentSet); }
-        }
-
         /// <summary>
         /// This queue contains the changes to the environment that this agent have to perceive. Since an agent can be 
         /// busy in doing other activities such event-handling or execution of plans, the perceived environment changes 

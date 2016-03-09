@@ -46,7 +46,9 @@ namespace FormulaLibrary
         }
 
         public abstract bool IsLiteral();
+
         public abstract object GetValue();
+
         public abstract string GetName();
 
 

@@ -12,7 +12,7 @@ using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using System;
 
-namespace FormulaLibrary.ANTLR.visitor
+namespace FormulaLibrary
 {
     public class FormulaVisitor : formula_grammarBaseVisitor<Formula>,IDisposable
     {

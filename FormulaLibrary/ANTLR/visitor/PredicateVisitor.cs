@@ -13,121 +13,110 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 
-namespace FormulaLibrary.ANTLR.visitor
+namespace FormulaLibrary
 {
     class PredicateVisitor : formula_grammarBaseVisitor<string>, IDisposable
     {
         /// <summary>
-        /// The terms of this predicate
+        /// The Terms of this predicate
         /// </summary>
         public List<Term> Terms
         {
-            get { return terms; }
+            get;
+            private set;
         }
-        private List<Term> terms;
 
         /// <summary>
         /// The functor of a parsed predicate
         /// </summary>
         public string Functor
         {
-            get { return functor; }
-            private set { functor = value; }
+            get;
+            private set;
         }
-        private string functor;
 
         /// <summary>
         /// Creates a new instance of predicate_visitor
         /// </summary>
         public PredicateVisitor()
         {
-            terms = new List<Term>();
+            Terms = new List<Term>();
         }
-        
+
         /// <summary>
         /// Return an AtomicFormula object that corresponds to the predicate this visitor parses.
         /// </summary>
         public AtomicFormula ToAtomicFormula()
         {
-            return new AtomicFormula(Functor, terms);
+            return new AtomicFormula(Functor, Terms);
         }
 
         public override string VisitPredicate([NotNull] formula_grammarParser.PredicateContext context)
         {
             base.VisitPredicate(context);
             Functor = context.functor.expr;
-            
+
             return "";
         }
-        
+
         public override string VisitLiteral_term([NotNull] formula_grammarParser.Literal_termContext context)
         {
             base.VisitLiteral_term(context);
             LiteralTerm lt = new LiteralTerm(context.name.expr);
-            terms.Add(lt);
+            Terms.Add(lt);
             return "";
         }
 
-        public override string VisitVariable_term([NotNull] formula_grammarParser.Variable_termContext context)
+        #region Valued Term
+
+        public override string VisitThe_string_type(formula_grammarParser.The_string_typeContext context)
         {
-            base.VisitVariable_term(context);
+            base.VisitThe_string_type(context);
 
-            //Create a new Type declaration using the specified type within the formula
-            Type type = Type.GetType(Visit(context.varType().children[0]));
+            ValuedTerm<string> aa = new ValuedTerm<string>(context.value);
+            Terms.Add(aa);
+            return "";
+        }
 
-            //Get the term name and value
-            //string str_value = context.value.expr;
-            string str_value = null;
-            if ((str_value = context.value.expr) == null)
-                throw new Exception("Something went wrong in parsing formula.\n");
+        public override string VisitThe_boolean_type(formula_grammarParser.The_boolean_typeContext context)
+        {
+            base.VisitThe_boolean_type(context);
 
-            string name = context.name.expr;
+            ValuedTerm<bool> aa = new ValuedTerm<bool>(context.value);
+            Terms.Add(aa);
+            return "";
+        }
 
-            //Create a new VariableTerm object
-            Type genericVariableTermType = typeof(VariableTerm<>);
-            Type varTermType = genericVariableTermType.MakeGenericType(type);
-            object varTerm = Activator.CreateInstance(varTermType, name);
+        public override string VisitThe_int_type(formula_grammarParser.The_int_typeContext context)
+        {
+            base.VisitThe_int_type(context);
 
-            //Cast the term value to the specified type
-            object value = null;
-
-            //In case the value is a char or a string, trim the initial and the ending (double)quotes
-            TrimQuotesChar(ref str_value);
-
-            if (typeof(string).Equals(type))
-            {
-                //In the simplest case, the type if a string. No casting operations are needed here
-                varTermType.GetProperty("Value").SetValue(varTerm, str_value);
-            }
-            else
-            {
-                //Create a new object referencing to the class the value belongs to
-                object termValueClassRef = Activator.CreateInstance(type);
-                try
-                {
-                    //Try executing the "Parse" method to parse the string value to the right value type
-                    MethodInfo parse_method = type.GetMethod("Parse", new[] { typeof(string), typeof(CultureInfo) });
-                    value = parse_method.Invoke(termValueClassRef, new object[] { str_value, CultureInfo.InvariantCulture });
-                }
-                catch (NullReferenceException e)
-                {
-                    //a NullReferenceException exception can occour if the Parse method is not included within a given type reference class.
-                    //In this case use a simple ChangeType to cast the string value to the right value type.
-                    value = Convert.ChangeType(str_value, type);
-                    Console.WriteLine(e);
-                }
-                finally
-                {
-                    //Finally, assign the value to the variable term
-                    varTermType.GetProperty("Value").SetValue(varTerm, value);
-                }
-            }
-            
-            //Add the term to the terms list
-            terms.Add((Term)varTerm);
+            ValuedTerm<int> aa = new ValuedTerm<int>(context.value);
+            Terms.Add(aa);    
 
             return "";
         }
+
+        public override string VisitThe_char_type(formula_grammarParser.The_char_typeContext context)
+        {
+            base.VisitThe_char_type(context);
+
+            ValuedTerm<char> aa = new ValuedTerm<char>(context.value);
+            Terms.Add(aa);    
+
+            return "";
+        }
+
+        public override string VisitThe_float_type(formula_grammarParser.The_float_typeContext context)
+        {
+            base.VisitThe_float_type(context);
+            ValuedTerm<float> aa = new ValuedTerm<float>(context.value);
+            Terms.Add(aa);    
+
+            return "";
+        }
+
+        #endregion Valued Term
 
         /// <summary>
         /// Trim (double)quotes from a string
@@ -141,22 +130,9 @@ namespace FormulaLibrary.ANTLR.visitor
                 str = str.Substring(0, str.Length - 1);
         }
 
-
-        public override string VisitSimple_type([NotNull] formula_grammarParser.Simple_typeContext context)
-        {
-            base.VisitSimple_type(context);
-            return context.expr;
-        }
-
-        public override string VisitNullable_type([NotNull] formula_grammarParser.Nullable_typeContext context)
-        {
-            base.VisitNullable_type(context);
-            return context.expr;
-        }
-
         public void Dispose()
         {
-            terms.Clear();
+            Terms.Clear();
         }
     }
 }

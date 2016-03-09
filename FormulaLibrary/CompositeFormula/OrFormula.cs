@@ -87,7 +87,7 @@ namespace FormulaLibrary
             return false;
         }
 
-        public override FormulaType GetType()
+        public override FormulaType GetFormulaType()
         {
             return FormulaType.OR_FORMULA;
         }
@@ -111,13 +111,6 @@ namespace FormulaLibrary
             b.Append(Right.ToString());
             b.Append(")");
             return b.ToString();
-        }
-
-        public override List<object> ConvertToSimpleFormula()
-        {
-            List<object> leftAssignment = Left.ConvertToSimpleFormula();
-            List<object> rightAssignment = Right.ConvertToSimpleFormula();
-            return leftAssignment.Union(rightAssignment).ToList();
         }
 
         public IFormula GetLeft()

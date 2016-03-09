@@ -68,11 +68,11 @@
     <Compile Include="Common\Formula\IFormula.cs" />
     <Compile Include="Common\Formula\FormulaType.cs" />
     <Compile Include="Common\Formula\ITerm.cs" />
-    <Compile Include="Common\Formula\IVariableTermFacade.cs" />
     <Compile Include="Common\Formula\CompositeFormula\IAndFormula.cs" />
     <Compile Include="Common\Formula\CompositeFormula\IOrFormula.cs" />
     <Compile Include="Common\Formula\CompositeFormula\INotFormula.cs" />
     <Compile Include="Common\Formula\CompositeFormula\IAtomicFormula.cs" />
+    <Compile Include="Common\Formula\IValuedTermFacade.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

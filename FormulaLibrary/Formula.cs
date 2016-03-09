@@ -15,10 +15,9 @@ namespace FormulaLibrary
 {
     public abstract class Formula : IFormula
     {
-        public abstract FormulaType GetType();
+        public abstract FormulaType GetFormulaType();
         public abstract bool IsParametric();
         public abstract bool IsAtomic();
-        public abstract List<object> ConvertToSimpleFormula();
         public abstract override string ToString();
         public abstract override bool Equals(object obj);
     }

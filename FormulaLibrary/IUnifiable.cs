@@ -9,8 +9,8 @@
 */
 namespace FormulaLibrary
 {
-    public interface IUnifiable<T>
+    public interface IUnifiable
     {
-        bool unify(Assignment<T> a);
+        ValuedTerm<T> Unify<T>(Assignment<T> a);
     }
 }

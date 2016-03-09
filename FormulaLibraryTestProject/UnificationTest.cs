@@ -5,7 +5,7 @@
 //         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
 //         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 //
-//  IVariableTermFacade.cs
+//  UnificationTest.cs
 //
 //  Author:
 //       Davide Guastella <davide.guastella90@gmail.com>
@@ -25,17 +25,14 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using NUnit.Framework;
 
-namespace MusaCommon
+namespace FormulaLibraryTestProject
 {
-    public interface IVariableTermFacade
+    [TestFixture]
+    public class UnificationTest
     {
-        Type GetVariableTermFor(Type t);
-        object GetNameOfVariableTerm(object var_term);
-        object GetValueOfVariableTerm(object var_term);
-        ITerm ConvertToLiteralTerm(ITerm var_term);
-        object CreateVariableTerm(string Name, object value);
-        object SetValueForVariableTerm(object varTerm, object value);
+        //TODO implementami
     }
 }
 

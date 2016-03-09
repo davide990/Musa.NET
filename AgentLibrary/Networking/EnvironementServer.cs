@@ -59,8 +59,6 @@ namespace AgentLibrary
             Logger = ModuleProvider.Get().Resolve<ILogger>();
         }
 
-
-
         /// <summary>
         /// sender agent is trusted? if not return false
         /// otherwise forward the message to receiver agent.
@@ -200,16 +198,6 @@ namespace AgentLibrary
                 the_plan_list.Add(the_plan.Name);
 
             return the_plan_list;
-        }
-
-        public List<string> GetAgentAssignments(AgentPassport agent)
-        {
-            List<string> outList = new List<string>();
-
-            foreach (IAssignment f in Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(agent.AgentName)).Assignments)
-                outList.Add(f.ToString());
-
-            return outList;
         }
 
         public bool QueryAgent(AgentPassport sender, AgentPassport receiver, string formula)

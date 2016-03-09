@@ -23,7 +23,7 @@
       <BeliefBase>
       	<!--<Belief value="f(x)"/>
       	<Belief value="h(x)"/>
-      	<Belief value="g(x<-int(3))"/>-->
+      	<Belief value="g(3)"/>-->
       </BeliefBase>
       <Events>
         <!--<Event Formula="f(x)" Plan="PlanExample1" Perception="AddBelief">

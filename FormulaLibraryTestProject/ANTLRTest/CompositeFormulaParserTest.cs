@@ -237,16 +237,14 @@ namespace FormulaLibraryTestProject
         public bool formula_test_12()
         {
             var FormulaUtils = new FormulaUtils();
-            string formula = "(   f(x,k<-int(3))&!h(s,o,a<-string(\"ciao mondo\")))  |!o(m,s<-char('d'))";
+            string formula = "f(x,3)&!h(s,o,\"ciao mondo\")  |!o(m,'d')";
             IFormula generatedFormula = FormulaUtils.Parse(formula);
 
-            Formula a = new AtomicFormula("f", new LiteralTerm("x"), new VariableTerm<int>("k", 3));
-            Formula b = new NotFormula(new AtomicFormula("h", new LiteralTerm("s"), new LiteralTerm("o"), new VariableTerm<string>("a", "ciao mondo")));
-            Formula c = new NotFormula(new AtomicFormula("o", new LiteralTerm("m"), new VariableTerm<char>("s", 'd')));
+            Formula a = new AtomicFormula("f", new LiteralTerm("x"), new ValuedTerm<int>(3));
+            Formula b = new NotFormula(new AtomicFormula("h", new LiteralTerm("s"), new LiteralTerm("o"), new ValuedTerm<string>("ciao mondo")));
+            Formula c = new NotFormula(new AtomicFormula("o", new LiteralTerm("m"), new ValuedTerm<char>('d')));
             Formula ab = new AndFormula(a, b);
-            
             Formula expectedFormula = new OrFormula(ab, c);
-
             return generatedFormula.Equals(expectedFormula);
         }
     }

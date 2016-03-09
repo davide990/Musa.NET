@@ -45,7 +45,7 @@ namespace FormulaLibrary
             Formula = f;
         }
 
-        public override FormulaType GetType()
+        public override FormulaType GetFormulaType()
         {
             return FormulaType.NOT_FORMULA;
         }
@@ -79,11 +79,6 @@ namespace FormulaLibrary
         public override bool IsAtomic()
         {
             return false;
-        }
-
-        public override List<object> ConvertToSimpleFormula()
-        {
-            return Formula.ConvertToSimpleFormula();
         }
 
         public IFormula GetFormula()

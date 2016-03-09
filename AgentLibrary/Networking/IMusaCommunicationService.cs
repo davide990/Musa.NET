@@ -80,17 +80,6 @@ namespace AgentLibrary
         List<string> GetAgentStatements(AgentPassport agent);
 
         /// <summary>
-        /// Return the assignment within the workbench of an agent
-        /// </summary>
-        /// <param name="agent"></param>
-        /// <returns></returns>
-        [WebInvoke(Method = "POST",
-            ResponseFormat = WebMessageFormat.Json,
-            RequestFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        List<string> GetAgentAssignments(AgentPassport agent);
-
-        /// <summary>
         /// Return the plans the specified agent has
         /// </summary>
         /// <param name="agent"></param>
