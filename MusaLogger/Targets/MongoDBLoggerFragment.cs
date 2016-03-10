@@ -3,13 +3,14 @@ using System;
 using NLog;
 using NLog.Config;
 using NLog.Mongo;
+using MusaCommon;
 
 namespace MusaLogger
 {
 	/// <summary>
 	/// Mongo DB logger.
 	/// </summary>
-	public sealed class MongoDBLogger : LoggerFragment
+	public sealed class MongoDBLoggerFragment : LoggerFragment, IMongoDBLoggerFragment
 	{
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="MusaConfig.MongoDBLogger"/> is enabled.
@@ -59,7 +60,7 @@ namespace MusaLogger
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MusaConfig.MongoDBLogger"/> class.
 		/// </summary>
-		public MongoDBLogger ()
+		public MongoDBLoggerFragment ()
 		{
 			configured = false;
 		}
@@ -99,7 +100,7 @@ namespace MusaLogger
 		/// <summary>
 		/// Log the specified message.
 		/// </summary>
-        public override void Log (int level, string message)
+        public void Log (int level, string message)
 		{
 			if (!configured) 
 			{
@@ -112,6 +113,68 @@ namespace MusaLogger
 			if (Enabled && (int)level >= MinimumLogLevel)
 				logger.Log (GetLogLevel(level), message);
 		}
+
+        #region IMongoDBLoggerFragment methods
+
+        public string GetMongoDBAddress()
+        {
+            return MongoDBAddress;
+        }
+
+        public void SetMongoDBAddress(string mongodbaddress)
+        {
+            MongoDBAddress = mongodbaddress;
+        }
+
+        public int GetMongoDBPort()
+        {
+            return MongoDBPort;
+        }
+
+        public void SetMongoDBPort(int mongodbport)
+        {
+            MongoDBPort = mongodbport;
+        }
+
+        public string GetMongoDBCollectionName()
+        {
+            return MongoDBCollectionName;
+        }
+
+        public void SetMongoDBCollectionName(string mongodbcollectionname)
+        {
+            MongoDBCollectionName = mongodbcollectionname;
+        }
+
+        public string GetMongoDBUser()
+        {
+            return MongoDBUser;
+        }
+
+        public void SetMongoDBUser(string mongodbuser)
+        {
+            MongoDBUser = mongodbuser;
+        }
+
+        public string GetMongoDBPass()
+        {
+            return MongoDBPass;
+        }
+
+        public void SetMongoDBPass(string mongodbpass)
+        {
+            MongoDBPass = mongodbpass;
+        }
+
+
+
+        #endregion
+
+        public void SetMinimumLogLevel(int level)
+        {
+            MinimumLogLevel = level;
+        }
+
 	}
 }
 

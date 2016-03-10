@@ -73,6 +73,10 @@
     <Compile Include="Common\Formula\CompositeFormula\INotFormula.cs" />
     <Compile Include="Common\Formula\CompositeFormula\IAtomicFormula.cs" />
     <Compile Include="Common\Formula\IValuedTermFacade.cs" />
+    <Compile Include="Common\Logger\Fragments\IWCFLoggerFragment.cs" />
+    <Compile Include="Common\Logger\Fragments\IConsoleLoggerFragment.cs" />
+    <Compile Include="Common\Logger\Fragments\IFileLoggerFragment.cs" />
+    <Compile Include="Common\Logger\Fragments\IMongoDBLoggerFragment.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -84,6 +88,7 @@
     <Folder Include="MusaModule\ModuleProvider\" />
     <Folder Include="Common\Formula\" />
     <Folder Include="Common\Formula\CompositeFormula\" />
+    <Folder Include="Common\Logger\Fragments\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -31,6 +31,7 @@ namespace MusaCommon
     public interface ILoggerFragment
     {
         void Log(int LogLevel, string message);
+        void SetMinimumLogLevel(int level);
     }
 }
 

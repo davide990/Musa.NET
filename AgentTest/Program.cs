@@ -93,9 +93,12 @@ namespace AgentTest
 
             MusaInitializer.MusaInitializer.Initialize();
 
-            MusaConfig.ReadFromFile("../../test_conf.xml");
-            AgentEnvironement env = AgentEnvironement.GetInstance();
+            //MusaConfig.ReadFromFile("../../test_conf.xml");
+            var logger = ModuleProvider.Get().Resolve<ILogger>();
+            logger.AddFragment<IConsoleLoggerFragment>(LogLevel.Trace);
+            logger.GetFragment<IConsoleLoggerFragment>().SetMinimumLogLevel(LogLevel.Debug);
 
+            //AgentEnvironement env = AgentEnvironement.GetInstance();
 
             //env.RegisterAgentFromConfiguration();
 

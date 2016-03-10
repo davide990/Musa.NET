@@ -3,6 +3,7 @@ using System.ServiceModel;
 using NLog;
 using System;
 using NLog.Config;
+using MusaCommon;
 
 namespace MusaLogger
 {
@@ -29,13 +30,6 @@ namespace MusaLogger
 		/// </summary>
 		protected override void InitializeTarget ()
 		{
-			/*var binding = new NetTcpBinding ();
-			binding.PortSharingEnabled = true;
-
-
-			client = new WCFClient (binding, new EndpointAddress ("net.tcp://localhost:8089"));*/
-
-
 			client = new WCFClient (new BasicHttpBinding (), new EndpointAddress (EndpointAddress));
 		}
 

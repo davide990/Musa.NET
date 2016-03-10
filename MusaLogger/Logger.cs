@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using MusaCommon;
 using System;
+using System.Linq;
 
 namespace MusaLogger
 {
@@ -21,42 +22,50 @@ namespace MusaLogger
             private set;
         }
 
-        public MongoDBLogger MongoDBLogger
+        public MongoDBLoggerFragment MongoDBLogger
         { 
             get
             { 
                 if (Fragments == null)
                     return null;
-                else
-                    return Fragments.Find(x => x is MongoDBLogger) as MongoDBLogger; 
+                if (Fragments.Count == 0)
+                    return null;
+                return Fragments.Find(x => x is MongoDBLoggerFragment) as MongoDBLoggerFragment; 
             } 
         }
 
-        public ConsoleLogger ConsoleLogger
+        public ConsoleLoggerFragment ConsoleLogger
         { 
             get
             { 
                 if (Fragments == null)
                     return null;
-                else
-                    return Fragments.Find(x => x is ConsoleLogger) as ConsoleLogger; 
+                if (Fragments.Count == 0)
+                    return null;
+                return Fragments.Find(x => x is ConsoleLoggerFragment) as ConsoleLoggerFragment; 
             } 
         }
 
-        public FileLogger FileLogger
+        public FileLoggerFragment FileLogger
         { 
             get
             { 
                 if (Fragments == null)
                     return null;
-                else
-                    return Fragments.Find(x => x is FileLogger) as FileLogger; 
+                if (Fragments.Count == 0)
+                    return null;
+                return Fragments.Find(x => x is FileLoggerFragment) as FileLoggerFragment; 
             }
         }
 
-        public WCFLogger WCFLogger
+        public WCFLoggerFragment WCFLogger
         { 
-            get { return Fragments.Find(x => x is WCFLogger) as WCFLogger; } 
+            get
+            {
+                if (Fragments.Count == 0)
+                    return null;
+                return Fragments.Find(x => x is WCFLoggerFragment) as WCFLoggerFragment;
+            } 
         }
 
         /// <summary>
@@ -65,6 +74,17 @@ namespace MusaLogger
         public Logger()
         {
             Fragments = new List<ILoggerFragment>();
+
+        }
+
+        public T GetFragment<T>() where T : ILoggerFragment
+        {
+            var the_fragment = Fragments.First(x => x is T);
+
+            if (the_fragment != null)
+                return (T)the_fragment;
+
+            return default(T);
         }
 
         /// <summary>
@@ -78,12 +98,24 @@ namespace MusaLogger
         }
 
         /// <summary>
-        /// Adds a set of fragments to this logger.
+        /// Adds a fragment of the provided type.
         /// </summary>
-        /// <param name="fragments">Fragments.</param>
-        public void AddFragment(IEnumerable<ILoggerFragment> fragments)
+        /// <typeparam name="T">The 1st type parameter.</typeparam>
+        public void AddFragment<T>(int minimumLogLevel = LogLevel.Debug) where T : ILoggerFragment
         {
-            Fragments.AddRange(fragments);
+            ILoggerFragment fragment;
+
+            if (typeof(IConsoleLoggerFragment).IsEquivalentTo(typeof(T)))
+                fragment = new ConsoleLoggerFragment();
+            else if (typeof(IMongoDBLoggerFragment).IsEquivalentTo(typeof(T)))
+                fragment = new MongoDBLoggerFragment();
+            else if (typeof(IFileLoggerFragment).IsEquivalentTo(typeof(T)))
+                fragment = new FileLoggerFragment();
+            else
+                fragment = new WCFLoggerFragment();
+
+            fragment.SetMinimumLogLevel(minimumLogLevel);
+            Fragments.Add(fragment);
         }
 
         /// <summary>
@@ -105,6 +137,23 @@ namespace MusaLogger
         public IEnumerable<ILoggerFragment> GetFragments()
         {
             return Fragments;
+        }
+
+        public void SetMinimumLogLevel<T>(int level)
+        {
+            if (!(typeof(ILoggerFragment).IsAssignableFrom(typeof(T))))
+                throw new Exception("Provided type " + typeof(T).Name + " is not a valid ILoggerFragment object.");
+
+            if (Fragments.Count <= 0)
+                return;
+            
+            Fragments.First(x => x is T).SetMinimumLogLevel(level);
+        }
+
+        public void SetMinimumLogLevel(int level)
+        {
+            foreach (ILoggerFragment fragment in Fragments)
+                fragment.SetMinimumLogLevel(level);
         }
 
         /// <summary>

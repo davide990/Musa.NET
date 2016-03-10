@@ -61,15 +61,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Targets\ConsoleLogger.cs" />
-    <Compile Include="Targets\FileLogger.cs" />
-    <Compile Include="Targets\MongoDBLogger.cs" />
     <Compile Include="Targets\WCF\WCFClient.cs" />
-    <Compile Include="Targets\WCF\WCFLogger.cs" />
-    <Compile Include="Targets\WCF\WCFTarget.cs" />
     <Compile Include="LoggerFragment.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MusaLoggerInitializer.cs" />
+    <Compile Include="Targets\ConsoleLoggerFragment.cs" />
+    <Compile Include="Targets\FileLoggerFragment.cs" />
+    <Compile Include="Targets\MongoDBLoggerFragment.cs" />
+    <Compile Include="Targets\WCF\WCFTarget.cs" />
+    <Compile Include="Targets\WCF\WCFLoggerFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="UML\MusaLogger.cd" />

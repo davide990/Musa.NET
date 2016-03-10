@@ -5,7 +5,7 @@
 //         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
 //         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 //
-//  ILogger.cs
+//  IFileLoggerFragment.cs
 //
 //  Author:
 //       Davide Guastella <davide.guastella90@gmail.com>
@@ -24,43 +24,17 @@
 //
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-using System.Collections.Generic;
 using System;
 
 namespace MusaCommon
 {
-	public interface ILogger
-	{
-		void Log (int level, string message);
+    public interface IFileLoggerFragment : ILoggerFragment
+    {
+        void SetLayout(string layout);
+        string GetLayout();
+        void SetFilename(string filename);
+        string GetFilename();
 
-		/// <summary>
-		/// Sets the color to be used for the next console log.
-		/// </summary>
-		/// <param name="bg">Background color</param>
-		/// <param name="fg">Foreground color</param>
-		void SetColorForNextConsoleLog (ConsoleColor bg, ConsoleColor fg);
-
-        void SetMinimumLogLevel<T>(int level);
-
-        void SetMinimumLogLevel(int level);
-
-		IEnumerable<ILoggerFragment> GetFragments ();
-
-        void AddFragment (ILoggerFragment fragment);
-
-        /// <summary>
-        /// Gets the fragment of the specified type.
-        /// </summary>
-        /// <returns>The fragment.</returns>
-        /// <typeparam name="T">The 1st type parameter.</typeparam>
-        T GetFragment<T>() where T : ILoggerFragment;
-
-        /// <summary>
-        /// Adds a fragment of the specified type.
-        /// </summary>
-        /// <param name="minimumLogLevel">Minimum log level.</param>
-        /// <typeparam name="T">The 1st type parameter.</typeparam>
-        void AddFragment<T>(int minimumLogLevel = LogLevel.Debug) where T : ILoggerFragment;
-	}
+    }
 }
 

@@ -30,10 +30,10 @@ namespace MusaConfiguration
         public bool NetworkingEnabled { get; set; }
 
         [XmlArray("Logging")]
-        [XmlArrayItem("ConsoleLogger", typeof(ConsoleLogger))]
-        [XmlArrayItem("FileLogger", typeof(FileLogger))]
-        [XmlArrayItem("MongoDBLogger", typeof(MongoDBLogger))]
-        [XmlArrayItem("WCFLogger", typeof(WCFLogger))]
+        [XmlArrayItem("ConsoleLogger", typeof(ConsoleLoggerFragment))]
+        [XmlArrayItem("FileLogger", typeof(FileLoggerFragment))]
+        [XmlArrayItem("MongoDBLogger", typeof(MongoDBLoggerFragment))]
+        [XmlArrayItem("WCFLogger", typeof(WCFLoggerFragment))]
         public List<LoggerFragment> LoggerFragments { get; set; }
 
         [XmlArray("Agents")]
@@ -94,67 +94,67 @@ namespace MusaConfiguration
         private string _fname;
 
         [XmlIgnore()]
-        public MongoDBLogger MongoDBLogger
+        public MongoDBLoggerFragment MongoDBLogger
         { 
             get
             { 
                 if (LoggerFragments == null)
                     return null;
                 else
-                    return LoggerFragments.Find(x => x is MongoDBLogger) as MongoDBLogger; 
+                    return LoggerFragments.Find(x => x is MongoDBLoggerFragment) as MongoDBLoggerFragment; 
             } 
             set
             { 
-                LoggerFragments.RemoveAll(x => x is MongoDBLogger); 
-                if (value is MongoDBLogger)
+                LoggerFragments.RemoveAll(x => x is MongoDBLoggerFragment); 
+                if (value is MongoDBLoggerFragment)
                     LoggerFragments.Add(value);
             }
         }
 
         [XmlIgnore()]
-        public ConsoleLogger ConsoleLogger
+        public ConsoleLoggerFragment ConsoleLogger
         { 
             get
             { 
                 if (LoggerFragments == null)
                     return null;
                 else
-                    return LoggerFragments.Find(x => x is ConsoleLogger) as ConsoleLogger; 
+                    return LoggerFragments.Find(x => x is ConsoleLoggerFragment) as ConsoleLoggerFragment; 
             } 
             set
             { 
-                LoggerFragments.RemoveAll(x => x is MongoDBLogger); 
-                if (value is ConsoleLogger)
+                LoggerFragments.RemoveAll(x => x is MongoDBLoggerFragment); 
+                if (value is ConsoleLoggerFragment)
                     LoggerFragments.Add(value);
             }
         }
 
         [XmlIgnore()]
-        public FileLogger FileLogger
+        public FileLoggerFragment FileLogger
         { 
             get
             { 
                 if (LoggerFragments == null)
                     return null;
                 else
-                    return LoggerFragments.Find(x => x is FileLogger) as FileLogger; 
+                    return LoggerFragments.Find(x => x is FileLoggerFragment) as FileLoggerFragment; 
             }
             set
             { 
-                LoggerFragments.RemoveAll(x => x is MongoDBLogger); 
-                if (value is FileLogger)
+                LoggerFragments.RemoveAll(x => x is MongoDBLoggerFragment); 
+                if (value is FileLoggerFragment)
                     LoggerFragments.Add(value);
             }
         }
 
         [XmlIgnore()]
-        public WCFLogger WCFLogger
+        public WCFLoggerFragment WCFLogger
         { 
-            get { return LoggerFragments.Find(x => x is WCFLogger) as WCFLogger; } 
+            get { return LoggerFragments.Find(x => x is WCFLoggerFragment) as WCFLoggerFragment; } 
             set
             { 
-                LoggerFragments.RemoveAll(x => x is MongoDBLogger); 
-                if (value is WCFLogger)
+                LoggerFragments.RemoveAll(x => x is MongoDBLoggerFragment); 
+                if (value is WCFLoggerFragment)
                     LoggerFragments.Add(value);
             }
         }
@@ -227,9 +227,16 @@ namespace MusaConfiguration
         {
             //If no logger has been found, create a default console logger
             if (instance.LoggerFragments.Count <= 0)
-                instance.LoggerFragments.Add(new ConsoleLogger());
-            
-            ModuleProvider.Get().Resolve<ILogger>().AddFragment(instance.LoggerFragments);
+            {
+                instance.LoggerFragments.Add(new ConsoleLoggerFragment());
+                return;
+            }
+
+            var logger = ModuleProvider.Get().Resolve<ILogger>();
+            foreach(ILoggerFragment fragment in instance.LoggerFragments)
+            {
+                logger.AddFragment(fragment);
+            }
         }
 
         #endregion Logger methods
@@ -251,7 +258,7 @@ namespace MusaConfiguration
 
                 //Create a default console logger
                 if (addDefaultConsoleLogger)
-                    instance.LoggerFragments.Add(new ConsoleLogger());
+                    instance.LoggerFragments.Add(new ConsoleLoggerFragment());
             }
 			
             return instance;

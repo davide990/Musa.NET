@@ -4,10 +4,11 @@ using System;
 using MusaLogger;
 using NLog.Config;
 using NLog;
+using MusaCommon;
 
 namespace MusaLogger
 {
-	public class WCFLogger : LoggerFragment
+	public class WCFLoggerFragment : LoggerFragment , IWCFLoggerFragment
 	{
 		[XmlAttribute("Enabled")]
 		public bool Enabled { get; set; }
@@ -18,6 +19,18 @@ namespace MusaLogger
 		[XmlIgnore ()]
 		private bool configured;
 
+        [XmlIgnore ()]
+        public string Layout 
+        {
+            get;
+            set;
+        }
+
+        public WCFLoggerFragment()
+        {
+            Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
+        }
+
 		public void configure()
 		{
 			// Create targets and add them to the configuration 
@@ -26,7 +39,7 @@ namespace MusaLogger
 			wcfTarget.Name = LoggerName;
 
 			// Set target properties 
-			wcfTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
+            wcfTarget.Layout = Layout;
 
 			// Define rules
             var rule1 = new LoggingRule(GetType().Name, GetLogLevel(MinimumLogLevel), wcfTarget);
@@ -39,7 +52,7 @@ namespace MusaLogger
 			LogManager.Configuration = Configuration;
 		}	
 
-        public override void Log (int level, string message)
+        public void Log (int level, string message)
 		{
 			if (!configured) 
 			{
@@ -62,7 +75,30 @@ namespace MusaLogger
 			}
 		}
 
+        public void SetLayout(string layout)
+        {
+            Layout = layout;
+        }
 
+        public string GetLayout()
+        {
+            return Layout;
+        }
+
+        public string GetEndpointAddress()
+        {
+            return EndpointAddress;
+        }
+
+        public void SetEndpointAddress(string address)
+        {
+            EndpointAddress = address;
+        }
+
+        public void SetMinimumLogLevel(int level)
+        {
+            MinimumLogLevel = level;
+        }
 	}
 }
 

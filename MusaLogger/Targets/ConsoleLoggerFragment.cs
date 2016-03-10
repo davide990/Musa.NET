@@ -30,6 +30,7 @@ using NLog.Config;
 using NLog.Targets;
 using NLog;
 using System;
+using MusaCommon;
 
 namespace MusaLogger
 {
@@ -43,7 +44,7 @@ namespace MusaLogger
         }
     }
 
-    public sealed class ConsoleLogger : LoggerFragment
+    public sealed class ConsoleLoggerFragment : LoggerFragment, IConsoleLoggerFragment
     {
         [XmlAttribute("Enabled")]
         public bool Enabled { get; set; }
@@ -51,12 +52,20 @@ namespace MusaLogger
         [XmlIgnore()]
         private bool configured;
 
-        public ConsoleLogger()
+        [XmlIgnore()]
+        public string Layout 
         {
+            get;
+            set;
+        }
+
+        public ConsoleLoggerFragment()
+        {
+            Layout = @"${date:format=HH\:mm\:ss}|${logger}|${level:uppercase=true}| ${message}";
             configured = false;
         }
 
-        internal void SetColorForNextLog(ConsoleColor BackgroundColor, ConsoleColor ForegroundColor)
+        public void SetColorForNextLog(ConsoleColor BackgroundColor, ConsoleColor ForegroundColor)
         {
             Console.BackgroundColor = BackgroundColor;
             Console.ForegroundColor = ForegroundColor;
@@ -65,14 +74,12 @@ namespace MusaLogger
         private void configure()
         {
             // Create targets and add them to the configuration 
-            //var consoleTarget = new ColoredConsoleTarget();
             var consoleTarget = new ConsoleTarget();
 
             // Set target properties 
-            consoleTarget.Layout = @"${date:format=HH\:mm\:ss}|${logger}|${level:uppercase=true}| ${message}";
+            consoleTarget.Layout = Layout;
 
             // Define rules
-            //var rule1 = new LoggingRule(LoggerName, GetLogLevel(LogLevel.Trace), consoleTarget);
             var rule1 = new LoggingRule(LoggerName, GetLogLevel(MinimumLogLevel), consoleTarget);
 
             Configuration.AddTarget(LoggerName, consoleTarget);
@@ -83,7 +90,7 @@ namespace MusaLogger
             LogManager.Configuration = Configuration;
         }
 
-        public override void Log(int LogLevel, string message)
+        public void Log(int LogLevel, string message)
         {
             if (!configured)
             {
@@ -98,6 +105,21 @@ namespace MusaLogger
         public override string ToString()
         {
             return string.Format("[ConsoleLogger: Enabled={0}]", Enabled);
+        }
+
+        public void SetLayout(string layout)
+        {
+            Layout = layout;
+        }
+
+        public string GetLayout()
+        {
+            return Layout;
+        }
+
+        public void SetMinimumLogLevel(int level)
+        {
+            MinimumLogLevel = level;
         }
     }
 }

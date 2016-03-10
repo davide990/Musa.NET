@@ -34,7 +34,7 @@ namespace MusaLogger
     /// <summary>
     /// The abstract class that defines the behaviour of the logger fragment.
     /// </summary>
-    public abstract class LoggerFragment : ILoggerFragment
+    public abstract class LoggerFragment
     {
         [XmlAttribute("MinimumLogLevel")]
         public int MinimumLogLevel { get; set; }
@@ -84,6 +84,15 @@ namespace MusaLogger
             }
         }
 
+/*        /// <summary>
+        /// Sets the minimum log level for this fragment.
+        /// </summary>
+        /// <param name="level">Level.</param>
+        public void SetMinimumLogLevel(int level)
+        {
+            MinimumLogLevel = level;
+        }*/
+
         protected NLog.LogLevel GetLogLevel(int level)
         {
             switch (level)
@@ -109,10 +118,10 @@ namespace MusaLogger
             }
         }
 
-        /// <summary>
+        /*/// <summary>
         /// Log the specified message.
         /// </summary>
-        public abstract void Log(int LogLevel, string message);
+        public abstract void Log(int LogLevel, string message);*/
     }
 }
 
