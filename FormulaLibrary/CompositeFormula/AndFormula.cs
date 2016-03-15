@@ -53,7 +53,13 @@ namespace FormulaLibrary
             this.Right = Right;
         }
 
-        public Formula this [string s]
+        public override void Unify(List<IAssignment> assignment)
+        {
+            Right.Unify(assignment);
+            Left.Unify(assignment);
+        }
+
+        public Formula this[string s]
         {
             get
             {
@@ -64,7 +70,7 @@ namespace FormulaLibrary
             }
         }
 
-        public Formula this [byte s]
+        public Formula this[byte s]
         {
             get
             {
@@ -112,7 +118,7 @@ namespace FormulaLibrary
             b.Append(")");
             return b.ToString();
         }
-            
+
         public IFormula GetLeft()
         {
             return Left;

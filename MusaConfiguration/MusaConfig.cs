@@ -197,7 +197,7 @@ namespace MusaConfiguration
             MaxNumAgent = "100";
             MusaAddress = "127.0.0.1";
             MusaAddressPort = 8089;
-            NetworkingEnabled = true;
+            NetworkingEnabled = false;
 
         }
 
@@ -277,9 +277,11 @@ namespace MusaConfiguration
             return string.Format("\"{0}\"", the_string);
         }
 
+        //TODO probabilmente non sarà piu necessaria dato che i caratteri invalidi non saranno piu permessi nelle formule
+        //data la nuova grammatica
         /// <summary>
         /// Preprocesses the xml configuration document by replacing invalid xml character. Since parametric statements 
-        /// may contains '<' symbol, these are replaced with the UTF-8 corresponding symbols.
+        /// may contains '&lt;' symbol, these are replaced with the UTF-8 corresponding symbols.
         /// </summary>
         /// <returns>The processed xml document.</returns>
         /// <param name="filename">Filename.</param>

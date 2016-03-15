@@ -127,6 +127,21 @@ namespace AgentLibrary
             Host.Close();
         }
 
+        public bool AskOne(Agent receiver, AgentMessage message)
+        {
+            IFormula messageFormula = ModuleProvider.Get().Resolve<IFormulaUtils>().Parse(message.Message as string);
+            List<IAssignment> assignments;
+            bool success = receiver.TestCondition(messageFormula, out assignments);
+
+            if(success)
+            {
+                //unifica
+
+            }
+
+            return true;
+        }
+
         #region IMusaCommunicationService interface methods
 
         public bool AgentIsActive(AgentPassport sender, AgentPassport receiver)
@@ -155,6 +170,8 @@ namespace AgentLibrary
 			
             receiver.MailBox.Push(new Tuple<AgentPassport, AgentMessage>(senderData, message));
             
+            
+
             return true;
         }
 

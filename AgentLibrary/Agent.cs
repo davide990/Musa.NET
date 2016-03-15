@@ -68,7 +68,7 @@ namespace AgentLibrary
         /// </summary>
         public List<IFormula> Beliefs
         {
-            get{ return new List<IFormula>(Workbench.Statements); }
+            get { return new List<IFormula>(Workbench.Statements); }
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace AgentLibrary
             {
                 lock (lock_perceivedEnvironmentChanges)
                 {
-                    return perceivedEnvironementChanges; 
+                    return perceivedEnvironementChanges;
                 }
             }
             private set
@@ -268,24 +268,6 @@ namespace AgentLibrary
             private set;
         }
 
-        private IFormulaUtils FormulaUtils
-        {
-            get;
-            set;
-        }
-
-        #endregion
-
-        /// <summary>
-        /// The logger of this agent. It is automatically configured using the environment configuration file. If this
-        /// file is missing, a console logger is automatically set up.
-        /// </summary>
-        public ILogger Logger
-        {
-            get;
-            private set;
-        }
-
         /// <summary>
         /// The "pointer" to the method invoked when a plan of this agent 
         /// requires to register a result.
@@ -306,10 +288,24 @@ namespace AgentLibrary
             set;
         }
 
+        #endregion Properties
+
+        #region Injectable modules
+
         /// <summary>
         /// An utility class for handling plans
         /// </summary>
         private IPlanFacade PlanFacade;
+
+        /// <summary>
+        /// The logger of this agent. It is automatically configured using the environment configuration file. If this
+        /// file is missing, a console logger is automatically set up.
+        /// </summary>
+        private ILogger Logger;
+
+        private IFormulaUtils FormulaUtils;
+
+        #endregion Injectable modules
 
         #region Constructors
 
@@ -398,7 +394,7 @@ namespace AgentLibrary
         {
             foreach (var v in changes)
                 Logger.Log(LogLevel.Trace, "[" + name + "] received " + action + " -> " + v);
-            
+
             PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(changes, action));
         }
 
@@ -448,7 +444,7 @@ namespace AgentLibrary
         {
             if (!Paused)
                 return;
-			
+
             Paused = false;
 
             Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkYellow);
@@ -477,7 +473,7 @@ namespace AgentLibrary
             //Check if the provided type is a valid plan
             if (!(typeof(IPlanModel).IsAssignableFrom(PlanModel)))
                 throw new Exception("Argument #1 in AddPlan(Type) must implement IPlanModel.");
-            
+
             //Create a new plan instance
             var plan_instance = PlanFacade.CreatePlanInstance(PlanModel, this, RegisterResultHandler, PlanFinishedHandler, Logger);
 
@@ -579,7 +575,7 @@ namespace AgentLibrary
         {
             if (Busy)
                 throw new Exception("Agent [" + Name + "] is currently executing plan " + CurrentExecutingPlan);
-            	
+
             //If Plan doesn't implement IPlanModel, then throw an exception
             if (!(typeof(IPlanModel).IsAssignableFrom(PlanModel)))
                 throw new Exception("Argument #1 in ExecutePlan(Type) must implement IPlanModel.");
@@ -603,7 +599,7 @@ namespace AgentLibrary
             CurrentExecutingPlan = the_plan;
 
             //Execute the plan
-            execute_method.Invoke(the_plan, new object[]{ args });
+            execute_method.Invoke(the_plan, new object[] { args });
 
             //TODO [ALTA PRIORITÀ] migliorare il sistema di bloccaggio dell'agente
             //Lock the agent's reasoning life cycle until the invoked plan terminates its execution
@@ -620,7 +616,7 @@ namespace AgentLibrary
                 throw new ArgumentNullException("Plan", "Argument #1 'Plan' cannot be null.");
 
             //Set the achievement of the plan [Plan] as an agent's perception
-            PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(new List<Type>{ Plan }, AgentPerception.Achieve));
+            PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(new List<Type> { Plan }, AgentPerception.Achieve));
 
             //Set the parameters to be used when the plan [Plan] is invoked
             //TODO ATTENZIONE QUI
@@ -696,6 +692,11 @@ namespace AgentLibrary
         public bool TestCondition(IFormula formula)
         {
             return Workbench.TestCondition(formula);
+        }
+
+        public bool TestCondition(IFormula formula, out List<IAssignment> generated_assignments)
+        {
+            return Workbench.TestCondition(formula, out generated_assignments);
         }
 
     }

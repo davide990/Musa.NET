@@ -35,7 +35,7 @@ namespace AgentTest
         static void configureAndStartMusa()
         {
             AgentEnvironement env = AgentEnvironement.GetInstance();
-			
+
             Agent a = new Agent("agent_1").Start();
             //Agent ag_b = new Agent ("agent_2").Start();
 
@@ -71,7 +71,7 @@ namespace AgentTest
             /*a.AddBelief(FormulaParser.Parse("f(x)"));*/
             a.AddBelief(FormulaParser.Parse("k(x)"), FormulaParser.Parse("p(3)"));
 
-            var ll = new List<IFormula>{ FormulaParser.Parse("w(\"hello\")"), FormulaParser.Parse("w(x)"), FormulaParser.Parse("cc(x)") };
+            var ll = new List<IFormula> { FormulaParser.Parse("w(\"hello\")"), FormulaParser.Parse("w(x)"), FormulaParser.Parse("cc(x)") };
             a.AddBelief(ll);
 
 
@@ -96,7 +96,7 @@ namespace AgentTest
             //MusaConfig.ReadFromFile("../../test_conf.xml");
             var logger = ModuleProvider.Get().Resolve<ILogger>();
             logger.AddFragment<IConsoleLoggerFragment>(LogLevel.Trace);
-            logger.GetFragment<IConsoleLoggerFragment>().SetMinimumLogLevel(LogLevel.Debug);
+            //logger.GetFragment<IConsoleLoggerFragment>().SetMinimumLogLevel(LogLevel.Debug);
 
             //AgentEnvironement env = AgentEnvironement.GetInstance();
 
@@ -128,7 +128,20 @@ namespace AgentTest
             var a = env.RegisteredAgents;
             */
 
-            configureAndStartMusa();
+            MusaInitializer.MusaInitializer.Initialize();
+            var fp = ModuleProvider.Get().Resolve<IFormulaUtils>();
+            var ass_fact = ModuleProvider.Get().Resolve<IAssignmentFactory>();
+            IFormula ff = fp.Parse("f(x,3)&g(x) | k(k) & !l(3,\"ciao\",o,x,p)");
+            Console.WriteLine(ff);
+            var assignments = new List<IAssignment>() { ass_fact.CreateAssignment("x", 3), ass_fact.CreateAssignment("o", "davide") };
+
+            ff.Unify(assignments);
+            Console.WriteLine(ff);
+            Console.ReadKey();
+
+
+
+            //configureAndStartMusa();
         }
 
         static void A_RegisterResult(string result)
@@ -224,7 +237,7 @@ namespace AgentTest
 
             Console.WriteLine("Hello plan =)");
 
-            var the_args = new PlanArgs(){ { "nome", "davide" } };
+            var the_args = new PlanArgs() { { "nome", "davide" } };
 
 
             ExecuteStep("wella", the_args);
@@ -328,5 +341,5 @@ namespace AgentTest
 
     }
 
-        
+
 }

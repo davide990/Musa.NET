@@ -25,6 +25,7 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+using MusaCommon;
 using System;
 
 namespace FormulaLibrary
@@ -51,6 +52,16 @@ namespace FormulaLibrary
         public ValuedTerm<T> Unify<T>(Assignment<T> a)
         {
             return new ValuedTerm<T>(a.Value);
+        }
+
+        public ITerm Unify(IAssignment a)
+        {
+            if (!a.GetName().Equals(Name))
+                return this;
+
+            var newTerm = ModuleProvider.Get().Resolve<IValuedTermFacade>().CreateValuedTerm(a.GetValue());
+
+            return newTerm;
         }
 
         public override bool IsLiteral()

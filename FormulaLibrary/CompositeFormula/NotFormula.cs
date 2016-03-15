@@ -45,10 +45,17 @@ namespace FormulaLibrary
             Formula = f;
         }
 
+        public override void Unify(List<IAssignment> assignment)
+        {
+            Formula.Unify(assignment);
+        }
+
         public override FormulaType GetFormulaType()
         {
             return FormulaType.NOT_FORMULA;
         }
+
+
 
         public override string ToString()
         {

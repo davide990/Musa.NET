@@ -32,6 +32,7 @@ namespace MusaCommon
     public interface IFormula
     {
         FormulaType GetFormulaType();
+        void Unify(List<IAssignment> assignments);
         bool IsAtomic();
     }
 }

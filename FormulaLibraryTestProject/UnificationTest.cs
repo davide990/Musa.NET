@@ -26,6 +26,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using NUnit.Framework;
+using MusaCommon;
+using System.Collections.Generic;
 
 namespace FormulaLibraryTestProject
 {
@@ -33,6 +35,35 @@ namespace FormulaLibraryTestProject
     public class UnificationTest
     {
         //TODO implementami
+
+        [TestCase("f(x)", ExpectedResult = true)]
+        [TestCase("f(y)", ExpectedResult = true)]
+        [TestCase("f(x,1)", ExpectedResult = true)]
+        [TestCase("f(x,1) & k(h)", ExpectedResult = true)]
+        [TestCase("k(x) & x(x)", ExpectedResult = true)]
+        [TestCase("f(y) & l(i) | f(o)", ExpectedResult = true)]
+        [TestCase("!r(x)", ExpectedResult = true)]
+        [TestCase("r(x) | e(3,x,4)", ExpectedResult = true)]
+        [TestCase("f(x,3)&g(x) | k(k) & !l(3,\"ciao\",o,x,p)", ExpectedResult = true)]
+        [Test]
+        public bool unification_test(string formula)
+        {
+            MusaInitializer.MusaInitializer.Initialize();
+            var fp = ModuleProvider.Get().Resolve<IFormulaUtils>();
+            var ass_fact = ModuleProvider.Get().Resolve<IAssignmentFactory>();
+            IFormula ff = fp.Parse(formula);
+            var assignments = new List<IAssignment>() { ass_fact.CreateAssignment("x", 3), ass_fact.CreateAssignment("o", "davide") };
+            try
+            {
+                ff.Unify(assignments);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+
+        }
     }
 }
 

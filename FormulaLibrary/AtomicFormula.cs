@@ -103,7 +103,7 @@ namespace FormulaLibrary
                 if (i != Terms.Count - 1)
                     b.Append(",");
             }
-            
+
             b.Append(")");
             return b.ToString();
         }
@@ -117,7 +117,7 @@ namespace FormulaLibrary
 
             if (!other.Functor.Equals(Functor))
                 return false;
-            
+
             foreach (var t in Terms)
             {
                 if (!other.Terms.Contains(t))
@@ -146,35 +146,6 @@ namespace FormulaLibrary
             return false;
         }
 
-        /// <summary>
-        /// Convert this formula to a simple type formula. That is, if this formula
-        /// contains any variable term, convert them to literal Terms. Found variable
-        /// Terms are returned to the output list
-        /// </summary>
-        /// <returns>a list containing the variable terms this formula previously contained</returns>
-        /*public override List<object> ConvertToSimpleFormula()
-        {
-            List<object> variableTerms = new List<object>();
-            
-            //Iterate each term
-            for (int i = 0; i < Terms.Count; i++)
-            {
-                //if a variable term occurs, convert each one to literal term
-                if (!Terms[i].IsLiteral())
-                {
-                    //add the variable term to the output list
-                    variableTerms.Add(Terms[i]);
-
-                    //get the type info for the current term
-                    //Type variableTermType = VariableTermFacace.GetVariableTermFor(Terms[i].GetType().GetGenericArguments()[0]);
-
-                    Terms[i] = VariableTermFacace.ConvertToLiteralTerm(Terms[i]);
-                }
-            }
-
-            return variableTerms;
-        }*/
-
         public override bool IsAtomic()
         {
             return true;
@@ -192,16 +163,11 @@ namespace FormulaLibrary
             {
                 //if a variable term occurs
                 if (!Terms[i].IsLiteral())
-                { 
-                    //get the type info for the current term
-                    //Type variableTermType = VariableTermFacace.GetVariableTermFor(Terms[i].GetType().GetGenericArguments()[0]);
-
-                    //string name = (string)VariableTermFacace.GetNameOfVariableTerm(Terms[i]);
-                    //object value = ValuedTermFacace.GetValueOfVariableTerm(Terms[i]);
+                {
                     object varTerm = ValuedTermFacace.CreateValuedTerm((Terms[i] as ITerm).GetValue());
 
                     //add the new instance to the cloned formula
-                    clone.Terms.Add((Term)varTerm);
+                    clone.Terms.Add(varTerm as Term);
                 }
                 else
                 {
@@ -209,6 +175,19 @@ namespace FormulaLibrary
                 }
             }
             return clone;
+        }
+
+        public override void Unify(List<IAssignment> assignment)
+        {
+            for (int i = 0; i < TermsCount; i++)
+            {
+                if (!Terms[i].IsLiteral())
+                    continue;
+
+                var the_assignment = assignment.Find(x => x.GetName().Equals(Terms[i].GetName()));
+                if (the_assignment != null)
+                    Terms[i] = (Terms[i] as LiteralTerm).Unify(the_assignment);
+            }
         }
 
 
@@ -235,22 +214,5 @@ namespace FormulaLibrary
         }
 
         #endregion IAtomicFormula members
-    }
-
-    sealed internal class InvalidFormulaFormatException : Exception
-    {
-        public InvalidFormulaFormatException()
-        {
-        }
-
-        public InvalidFormulaFormatException(string message)
-            : base(message)
-        {
-        }
-
-        public InvalidFormulaFormatException(string message, Exception inner)
-            : base(message, inner)
-        {
-        }
     }
 }

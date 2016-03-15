@@ -321,15 +321,15 @@ namespace AgentLibrary
                     achieveGoal(planToExecute, args);
                     break;
 
-                case InformationType.AskOne:
-                    //msg contiene una formula
-                    //formula --> IFormula
-                    //testa formula in workbench
-                    //manda risultato a sender_agent_passport
-                    break;
+                //case InformationType.AskOne:
+                //    //msg contiene una formula
+                //    //formula --> IFormula
+                //    //testa formula in workbench
+                //    //manda risultato a sender_agent_passport
+                //    break;
 
-                case InformationType.AskAll:
-                    break;
+                //case InformationType.AskAll:
+                //    break;
 
             }
         }
