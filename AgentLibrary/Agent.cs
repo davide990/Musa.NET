@@ -689,6 +689,33 @@ namespace AgentLibrary
 
         #endregion
 
+        /// <summary>
+        /// [invoked from EnvironementServer class]
+        /// This method is invoked when an agent sends a message of type AskOne to
+        /// this agent. The AskOne type message is processed asynchronously. 
+        /// </summary>
+        /// <param name="message">the message this agent have to test</param>
+        /// <param name="unifiedFormula">If the formula inside the message is verified, this
+        /// value will contains the formula unified with the assignments this agent found for it.</param>
+        /// <returns>True if the formula inside the message is true for this agent, false otherwise.</returns>
+        internal bool AskOne(AgentMessage message, out IFormula unifiedFormula)
+        {
+            IFormula messageFormula = FormulaUtils.Parse(message.Message as string);
+            List<IAssignment> assignments;
+            bool success = TestCondition(messageFormula, out assignments);
+
+            if (success)
+            {
+                unifiedFormula = messageFormula;
+                unifiedFormula.Unify(assignments);
+            }
+            else
+                unifiedFormula = null;
+
+            return success;
+        }
+
+
         public bool TestCondition(IFormula formula)
         {
             return Workbench.TestCondition(formula);
@@ -698,6 +725,19 @@ namespace AgentLibrary
         {
             return Workbench.TestCondition(formula, out generated_assignments);
         }
+
+        /// <summary>
+        /// Send a message to an agent that is located in the same environment of this agent.
+        /// </summary>
+        /// <param name="AgentName">The receiver agent</param>
+        /// <param name="message">The message to be sent</param>
+        public void SendMessage(string AgentName, AgentMessage message)
+        {
+
+        }
+
+
+
 
     }
 }

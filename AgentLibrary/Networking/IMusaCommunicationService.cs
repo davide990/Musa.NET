@@ -13,7 +13,7 @@ namespace AgentLibrary
         /// <summary>
         /// Sends a message to an agent
         /// </summary>
-        /// <returns><c>true</c>, if agent message was sent, <c>false</c> otherwise.</returns>
+        /// <returns>A response message</returns>
         /// <param name="senderData">Sender data.</param>
         /// <param name="receiverData">Receiver data.</param>
         /// <param name="message">Message.</param>
@@ -21,7 +21,7 @@ namespace AgentLibrary
             ResponseFormat = WebMessageFormat.Json,
             RequestFormat = WebMessageFormat.Json)]
         [OperationContract]
-        bool sendAgentMessage(AgentPassport senderData, AgentPassport receiverData, AgentMessage message);
+        AgentMessage sendAgentMessage(AgentPassport senderData, AgentPassport receiverData, AgentMessage message);
 
         /// <summary>
         /// Sends the broadcast message.

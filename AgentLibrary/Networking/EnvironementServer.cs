@@ -127,21 +127,6 @@ namespace AgentLibrary
             Host.Close();
         }
 
-        public bool AskOne(Agent receiver, AgentMessage message)
-        {
-            IFormula messageFormula = ModuleProvider.Get().Resolve<IFormulaUtils>().Parse(message.Message as string);
-            List<IAssignment> assignments;
-            bool success = receiver.TestCondition(messageFormula, out assignments);
-
-            if(success)
-            {
-                //unifica
-
-            }
-
-            return true;
-        }
-
         #region IMusaCommunicationService interface methods
 
         public bool AgentIsActive(AgentPassport sender, AgentPassport receiver)
@@ -157,22 +142,37 @@ namespace AgentLibrary
             throw new NotImplementedException();
         }
 
-        public bool sendAgentMessage(AgentPassport senderData, AgentPassport receiverData, AgentMessage message)
+        public AgentMessage sendAgentMessage(AgentPassport senderData, AgentPassport receiverData, AgentMessage message)
         {
             if (!AgentIsAuthorized(senderData))
-                return false;
+            {
+                throw new Exception("Agent '" + senderData.AgentName + "' is not authorized.");
+                //return null;
+            }
+                
 
             //find the agent to which the message must be forwarded
             Agent receiver = Environment.RegisteredAgents.FirstOrDefault(x => x.Name.Equals(receiverData.AgentName));
 
             if (receiver == null)
-                return false;
+                return null;
 			
-            receiver.MailBox.Push(new Tuple<AgentPassport, AgentMessage>(senderData, message));
-            
-            
+            if(message.InfoType == InformationType.AskOne)
+            {
+                IFormula out_formula;
+                bool success = receiver.AskOne(message, out out_formula);
 
-            return true;
+                AgentMessage response = new AgentMessage();
+                response.InfoType = InformationType.AskOne;
+                response.Message = out_formula.ToString();
+                //TODO
+                //response.Args = assignments;
+
+                return response;
+            }
+
+            receiver.MailBox.Push(new Tuple<AgentPassport, AgentMessage>(senderData, message));
+            return null;
         }
 
         public bool sendBroadcastMessage(AgentPassport senderData, EnvironementData receiverData, AgentMessage message)

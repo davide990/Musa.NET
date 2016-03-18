@@ -93,7 +93,7 @@ namespace AgentTest
 
             MusaInitializer.MusaInitializer.Initialize();
 
-            //MusaConfig.ReadFromFile("../../test_conf.xml");
+            //MusaConfig.ReadFrom/File("../../test_conf.xml");
             var logger = ModuleProvider.Get().Resolve<ILogger>();
             logger.AddFragment<IConsoleLoggerFragment>(LogLevel.Trace);
             //logger.GetFragment<IConsoleLoggerFragment>().SetMinimumLogLevel(LogLevel.Debug);
@@ -128,20 +128,7 @@ namespace AgentTest
             var a = env.RegisteredAgents;
             */
 
-            MusaInitializer.MusaInitializer.Initialize();
-            var fp = ModuleProvider.Get().Resolve<IFormulaUtils>();
-            var ass_fact = ModuleProvider.Get().Resolve<IAssignmentFactory>();
-            IFormula ff = fp.Parse("f(x,3)&g(x) | k(k) & !l(3,\"ciao\",o,x,p)");
-            Console.WriteLine(ff);
-            var assignments = new List<IAssignment>() { ass_fact.CreateAssignment("x", 3), ass_fact.CreateAssignment("o", "davide") };
-
-            ff.Unify(assignments);
-            Console.WriteLine(ff);
-            Console.ReadKey();
-
-
-
-            //configureAndStartMusa();
+			configureAndStartMusa ();
         }
 
         static void A_RegisterResult(string result)
