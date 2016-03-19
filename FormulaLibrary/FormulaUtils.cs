@@ -32,6 +32,7 @@ using Antlr4.Runtime.Tree;
 using FormulaLibrary;
 using System.IO;
 using System.Text;
+using System;
 
 namespace FormulaLibrary
 {
@@ -85,7 +86,17 @@ namespace FormulaLibrary
             formula_grammarParser parser = new formula_grammarParser(tokens);
 
             //Invoke the parser
-            IParseTree tree = parser.disjunction(); 
+            IParseTree tree;
+            try
+            {
+                tree = parser.disjunction(); 
+            }
+            catch
+            {
+                Console.WriteLine("Error parsing formula \"" + formula + "\"");
+                return null;
+            }
+
             /*
             catch(Exception e)
             {

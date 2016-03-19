@@ -100,8 +100,6 @@ namespace AgentTest
             logger.AddFragment<IConsoleLoggerFragment>(LogLevel.Trace);
             //logger.GetFragment<IConsoleLoggerFragment>().SetMinimumLogLevel(LogLevel.Debug);
 
-
-
             /*var f1 = ModuleProvider.Get().Resolve<IFormulaUtils>().Parse("w(\"hello\")");
             var f2 = new AtomicFormula("w", new ValuedTerm<string>("hello"));
 
@@ -110,9 +108,6 @@ namespace AgentTest
 
             Console.WriteLine("f1 -> " + f1.GetHashCode());
             Console.WriteLine("f2 -> " + f2.GetHashCode());*/
-
-
-
 
             configureAndStartMusa ();
         }
