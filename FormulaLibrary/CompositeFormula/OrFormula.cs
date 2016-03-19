@@ -93,6 +93,11 @@ namespace FormulaLibrary
             return false;
         }
 
+        public override int GetHashCode()
+        {
+            return Left.GetHashCode() + Right.GetHashCode();
+        }
+
         public override FormulaType GetFormulaType()
         {
             return FormulaType.OR_FORMULA;

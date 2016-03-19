@@ -306,7 +306,7 @@ namespace AgentLibrary
 
                 case InformationType.Untell:
                     Logger.Log(LogLevel.Debug, "[" + parentAgent.Name + "] perceiving UNTELL: " + msg);
-                    parentAgent.AddBelief(FormulaParser.Parse(msg.Message as string));
+                    parentAgent.RemoveBelief(FormulaParser.Parse(msg.Message as string));
                     break;
 			
                 case InformationType.Achieve:

@@ -59,7 +59,7 @@ namespace FormulaLibrary
             Left.Unify(assignment);
         }
 
-        public Formula this[string s]
+        public Formula this [string s]
         {
             get
             {
@@ -70,7 +70,7 @@ namespace FormulaLibrary
             }
         }
 
-        public Formula this[byte s]
+        public Formula this [byte s]
         {
             get
             {
@@ -91,6 +91,11 @@ namespace FormulaLibrary
             if (obj is AndFormula)
                 return Equals(obj as AndFormula);
             return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return Left.GetHashCode() + Right.GetHashCode();
         }
 
         public override FormulaType GetFormulaType()

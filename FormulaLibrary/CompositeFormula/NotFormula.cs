@@ -55,8 +55,6 @@ namespace FormulaLibrary
             return FormulaType.NOT_FORMULA;
         }
 
-
-
         public override string ToString()
         {
             StringBuilder b = new StringBuilder();
@@ -76,6 +74,11 @@ namespace FormulaLibrary
         public bool Equals(NotFormula other)
         {
             return other.Formula.Equals(Formula);
+        }
+
+        public override int GetHashCode()
+        {
+            return -Formula.GetHashCode();
         }
 
         public override bool IsParametric()

@@ -687,6 +687,28 @@ namespace AgentLibrary
             }
         }
 
+
+        public void RemoveBelief(params IFormula[] formula)
+        {
+            foreach (IFormula af in formula)
+            {
+                Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
+                Logger.Log(LogLevel.Debug, "[" + Name + "] Removing belief " + af);
+                PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.RemoveBelief));
+            }
+        }
+
+        public void RemoveBelief(IList formula_list)
+        {
+            foreach (IFormula af in formula_list)
+            {
+                Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
+                Logger.Log(LogLevel.Debug, "[" + Name + "] Removing belief " + af);
+                PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.RemoveBelief));
+            }
+        }
+
+
         #endregion
 
         /// <summary>

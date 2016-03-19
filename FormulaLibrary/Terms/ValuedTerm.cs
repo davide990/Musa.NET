@@ -26,6 +26,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.Text;
 
 namespace FormulaLibrary
 {
@@ -53,8 +54,10 @@ namespace FormulaLibrary
 
         public override string ToString()
         {
+            if (typeof(T) == typeof(string))
+                return "\"" + Value + "\"";
+            
             return Value.ToString();
-
         }
 
         public bool Equals(ValuedTerm<T> other)
@@ -68,6 +71,11 @@ namespace FormulaLibrary
                 return false;
 
             return Equals(obj as ValuedTerm<T>);
+        }
+
+        public override int GetHashCode()
+        {
+            return Value.GetHashCode();
         }
 
         public override bool IsLiteral()

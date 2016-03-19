@@ -129,7 +129,9 @@ namespace FormulaLibrary
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            int hc = 0;
+            Terms.ForEach(x => hc += x.GetHashCode());
+            return hc + Functor.GetHashCode();
         }
 
         /// <summary>

@@ -37,6 +37,7 @@ namespace AgentTest
             AgentEnvironement env = AgentEnvironement.GetInstance();
 
             Agent a = new Agent("agent_1").Start();
+            Agent b = new Agent("agent_2").Start();
             //Agent ag_b = new Agent ("agent_2").Start();
 
             BackgroundWorker wk = new BackgroundWorker();
@@ -63,6 +64,7 @@ namespace AgentTest
 
             //a.AddEvent ("f(x)", AgentPerception.RemoveBelief, typeof(PlanExample2));
             env.RegisterAgent(a);
+            env.RegisterAgent(b);
             //env.RegisterAgent (ag_b);
 
 
@@ -98,37 +100,21 @@ namespace AgentTest
             logger.AddFragment<IConsoleLoggerFragment>(LogLevel.Trace);
             //logger.GetFragment<IConsoleLoggerFragment>().SetMinimumLogLevel(LogLevel.Debug);
 
-            //AgentEnvironement env = AgentEnvironement.GetInstance();
-
-            //env.RegisterAgentFromConfiguration();
 
 
-            //env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));
-            //env.RegisterStatement (new AtomicFormula ("f", new VariableTerm<int>("l",3)));
+            /*var f1 = ModuleProvider.Get().Resolve<IFormulaUtils>().Parse("w(\"hello\")");
+            var f2 = new AtomicFormula("w", new ValuedTerm<string>("hello"));
 
-            //env.WaitForAgents();
+            var f1_h = f1.GetHashCode();
+            var f2_h = f1.GetHashCode();
+
+            Console.WriteLine("f1 -> " + f1.GetHashCode());
+            Console.WriteLine("f2 -> " + f2.GetHashCode());*/
 
 
-            /*BackgroundWorker wk = new BackgroundWorker();
-            wk.DoWork += delegate
-            {
-                Thread.Sleep(15000);
-                var ag = env.RegisteredAgents[0];
-                var fp = ModuleProvider.Get().Resolve<IFormulaParser>();
-                var formula = fp.Parse("g(x<-int(13))");
-                ag.UpdateBelief(formula as AtomicFormula);
-            };
-            wk.RunWorkerAsync();
 
-			
-            env.WaitForAgents();*/
-            /*
-            AgentEnvironement env = AgentEnvironement.GetInstance();
-            env.RegisterAgentFromConfiguration();
-            var a = env.RegisteredAgents;
-            */
 
-			configureAndStartMusa ();
+            configureAndStartMusa ();
         }
 
         static void A_RegisterResult(string result)

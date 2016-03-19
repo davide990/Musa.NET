@@ -162,12 +162,19 @@ namespace AgentLibrary
                 IFormula out_formula;
                 bool success = receiver.AskOne(message, out out_formula);
 
-                AgentMessage response = new AgentMessage();
-                response.InfoType = InformationType.AskOne;
-                response.Message = out_formula.ToString();
                 //TODO
                 //response.Args = assignments;
 
+                AgentMessage response = new AgentMessage();
+                response.InfoType = InformationType.AskOne;
+
+                if (!success)
+                {
+                    response.Message = "NULL";
+                    return response;
+                }
+
+                response.Message = out_formula.ToString();
                 return response;
             }
 
