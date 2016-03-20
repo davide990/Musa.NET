@@ -133,5 +133,17 @@ namespace FormulaLibrary
         {
             return Right;
         }
+
+        public override bool MatchWith(IFormula f, out List<IAssignment> generatedAssignment)
+        {
+            var leftAssignments = new List<IAssignment>();
+            var rightAssignments = new List<IAssignment>();
+
+            var leftMatch = f.MatchWith(Left, out leftAssignments);
+            var rightMatch = f.MatchWith(Right, out rightAssignments);
+            generatedAssignment = leftAssignments.Union(rightAssignments).ToList();
+
+            return leftMatch | rightMatch;
+        }
     }
 }

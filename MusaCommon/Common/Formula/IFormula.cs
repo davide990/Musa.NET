@@ -33,6 +33,7 @@ namespace MusaCommon
     {
         FormulaType GetFormulaType();
         void Unify(List<IAssignment> assignments);
+        bool MatchWith(IFormula f, out List<IAssignment> generatedAssignment);
         bool IsAtomic();
     }
 }

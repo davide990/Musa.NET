@@ -58,6 +58,7 @@ namespace FormulaLibrary
             }
             else if (f is NotFormula)
             {
+                
                 unrolled_formula_list.AddRange(UnrollFormula((f as NotFormula).Formula));
             }
             else
@@ -87,7 +88,9 @@ namespace FormulaLibrary
 
             //Invoke the parser
             IParseTree tree;
-            try
+
+            tree = parser.disjunction();
+/*            try
             {
                 tree = parser.disjunction(); 
             }
@@ -96,7 +99,7 @@ namespace FormulaLibrary
                 Console.WriteLine("Error parsing formula \"" + formula + "\"");
                 return null;
             }
-
+            */
             /*
             catch(Exception e)
             {

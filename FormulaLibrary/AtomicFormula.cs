@@ -216,5 +216,81 @@ namespace FormulaLibrary
         }
 
         #endregion IAtomicFormula members
+
+        /// <summary>
+        /// Check if this formula is assignable from a specified formula, eventually
+        /// using a set of assignments.
+        /// </summary>
+        /// <param name="f">The formula to be tested</param>
+        /// <returns>True if this formula is equals to f, eventually unifying f with the generated assignment set</returns>
+        public override bool MatchWith(IFormula f, out List<IAssignment> generatedAssignment)
+        {
+            generatedAssignment = new List<IAssignment>();
+            if (!f.IsAtomic())
+                return false;
+
+            ITerm a, b;
+            bool success = true;
+            var input_formula = f as IAtomicFormula;
+
+
+            if (GetTermsCount() != input_formula.GetTermsCount() || !GetFunctor().Equals(input_formula.GetFunctor()))
+                return false;
+
+            generatedAssignment.Clear();
+            success = true;
+
+            //Iterate each belief's term
+            for (int i = 0; i < GetTermsCount(); i++)
+            {
+                a = GetTermAt(i);
+                b = input_formula.GetTermAt(i);
+
+                object a_value = null;
+                if (!a.IsLiteral())
+                {
+                    if (!b.IsLiteral())
+                    {
+                        //a and b are both variable 
+                        if (a_value.Equals(b.GetValue()))
+                            //if both valued terms have equal values, proceed with the next couple of terms
+                            continue;
+                        else
+                        {
+                            //terms are both valued but they have different values. The test fails here.
+                            success = false;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        //a is variable term, b is literal. An assignment is created to assign to b the value of a
+                        generatedAssignment.Add(ModuleProvider.Get().Resolve<IAssignmentFactory>().CreateAssignment(b.GetName(), a.GetValue()));
+                    }
+                }
+                else
+                {
+                    if (b.IsLiteral())
+                    {
+                        //Here, a is leteral
+                        if (a.Equals(b))
+                            continue;   //b == a
+                        else
+                        {
+                            success = false;    //b != a, test fails
+                            break;
+                        }
+                    }
+                    else
+                        //b is variable, a is literal - CREA ASSIGNMENT
+                        generatedAssignment.Add(ModuleProvider.Get().Resolve<IAssignmentFactory>().CreateAssignment(a.GetName(), b.GetValue()));
+                }
+            }
+            if (success)
+                return true;
+
+            return false;
+        }
+
     }
 }

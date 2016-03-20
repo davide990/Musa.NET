@@ -95,5 +95,10 @@ namespace FormulaLibrary
         {
             return Formula;
         }
+
+        public override bool MatchWith(IFormula f, out List<IAssignment> generatedAssignment)
+        {
+            return f.MatchWith(this, out generatedAssignment);
+        }
     }
 }

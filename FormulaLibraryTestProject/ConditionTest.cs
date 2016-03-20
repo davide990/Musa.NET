@@ -41,9 +41,9 @@ namespace FormulaLibraryTestProject
         [TestCase("f(x,y)&g(p)", ExpectedResult = true)]
         [TestCase("f(x)&g(p)", ExpectedResult = true)]
         [TestCase("f(x,y)&g(k,l)", ExpectedResult = false)]
-        [TestCase("f(x<-int(8))", ExpectedResult = true)]
-        [TestCase("f(x<-int(8),y)", ExpectedResult = true)]
-        [TestCase("f(x,y<-int(8999))|g(p<-short(1))", ExpectedResult = true)]
+        [TestCase("f(8)", ExpectedResult = true)]
+        [TestCase("f(8,y)", ExpectedResult = true)]
+        [TestCase("f(x,8999)|g(1)", ExpectedResult = true)]
         [Test]
         public bool test1(string Formula)
         {
@@ -71,7 +71,7 @@ namespace FormulaLibraryTestProject
             MusaInitializer.MusaInitializer.Initialize();
             AgentWorkbench wb = new AgentWorkbench(new Agent());
             var parser = new FormulaUtils();
-            wb.AddStatement(parser.Parse("f(x<-string(\"ciao\"))"), parser.Parse("f(x,y)"), parser.Parse("g(p)"));
+            wb.AddStatement(parser.Parse("f(\"ciao\")"), parser.Parse("f(x,y)"), parser.Parse("g(p)"));
 
             Console.WriteLine("For formula " + Formula + " generated assignment: ");
             List<IAssignment> assignment;
@@ -79,6 +79,30 @@ namespace FormulaLibraryTestProject
 
             return satisfied;
         }
+
+
+		[TestCase("!f(x)", ExpectedResult = false)]
+		[TestCase("!p(x)", ExpectedResult = true)]
+		[TestCase("f(x)&!g(p)", ExpectedResult = false)]
+		[TestCase("f(x)|!g(p)", ExpectedResult = true)]
+		[TestCase("f(x)&g(p)", ExpectedResult = true)]
+		[TestCase("!f(x)&g(3)&(f(x)&!g(x))", ExpectedResult = false)]
+		[TestCase("!f(x)|g(3)&(k(3)|!g(x))", ExpectedResult = true)]
+		[Test]
+		public bool test3(string Formula)
+		{
+			MusaInitializer.MusaInitializer.Initialize();
+			AgentWorkbench wb = new AgentWorkbench(new Agent());
+			var parser = new FormulaUtils();
+			wb.AddStatement(parser.Parse("f(\"ciao\")"), parser.Parse("k(x)"), parser.Parse("g(p)"));
+
+			Console.WriteLine("For formula " + Formula + " generated assignment: ");
+			List<IAssignment> assignment;
+			var satisfied = wb.TestCondition(parser.Parse(Formula), out assignment);
+
+			return satisfied;
+		}
+
     }
 }
 

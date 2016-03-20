@@ -104,7 +104,7 @@ public partial class formula_grammarParser : Parser {
 			_errHandler.ReportError(this, re);
 			_errHandler.Recover(this, re);
 
-            throw new Exception(re.Message);
+            throw re;
 		}
 		finally {
 			ExitRule();
@@ -151,7 +151,7 @@ public partial class formula_grammarParser : Parser {
 			_errHandler.ReportError(this, re);
 			_errHandler.Recover(this, re);
 
-            throw new Exception(re.Message);
+            throw re;
 		}
 		finally {
 			ExitRule();
@@ -220,7 +220,7 @@ public partial class formula_grammarParser : Parser {
 			_errHandler.ReportError(this, re);
 			//_errHandler.Recover(this, re);
             //this exception is needed to determine if a formula is correctly parsed or not outside the parser
-            throw new Exception(re.Message);
+            throw re;
 		}
 		finally {
 			ExitRule();
@@ -289,7 +289,7 @@ public partial class formula_grammarParser : Parser {
 			_errHandler.ReportError(this, re);
 			_errHandler.Recover(this, re);
 
-            throw new Exception(re.Message);
+            throw re;
 		}
 		finally {
 			ExitRule();
@@ -367,7 +367,7 @@ public partial class formula_grammarParser : Parser {
 			_errHandler.ReportError(this, re);
 			_errHandler.Recover(this, re);
 
-            throw new Exception(re.Message);
+            throw re;
 		}
 		finally {
 			ExitRule();
@@ -423,7 +423,7 @@ public partial class formula_grammarParser : Parser {
 			_errHandler.ReportError(this, re);
 			_errHandler.Recover(this, re);
 
-            throw new Exception(re.Message);
+            throw re;
 		}
 		finally {
 			ExitRule();
@@ -488,7 +488,7 @@ public partial class formula_grammarParser : Parser {
 			_errHandler.ReportError(this, re);
 			_errHandler.Recover(this, re);
 
-            throw new Exception(re.Message);
+            throw re;
 		}
 		finally {
 			ExitRule();
@@ -556,7 +556,7 @@ public partial class formula_grammarParser : Parser {
 			_errHandler.ReportError(this, re);
 			_errHandler.Recover(this, re);
 
-            throw new Exception(re.Message);
+            throw re;
 		}
 		finally {
 			ExitRule();
@@ -604,7 +604,7 @@ public partial class formula_grammarParser : Parser {
 			_errHandler.ReportError(this, re);
 			_errHandler.Recover(this, re);
 
-            throw new Exception(re.Message);
+            throw re;
 		}
 		finally {
 			ExitRule();
@@ -695,7 +695,7 @@ public partial class formula_grammarParser : Parser {
 			_errHandler.ReportError(this, re);
 			_errHandler.Recover(this, re);
 
-            throw new Exception(re.Message);
+            throw re;
 		}
 		finally {
 			ExitRule();
@@ -743,7 +743,7 @@ public partial class formula_grammarParser : Parser {
 			_errHandler.ReportError(this, re);
 			_errHandler.Recover(this, re);
 
-            throw new Exception(re.Message);
+            throw re;
 		}
 		finally {
 			ExitRule();
@@ -803,7 +803,7 @@ public partial class formula_grammarParser : Parser {
 			_errHandler.ReportError(this, re);
 			_errHandler.Recover(this, re);
 
-            throw new Exception(re.Message);
+            throw re;
 		}
 		finally {
 			ExitRule();
@@ -851,7 +851,7 @@ public partial class formula_grammarParser : Parser {
 			_errHandler.ReportError(this, re);
 			_errHandler.Recover(this, re);
 
-            throw new Exception(re.Message);
+            throw re;
 		}
 		finally {
 			ExitRule();
@@ -899,7 +899,7 @@ public partial class formula_grammarParser : Parser {
 			_errHandler.ReportError(this, re);
 			_errHandler.Recover(this, re);
 
-            throw new Exception(re.Message);
+            throw re;
 		}
 		finally {
 			ExitRule();
@@ -947,7 +947,7 @@ public partial class formula_grammarParser : Parser {
 			_errHandler.ReportError(this, re);
 			_errHandler.Recover(this, re);
 
-            throw new Exception(re.Message);
+            throw re;
 		}
 		finally {
 			ExitRule();

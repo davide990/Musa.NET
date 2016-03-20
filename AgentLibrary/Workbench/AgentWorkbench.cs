@@ -78,7 +78,7 @@ namespace AgentLibrary
         /// The agent this workbench belongs to
         /// </summary>
         private readonly Agent parentAgent;
-        
+
         private ILogger logger;
         private IAssignmentFactory assignmentFactory;
         private IFormulaUtils FormulaUtils;
@@ -110,7 +110,7 @@ namespace AgentLibrary
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
                     foreach (var item in e.NewItems)
                         logger.Log(LogLevel.Trace, "[" + parentAgent.Name + "] Added assignment: " + item);
-                    break;  
+                    break;
 
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
                     foreach (var item in e.OldItems)
@@ -207,7 +207,7 @@ namespace AgentLibrary
                     foreach (IFormula unrolledFormula in unrolled)
                     {
                         if (Statements.Contains(unrolledFormula))
-                            Statements.Remove(unrolledFormula);    
+                            Statements.Remove(unrolledFormula);
                     }
                     continue;
                 }
@@ -215,7 +215,7 @@ namespace AgentLibrary
                 {
                     if (Statements.Contains(ff))
                         Statements.Remove(ff);
-                }    
+                }
             }
         }
 
@@ -251,7 +251,6 @@ namespace AgentLibrary
         /// <returns>True if formula is satisfied in this workbench</returns>
         public bool TestCondition(IFormula formula)
         {
-            //logger.Log(LogLevel.Trace, "Testing condition '" + formula + "'");
             if (formula.GetFormulaType() == FormulaType.NOT_FORMULA)
                 return !TestCondition((formula as INotFormula).GetFormula());
             else if (formula.GetFormulaType() == FormulaType.OR_FORMULA)
@@ -262,7 +261,12 @@ namespace AgentLibrary
             {
                 List<IAssignment> l;
                 //here, formula is atomic
-                return testCondition(formula, out l);
+                foreach (IFormula f in Statements)
+                {
+                    if (f.MatchWith(formula, out l))
+                        return true;
+                }
+                return false;
             }
         }
 
@@ -295,92 +299,65 @@ namespace AgentLibrary
             else
             {
                 //here, formula is atomic
-                return testCondition(formula, out generatedAssignment);
+                foreach (IFormula f in Statements)
+                {
+                    if (f.MatchWith(formula, out generatedAssignment))
+                        return true;
+                }
+                generatedAssignment = new List<IAssignment>();
+                return false;
             }
         }
 
         /// <summary>
-        /// Test the parametric condition f into this workbench. Since it is
-        /// a parametric formula, at least one term has an associated value in 
-        /// form of assignment, contained in this workbench.
+        /// Test if a formula is verified into this workbench.
         /// </summary>
-        /// <returns>True if f is satisfied in this workbench</returns>
-        private bool testCondition(IFormula f, out List<IAssignment> generatedAssignment)
+        /// <param name="formula">The formula to be verified</param>
+        /// <param name="unifiedPredicates">The list of predicates which match with the input formula when 
+        /// unified with a specific set of assignments</param>
+        /// <param name="generatedAssignment">The assignment set generated from this test</param>
+        /// <returns>True if at lest one predicates match with the input formula, false otherwise.</returns>
+        public bool TestCondition(IFormula formula, out List<IFormula> unifiedPredicates, out List<IAssignment> generatedAssignment)
         {
-            generatedAssignment = new List<IAssignment>();
-
-            if (!f.IsAtomic())
-                return false;
-
-            ITerm a, b;
-            bool success = true;
-            var input_formula = f as IAtomicFormula;
-
-            //Iterate each atomic formula within the agent's workbench
-            foreach (IAtomicFormula belief in Statements)
+            if (formula.GetFormulaType() == FormulaType.NOT_FORMULA)
+                return !TestCondition((formula as INotFormula).GetFormula(), out unifiedPredicates, out generatedAssignment);
+            else if (formula.GetFormulaType() == FormulaType.OR_FORMULA)
             {
-                if (belief.GetTermsCount() != input_formula.GetTermsCount() || !belief.GetFunctor().Equals(input_formula.GetFunctor()))
-                    continue;
-
-                generatedAssignment.Clear();
-                success = true;
-
-                //Iterate each belief's term
-                for (int i = 0; i < belief.GetTermsCount(); i++)
-                {
-                    a = belief.GetTermAt(i);
-                    b = input_formula.GetTermAt(i);
-
-                    object a_value = null;
-                    //belief_term_has_assignment = ExistsAssignmentForTerm(a.GetName(), out a_value);
-
-                    //if (belief_term_has_assignment)
-                    if (!a.IsLiteral())
-                    {
-                        //if (b.GetType().IsGenericType)
-                        if (!b.IsLiteral())
-                        {
-                            //a and b are both variable 
-                            if (a_value.Equals(b.GetValue()))
-                                //if both valued terms have equal values, proceed with the next couple of terms
-                                continue;
-                            else
-                            { 
-                                //terms are both valued but they have different values. The test fails here.
-                                success = false; 
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            //a is variable term, b is literal. An assignment is created to assign to b the value of a
-                            generatedAssignment.Add(assignmentFactory.CreateAssignment(b.GetName(), a.GetValue()));
-                        }
-                    }
-                    else
-                    {
-                        if (b.IsLiteral())
-                        {
-                            //Here, a is leteral
-                            if (a.Equals(b))
-                                continue;   //b == a
-                            else
-                            {
-                                success = false;    //b != a, test fails
-                                break;
-                            }
-                        }
-                        else
-                            //b is variable, a is literal - CREA ASSIGNMENT
-                            generatedAssignment.Add(assignmentFactory.CreateAssignment(a.GetName(), b.GetValue()));
-                    }
-                }
-                if (success)
-                    return true;
+                List<IAssignment> rightAssignment, leftAssignment;
+                bool leftResult = TestCondition((formula as IOrFormula).GetLeft(), out unifiedPredicates, out leftAssignment);
+                bool rightResult = TestCondition((formula as IOrFormula).GetRight(), out unifiedPredicates, out rightAssignment);
+                generatedAssignment = leftAssignment.Union(rightAssignment).ToList();
+                return leftResult | rightResult;
             }
-            return false;
-        }
+            else if (formula.GetFormulaType() == FormulaType.AND_FORMULA)
+            {
+                List<IAssignment> rightAssignment, leftAssignment;
+                bool leftResult = TestCondition((formula as IAndFormula).GetLeft(), out unifiedPredicates, out leftAssignment);
+                bool rightResult = TestCondition((formula as IAndFormula).GetRight(), out unifiedPredicates, out rightAssignment);
+                generatedAssignment = leftAssignment.Union(rightAssignment).ToList();
+                return leftResult & rightResult;
+            }
+            else
+            {
+                //here, formula is atomic
+                unifiedPredicates = new List<IFormula>();
+                generatedAssignment = new List<IAssignment>();
+                bool success = false;
 
+                foreach (IFormula f in Statements)
+                {
+                    List<IAssignment> current_assignments;
+                    if (!f.MatchWith(formula, out current_assignments))
+                        continue;
+
+                    success = true;
+                    generatedAssignment.AddRange(current_assignments);
+                    unifiedPredicates.Add(f);
+                }
+                return success;
+            }
+
+        }
         #endregion Test condition methods
 
         public void setAddFormulaPolicy(WorkbenchAddFormulaPolicy p)

@@ -149,37 +149,74 @@ namespace AgentLibrary
                 throw new Exception("Agent '" + senderData.AgentName + "' is not authorized.");
                 //return null;
             }
-                
 
             //find the agent to which the message must be forwarded
             Agent receiver = Environment.RegisteredAgents.FirstOrDefault(x => x.Name.Equals(receiverData.AgentName));
 
             if (receiver == null)
                 return null;
-			
-            if(message.InfoType == InformationType.AskOne)
-            {
-                IFormula out_formula;
-                bool success = receiver.AskOne(message, out out_formula);
 
-                //TODO
-                //response.Args = assignments;
+            if (message.InfoType == InformationType.AskOne)
+                return processAskOneMessages(receiver, message);
 
-                AgentMessage response = new AgentMessage();
-                response.InfoType = InformationType.AskOne;
-
-                if (!success)
-                {
-                    response.Message = "NULL";
-                    return response;
-                }
-
-                response.Message = out_formula.ToString();
-                return response;
-            }
+            if (message.InfoType == InformationType.AskAll)
+                return processAskAllMessages(receiver, message);
 
             receiver.MailBox.Push(new Tuple<AgentPassport, AgentMessage>(senderData, message));
             return null;
+        }
+
+        private AgentMessage processAskAllMessages(Agent receiver, AgentMessage message)
+        {
+            IFormula out_formula;
+            AgentMessage response = new AgentMessage();
+
+
+            bool success = receiver.AskOne(message, out out_formula);
+
+            if (!success)
+            {
+                //If no agent is able to reply, return a null message
+                response.Message = "NULL";
+                return response;
+            }
+
+            //TODO
+            //response.Args = assignments;
+            response.InfoType = InformationType.AskAll;
+            response.Sender = receiver.Name;
+            response.Message = out_formula.ToString();
+            return response;
+
+
+
+        }
+
+        /// <summary>
+        /// Process messages of type AskOne.
+        /// </summary>
+        /// <param name="receiver">The receiver agent that process the message</param>
+        /// <param name="message">The message to be processed</param>
+        /// <returns></returns>
+        private AgentMessage processAskOneMessages(Agent receiver, AgentMessage message)
+        {
+            IFormula out_formula;
+            bool success = receiver.AskOne(message, out out_formula);
+
+            //TODO
+            //response.Args = assignments;
+
+            AgentMessage response = new AgentMessage();
+            response.InfoType = InformationType.AskOne;
+
+            if (!success)
+            {
+                response.Message = "NULL";
+                return response;
+            }
+
+            response.Message = out_formula.ToString();
+            return response;
         }
 
         public bool sendBroadcastMessage(AgentPassport senderData, EnvironementData receiverData, AgentMessage message)
@@ -191,7 +228,7 @@ namespace AgentLibrary
             {
                 a.MailBox.Push(new Tuple<AgentPassport, AgentMessage>(senderData, message));
             }
-            
+
             return true;
         }
 
@@ -243,7 +280,7 @@ namespace AgentLibrary
         {
             if (!AgentIsAuthorized(newAgent))
                 return false;
-            
+
             Agent a = new Agent(newAgent.AgentName);
 
             //TODO set workgroup, role and other attributes here

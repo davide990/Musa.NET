@@ -69,6 +69,12 @@ namespace AgentLibrary
     public class AgentMessage
     {
         /// <summary>
+        /// The name of the agent which sent this message
+        /// </summary>
+        [DataMember]
+        public string Sender { get; set; }
+
+        /// <summary>
         /// The content of this message
         /// </summary>
         [DataMember]
