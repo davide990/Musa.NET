@@ -197,7 +197,7 @@ namespace MusaConfiguration
             MaxNumAgent = "100";
             MusaAddress = "127.0.0.1";
             MusaAddressPort = 8089;
-            NetworkingEnabled = true;
+            NetworkingEnabled = false;
 
         }
 

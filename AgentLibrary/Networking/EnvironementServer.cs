@@ -162,22 +162,23 @@ namespace AgentLibrary
             if (message.InfoType == InformationType.AskAll)
                 return processAskAllMessages(receiver, message);
 
-            receiver.MailBox.Push(new Tuple<AgentPassport, AgentMessage>(senderData, message));
+            receiver.AddToMailbox(senderData, message);
             return null;
         }
 
         private AgentMessage processAskAllMessages(Agent receiver, AgentMessage message)
         {
-            IFormula out_formula;
             AgentMessage response = new AgentMessage();
 
+            List<IFormula> outFormula;
+            List<IAssignment> outAssignments;
 
-            bool success = receiver.AskOne(message, out out_formula);
+            var received_formula = ModuleProvider.Get().Resolve<IFormulaUtils>().Parse(message.GetInformation() as string);
+            bool success = receiver.TestCondition(received_formula, out outFormula, out outAssignments);
 
             if (!success)
             {
-                //If no agent is able to reply, return a null message
-                response.Message = "NULL";
+                //If no agent is able to reply, return an empty message
                 return response;
             }
 
@@ -185,11 +186,8 @@ namespace AgentLibrary
             //response.Args = assignments;
             response.InfoType = InformationType.AskAll;
             response.Sender = receiver.Name;
-            response.Message = out_formula.ToString();
+            outFormula.ForEach(x => response.AddInfo(x));
             return response;
-
-
-
         }
 
         /// <summary>
@@ -200,22 +198,31 @@ namespace AgentLibrary
         /// <returns></returns>
         private AgentMessage processAskOneMessages(Agent receiver, AgentMessage message)
         {
-            IFormula out_formula;
-            bool success = receiver.AskOne(message, out out_formula);
+            AgentMessage response = new AgentMessage();
+            List<IAssignment> assignments;
+            IFormula unifiedFormula;
 
+            //Parse the received formula
+            IFormula messageFormula = ModuleProvider.Get().Resolve<IFormulaUtils>().Parse(message.GetInformation() as string);
+
+            //Test the received formula within the receiver workbench
+            bool success = receiver.TestCondition(messageFormula, out assignments);
+
+            //Set the initial response informations
+            response.InfoType = InformationType.AskOne;
+            response.Sender = receiver.Name;
+
+            //return an empty message if the formula is not satisfied
+            if (!success)
+                return response;
+
+            unifiedFormula = messageFormula;
+            unifiedFormula.Unify(assignments);
             //TODO
             //response.Args = assignments;
+            response.AddInfo(unifiedFormula);
 
-            AgentMessage response = new AgentMessage();
-            response.InfoType = InformationType.AskOne;
-
-            if (!success)
-            {
-                response.Message = "NULL";
-                return response;
-            }
-
-            response.Message = out_formula.ToString();
+            //return the response to the requester agent
             return response;
         }
 
@@ -225,9 +232,7 @@ namespace AgentLibrary
                 return false;
 
             foreach (Agent a in Environment.RegisteredAgents)
-            {
-                a.MailBox.Push(new Tuple<AgentPassport, AgentMessage>(senderData, message));
-            }
+                a.AddToMailbox(senderData, message);
 
             return true;
         }

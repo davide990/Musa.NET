@@ -283,54 +283,42 @@ namespace AgentLibrary
         /// </summary>
         private void checkMailBox()
         {
-            if (parentAgent.MailBox.Count <= 0)
+            if (parentAgent.MailBoxCount <= 0)
                 return;
 			
             //Take the last message within the mail box
-            Tuple<AgentPassport, AgentMessage> last_message = parentAgent.MailBox.Pop();
+            Tuple<AgentPassport, AgentMessage> last_message = parentAgent.GetLastMessageInMailBox();
             AgentPassport sender_agent_passport = last_message.Item1;
             AgentMessage msg = last_message.Item2;
             //TODO [importante] bisogna capire qui se un evento è interno o esterno (vedi documentazione jason/agentspeak)
 
             Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Green);
-
             var FormulaParser = ModuleProvider.Get().Resolve<IFormulaUtils>();
 
-            //process the message
+            //process the message (AskOne and AskAll are processed separately
             switch (msg.InfoType)
             {
                 case InformationType.Tell:
                     Logger.Log(LogLevel.Debug, "[" + parentAgent.Name + "] perceiving TELL: " + msg);
-                    parentAgent.AddBelief(FormulaParser.Parse(msg.Message as string));
+                    parentAgent.AddBelief(FormulaParser.Parse(msg.GetInformation() as string));
                     break;
 
                 case InformationType.Untell:
                     Logger.Log(LogLevel.Debug, "[" + parentAgent.Name + "] perceiving UNTELL: " + msg);
-                    parentAgent.RemoveBelief(FormulaParser.Parse(msg.Message as string));
+                    parentAgent.RemoveBelief(FormulaParser.Parse(msg.GetInformation() as string));
                     break;
 			
                 case InformationType.Achieve:
-                    if (string.IsNullOrEmpty(msg.Message as string))
+                    if (string.IsNullOrEmpty(msg.GetInformation() as string))
                         throw new Exception("Received an empty message. Cannot achieve any goal.");
 
-                    Type planToExecute = parentAgent.Plans.Find(x => x.Name.Equals(msg.Message as string));
+                    Type planToExecute = parentAgent.Plans.Find(x => x.Name.Equals(msg.GetInformation() as string));
                     //TODO i parametri do stanno?
                     PlanArgs args = null;
 
                     //Achieve the goal
                     achieveGoal(planToExecute, args);
                     break;
-
-                //case InformationType.AskOne:
-                //    //msg contiene una formula
-                //    //formula --> IFormula
-                //    //testa formula in workbench
-                //    //manda risultato a sender_agent_passport
-                //    break;
-
-                //case InformationType.AskAll:
-                //    break;
-
             }
         }
 

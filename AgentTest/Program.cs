@@ -101,7 +101,7 @@ namespace AgentTest
             //logger.GetFragment<IConsoleLoggerFragment>().SetMinimumLogLevel(LogLevel.Debug);
 
             //var fp = ModuleProvider.Get().Resolve<IFormulaUtils>();
-            configureAndStartMusa ();
+            configureAndStartMusa();
         }
 
         static void A_RegisterResult(string result)

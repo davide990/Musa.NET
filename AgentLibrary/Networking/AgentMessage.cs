@@ -78,7 +78,7 @@ namespace AgentLibrary
         /// The content of this message
         /// </summary>
         [DataMember]
-        public object Message { get; set; }
+        public List<object> Message { get; set; }
 
         /// <summary>
         /// Gets or sets the arguments.
@@ -104,6 +104,68 @@ namespace AgentLibrary
         /// </summary>
         [DataMember]
         public InformationType InfoType { get; set; }
+
+        /// <summary>
+        /// The number of informations contained in this message
+        /// </summary>
+        public int InformationsCount
+        {
+            get
+            {
+                return Message.Count;
+            }
+        }
+
+        public AgentMessage(object Info = null)
+        {
+            Message = new List<object>();
+            if (!string.IsNullOrEmpty(Info as string))
+                Message.Add(Info);
+        }
+
+        /// <summary>
+        /// Return a clone of this message. By default, the cloned message
+        /// doesn't contains the information.
+        /// </summary>
+        /// <returns></returns>
+        public object Clone(bool cloneInfo = false)
+        {
+            AgentMessage cloned = new AgentMessage();
+            cloned.Args = Args;
+            cloned.InfoType = InfoType;
+            cloned.MessagePriority = MessagePriority;
+            cloned.MessageValidity = MessageValidity;
+            cloned.Sender = Sender;
+
+            if (cloneInfo)
+                cloned.Message = Message;
+
+            return cloned;
+        }
+
+        /// <summary>
+        /// Return the information contained in this message.
+        /// </summary>
+        /// <returns>The list of informations if informations count is more than 1, otherwise
+        /// return the unique information contained in this message</returns>
+        public dynamic GetInformation()
+        {
+            if (Message.Count == 0)
+                return null;
+            if (Message.Count > 1)
+                return Message;
+
+            return Message[0];
+        }
+
+        /// <summary>
+        /// Add an information to this message
+        /// </summary>
+        /// <param name="info">The information to be added</param>
+        public void AddInfo(object info)
+        {
+            Message.Add(info);
+        }
 
         public override string ToString()
         {

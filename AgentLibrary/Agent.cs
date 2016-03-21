@@ -107,10 +107,10 @@ namespace AgentLibrary
         /// may receive from other agents in the same, or different, environment. The messages are processed, one by 
         /// one, during the agent's reasoning cycles.
         /// </summary>
-        public Stack<Tuple<AgentPassport, AgentMessage>> MailBox
+        private Stack<Tuple<AgentPassport, AgentMessage>> MailBox
         {
             get { return mailBox; }
-            internal set
+            set
             {
                 lock (lock_mailBox)
                 {
@@ -118,9 +118,19 @@ namespace AgentLibrary
                 }
             }
         }
-
         private Stack<Tuple<AgentPassport, AgentMessage>> mailBox;
         private object lock_mailBox = new object();
+
+        /// <summary>
+        /// Returns 
+        /// </summary>
+        public int MailBoxCount
+        {
+            get
+            {
+                return MailBox.Count;
+            }
+        }
 
         /// <summary>
         /// Gets the plans type that this agent is aware of.
@@ -397,6 +407,7 @@ namespace AgentLibrary
 
             PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(changes, action));
         }
+        #region Agent's execution related methods
 
         /// <summary>
         /// Start this agent
@@ -462,6 +473,9 @@ namespace AgentLibrary
             }
         }
 
+        #endregion Agent's execution related methods
+
+        #region Agent's plans related methods
 
         /// <summary>
         /// Adds a plan to this agent.
@@ -506,6 +520,49 @@ namespace AgentLibrary
             //Add the plan to the agent's plan collection
             PlansCollection.Add(Plan, plan_instance);
         }
+
+        /// <summary>
+        /// Executes a plan.
+        /// </summary>
+        /// <param name="PlanModel">Plan.</param>
+        /// <param name="args">Arguments.</param>
+        internal void ExecutePlan(Type PlanModel, IPlanArgs args = null)
+        {
+            if (Busy)
+                throw new Exception("Agent [" + Name + "] is currently executing plan " + CurrentExecutingPlan);
+
+            //If Plan doesn't implement IPlanModel, then throw an exception
+            if (!(typeof(IPlanModel).IsAssignableFrom(PlanModel)))
+                throw new Exception("Argument #1 in ExecutePlan(Type) must implement IPlanModel.");
+
+            IPlanInstance the_plan = null;
+
+            //Search for the plan instance that match the specified model PlanModel
+            PlansCollection.TryGetValue(PlanModel, out the_plan);
+
+            //If the input plan has not been found within the agent's plans collection, throw an exception
+            if (the_plan == null)
+                throw new Exception("Plan '" + PlanModel.Name + "' not found in agent [" + Name + "] plans collection.");
+
+            //Get the plan's Execute() method
+            MethodInfo execute_method = PlanFacade.GetExecuteMethodForPlan(PlanModel);
+
+            //Set the agent to busy
+            Busy = true;
+
+            //Set the value for CurrentExecutingPlan 
+            CurrentExecutingPlan = the_plan;
+
+            //Execute the plan
+            execute_method.Invoke(the_plan, new object[] { args });
+
+            //TODO [ALTA PRIORITÀ] migliorare il sistema di bloccaggio dell'agente
+            //Lock the agent's reasoning life cycle until the invoked plan terminates its execution
+            while (Busy)
+                ;
+        }
+
+        #endregion Agent's plans related methods
 
         #region Agent's plans event handlers
 
@@ -567,47 +624,6 @@ namespace AgentLibrary
         #endregion Agent's plans event handlers
 
         /// <summary>
-        /// Executes a plan.
-        /// </summary>
-        /// <param name="PlanModel">Plan.</param>
-        /// <param name="args">Arguments.</param>
-        internal void ExecutePlan(Type PlanModel, IPlanArgs args = null)
-        {
-            if (Busy)
-                throw new Exception("Agent [" + Name + "] is currently executing plan " + CurrentExecutingPlan);
-
-            //If Plan doesn't implement IPlanModel, then throw an exception
-            if (!(typeof(IPlanModel).IsAssignableFrom(PlanModel)))
-                throw new Exception("Argument #1 in ExecutePlan(Type) must implement IPlanModel.");
-
-            IPlanInstance the_plan = null;
-
-            //Search for the plan instance that match the specified model PlanModel
-            PlansCollection.TryGetValue(PlanModel, out the_plan);
-
-            //If the input plan has not been found within the agent's plans collection, throw an exception
-            if (the_plan == null)
-                throw new Exception("Plan '" + PlanModel.Name + "' not found in agent [" + Name + "] plans collection.");
-
-            //Get the plan's Execute() method
-            MethodInfo execute_method = PlanFacade.GetExecuteMethodForPlan(PlanModel);
-
-            //Set the agent to busy
-            Busy = true;
-
-            //Set the value for CurrentExecutingPlan 
-            CurrentExecutingPlan = the_plan;
-
-            //Execute the plan
-            execute_method.Invoke(the_plan, new object[] { args });
-
-            //TODO [ALTA PRIORITÀ] migliorare il sistema di bloccaggio dell'agente
-            //Lock the agent's reasoning life cycle until the invoked plan terminates its execution
-            while (Busy)
-                ;
-        }
-
-        /// <summary>
         /// Tell this agent to achieve a goal by executing a specified plan
         /// </summary>
         public void AchieveGoal(Type Plan, PlanArgs Args = null)
@@ -628,9 +644,8 @@ namespace AgentLibrary
         /// Adds an event.
         /// </summary>
         /// <param name="formula">The formula to reason on.</param>
-        /// <param name="perception">The perception this event reacts to.</param>
-        /// <param name="Plan">The plan to be invoked when the event is
-        /// triggered.</param>
+        /// <param name="perception">The perception that trigger this event.</param>
+        /// <param name="Plan">The plan to be invoked when the event is triggered.</param>
         /// <param name="Args">The argument to be passed to the invoked plan
         /// when the event is triggered.</param>
         public void AddEvent(string formula, AgentPerception perception, Type Plan, PlanArgs Args = null)
@@ -646,6 +661,8 @@ namespace AgentLibrary
         {
             reasoner.AddEvent(ev.Formula, ev.Perception, ev.Plan, ev.Args);
         }
+
+        #region Beliefs related methods
 
         public void AddBelief(params IFormula[] formula)
         {
@@ -708,35 +725,55 @@ namespace AgentLibrary
             }
         }
 
+        #endregion Beliefs related methods
 
         #endregion
 
+        #region Messages methods
+
         /// <summary>
-        /// [invoked from EnvironementServer class]
-        /// This method is invoked when an agent sends a message of type AskOne to
-        /// this agent. The AskOne type message is processed asynchronously. 
+        /// Add a message to be processed within the agent's mail box
         /// </summary>
-        /// <param name="message">the message this agent have to test</param>
-        /// <param name="unifiedFormula">If the formula inside the message is verified, this
-        /// value will contains the formula unified with the assignments this agent found for it.</param>
-        /// <returns>True if the formula inside the message is true for this agent, false otherwise.</returns>
-        internal bool AskOne(AgentMessage message, out IFormula unifiedFormula)
+        /// <param name="message"></param>
+        internal void AddToMailbox(AgentPassport agentPassport, AgentMessage message)
         {
-            IFormula messageFormula = FormulaUtils.Parse(message.Message as string);
-            List<IAssignment> assignments;
-            bool success = TestCondition(messageFormula, out assignments);
-
-            if (success)
+            if (message.InformationsCount > 1)
             {
-                unifiedFormula = messageFormula;
-                unifiedFormula.Unify(assignments);
+                var the_messages = unrollMessages(message);
+                the_messages.ForEach(x => MailBox.Push(new Tuple<AgentPassport, AgentMessage>(agentPassport, x)));
+                return;
             }
-            else
-                unifiedFormula = null;
 
-            return success;
+            MailBox.Push(new Tuple<AgentPassport, AgentMessage>(agentPassport, message));
         }
 
+        /// <summary>
+        /// Given an AgentMessage that contains over 1 informations,
+        /// this method unrolls it to a list of AgentMessage each one
+        /// containing only one information.
+        /// </summary>
+        private List<AgentMessage> unrollMessages(AgentMessage message)
+        {
+            List<AgentMessage> unrolled = new List<AgentMessage>();
+
+            foreach (object info in message.Message)
+            {
+                var mm = message.Clone() as AgentMessage;
+                mm.AddInfo(info);
+                unrolled.Add(mm);
+            }
+
+            return unrolled;
+        }
+
+        public Tuple<AgentPassport, AgentMessage> GetLastMessageInMailBox()
+        {
+            return MailBox.Pop();
+        }
+
+        #endregion Messages methods
+
+        #region Test condition methods
 
         public bool TestCondition(IFormula formula)
         {
@@ -748,6 +785,15 @@ namespace AgentLibrary
             return Workbench.TestCondition(formula, out generated_assignments);
         }
 
+        public bool TestCondition(IFormula formula, out List<IFormula> unifiedPredicates, out List<IAssignment> generated_assignments)
+        {
+            return Workbench.TestCondition(formula, out unifiedPredicates, out generated_assignments);
+        }
+
+        #endregion Test condition methods
+
+        #region Communication methods
+        
         /// <summary>
         /// Send a message to an agent that is located in the same environment of this agent.
         /// </summary>
@@ -758,8 +804,6 @@ namespace AgentLibrary
 
         }
 
-
-
-
+        #endregion Communication methods
     }
 }
