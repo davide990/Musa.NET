@@ -35,25 +35,25 @@ namespace FormulaLibrary
 {
     public sealed class OrFormula : Formula, IOrFormula, IEquatable<OrFormula>
     {
-        public Formula Left
+        public IFormula Left
         {
             get;
             private set;
         }
 
-        public Formula Right
+        public IFormula Right
         {
             get;
             private set;
         }
 
-        public OrFormula(Formula Left, Formula Right)
+        public OrFormula(IFormula Left, IFormula Right)
         {
             this.Left = Left;
             this.Right = Right;
         }
 
-        public Formula this[string s]
+        public IFormula this[string s]
         {
             get
             {
@@ -64,7 +64,7 @@ namespace FormulaLibrary
             }
         }
 
-        public Formula this[byte s]
+        public IFormula this[byte s]
         {
             get
             {
@@ -144,6 +144,11 @@ namespace FormulaLibrary
             generatedAssignment = leftAssignments.Union(rightAssignments).ToList();
 
             return leftMatch | rightMatch;
+        }
+
+        public override object Clone()
+        {
+            return new OrFormula(Left.Clone() as IFormula, Right.Clone() as IFormula);
         }
     }
 }

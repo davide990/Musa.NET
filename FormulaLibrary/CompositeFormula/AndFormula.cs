@@ -35,19 +35,19 @@ namespace FormulaLibrary
 {
     public sealed class AndFormula : Formula, IAndFormula, IEquatable<AndFormula>
     {
-        public Formula Left
+        public IFormula Left
         {
             get;
             private set;
         }
 
-        public Formula Right
+		public IFormula Right
         {
             get;
             private set;
         }
 
-        public AndFormula(Formula Left, Formula Right)
+		public AndFormula(IFormula Left, IFormula Right)
         {
             this.Left = Left;
             this.Right = Right;
@@ -59,7 +59,7 @@ namespace FormulaLibrary
             Left.Unify(assignment);
         }
 
-        public Formula this [string s]
+        public IFormula this [string s]
         {
             get
             {
@@ -70,7 +70,7 @@ namespace FormulaLibrary
             }
         }
 
-        public Formula this [byte s]
+		public IFormula this [byte s]
         {
             get
             {
@@ -105,7 +105,7 @@ namespace FormulaLibrary
 
         public override bool IsParametric()
         {
-            return Left.IsParametric() & Right.IsParametric();
+            return Left.IsParametric() | Right.IsParametric();
         }
 
         public override bool IsAtomic()
@@ -144,6 +144,11 @@ namespace FormulaLibrary
             generatedAssignment = leftAssignments.Union(rightAssignments).ToList();
 
             return leftMatch & rightMatch;
+        }
+
+        public override object Clone()
+        {
+            return new AndFormula(Left.Clone() as IFormula, Right.Clone() as IFormula);
         }
     }
 }

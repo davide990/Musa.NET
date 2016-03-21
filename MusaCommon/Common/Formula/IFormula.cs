@@ -29,12 +29,16 @@ using System.Collections.Generic;
 
 namespace MusaCommon
 {
-    public interface IFormula
+    public interface IFormula: ICloneable
     {
         FormulaType GetFormulaType();
         void Unify(List<IAssignment> assignments);
+		bool IsParametric();
+        new object Clone ();
         bool MatchWith(IFormula f, out List<IAssignment> generatedAssignment);
         bool IsAtomic();
+
+
     }
 }
 

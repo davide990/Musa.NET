@@ -38,7 +38,7 @@ namespace FormulaLibrary
     /// - a functor, and
     /// - a list of Terms
     /// </summary>
-    public sealed class AtomicFormula : Formula, IAtomicFormula, ICloneable
+    public sealed class AtomicFormula : Formula, IAtomicFormula//, ICloneable
     {
         /// <summary>
         /// The functor of this formula
@@ -156,7 +156,7 @@ namespace FormulaLibrary
         /// <summary>
         /// Create a clone of this formula
         /// </summary>
-        public object Clone()
+        public override object Clone()
         {
             AtomicFormula clone = new AtomicFormula(Functor);
 

@@ -28,6 +28,8 @@
 using System;
 using System.Runtime.Serialization;
 using System.Collections.Generic;
+using System.Text;
+using MusaCommon;
 
 namespace AgentLibrary
 {
@@ -158,18 +160,28 @@ namespace AgentLibrary
             return Message[0];
         }
 
+
         /// <summary>
         /// Add an information to this message
         /// </summary>
-        /// <param name="info">The information to be added</param>
+        /// <param name="info">The information to be added. The type of object must be string or IFormula</param>
         public void AddInfo(object info)
         {
+            if (!(info is string | info is IFormula))
+                throw new Exception("Provided object is neither of type string or IFormula.");
+
             Message.Add(info);
         }
 
         public override string ToString()
         {
-            return string.Format("[AgentMessage: Message=[{0}], MessageValidity={1}, MessagePriority={2}, InfoType={3}]", Message, MessageValidity, MessagePriority, InfoType);
+            string the_information;
+            if (InformationsCount > 1)
+                the_information = string.Join(",", GetInformation());
+            else
+                the_information = Convert.ToString(GetInformation());
+
+            return string.Format("[AgentMessage: Message=[{0}], MessageValidity={1}, MessagePriority={2}, InfoType={3}]", the_information, MessageValidity, MessagePriority, InfoType);
         }
     }
 }

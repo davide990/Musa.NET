@@ -63,7 +63,7 @@ namespace AgentLibrary
             {
                 lock (events_catalogue_lock)
                 {
-                    eventsCatalogue = value; 
+                    eventsCatalogue = value;
                 }
             }
         }
@@ -84,7 +84,7 @@ namespace AgentLibrary
             {
                 lock (events_args_lock)
                 {
-                    events_args = value; 
+                    events_args = value;
                 }
             }
         }
@@ -107,7 +107,7 @@ namespace AgentLibrary
             {
                 lock (events_lock)
                 {
-                    perceived_events = value; 
+                    perceived_events = value;
                 }
             }
         }
@@ -122,10 +122,10 @@ namespace AgentLibrary
         {
             get { return is_running; }
             private set
-            { 
+            {
                 lock (is_running_lock)
                 {
-                    is_running = value;	
+                    is_running = value;
                 }
             }
         }
@@ -140,8 +140,8 @@ namespace AgentLibrary
         {
             get { return _paused; }
             private set
-            { 
-                _paused = value; 
+            {
+                _paused = value;
                 if (pause_requested)
                     pause_requested = false;
             }
@@ -285,31 +285,44 @@ namespace AgentLibrary
         {
             if (parentAgent.MailBoxCount <= 0)
                 return;
-			
+
             //Take the last message within the mail box
             Tuple<AgentPassport, AgentMessage> last_message = parentAgent.GetLastMessageInMailBox();
             AgentPassport sender_agent_passport = last_message.Item1;
             AgentMessage msg = last_message.Item2;
+
+            //Exit if an empty message has been received
+            if (msg.InformationsCount == 0)
+                return;
+
+            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaUtils>();
+
             //TODO [importante] bisogna capire qui se un evento è interno o esterno (vedi documentazione jason/agentspeak)
 
             Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Green);
-            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaUtils>();
+            dynamic messageContent = msg.GetInformation();
 
             //process the message (AskOne and AskAll are processed separately
             switch (msg.InfoType)
             {
                 case InformationType.Tell:
                     Logger.Log(LogLevel.Debug, "[" + parentAgent.Name + "] perceiving TELL: " + msg);
-                    parentAgent.AddBelief(FormulaParser.Parse(msg.GetInformation() as string));
+                    if (messageContent is string)
+                        messageContent = FormulaParser.Parse(messageContent as string);
+
+                    parentAgent.AddBelief(messageContent);
                     break;
 
                 case InformationType.Untell:
                     Logger.Log(LogLevel.Debug, "[" + parentAgent.Name + "] perceiving UNTELL: " + msg);
-                    parentAgent.RemoveBelief(FormulaParser.Parse(msg.GetInformation() as string));
+                    if (msg.GetInformation() is string)
+                        messageContent = FormulaParser.Parse(messageContent as string);
+
+                    parentAgent.RemoveBelief(messageContent);
                     break;
-			
+
                 case InformationType.Achieve:
-                    if (string.IsNullOrEmpty(msg.GetInformation() as string))
+                    if (string.IsNullOrEmpty(messageContent))
                         throw new Exception("Received an empty message. Cannot achieve any goal.");
 
                     Type planToExecute = parentAgent.Plans.Find(x => x.Name.Equals(msg.GetInformation() as string));
@@ -467,7 +480,7 @@ namespace AgentLibrary
             //If Plan is not of type PlanModel, then throw an exception
             if (!(typeof(IPlanModel).IsAssignableFrom(Plan)))
                 throw new Exception("Argument #3 in AddEvent(...) must inherits from PlanModel.");
-			
+
             AgentEventKey the_key = new AgentEventKey(formula, perception);
 
             //Check if the event is already contained within the agent's event catalogue

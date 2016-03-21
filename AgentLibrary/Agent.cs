@@ -793,15 +793,43 @@ namespace AgentLibrary
         #endregion Test condition methods
 
         #region Communication methods
-        
+
         /// <summary>
         /// Send a message to an agent that is located in the same environment of this agent.
         /// </summary>
-        /// <param name="AgentName">The receiver agent</param>
+        /// <param name="agentReceiverName">The receiver agent</param>
         /// <param name="message">The message to be sent</param>
-        public void SendMessage(string AgentName, AgentMessage message)
+        public void SendMessage(string agentReceiverName, AgentMessage message)
         {
+            EnvironmentServer srv = AgentEnvironement.GetInstance().EnvironmentServer;
+            AgentPassport receiver = srv.GetAgentinfo(agentReceiverName);
+            AgentMessage response = srv.sendAgentMessage(GetPassport(), receiver, message);
 
+            Logger.Log(LogLevel.Debug, "[" + Name + "] send message to [" + receiver + "]: " + message);
+            if (response != null)
+            {
+                Logger.Log(LogLevel.Debug, "[" + Name + "] received response from [" + receiver + "]: " + response);
+                AddToMailbox(receiver, response);
+            }
+        }
+
+        /// <summary>
+        /// Send a message to an agent that is located in the same environment of this agent.
+        /// </summary>
+        /// <param name="receiver">The receiver agent</param>
+        /// <param name="message">The message to be sent</param>
+        public void SendMessage(Agent receiver, AgentMessage message)
+        {
+            EnvironmentServer srv = AgentEnvironement.GetInstance().EnvironmentServer;
+            //AgentPassport receiver = srv.GetAgentinfo(AgentName);
+            AgentMessage response = srv.sendAgentMessage(GetPassport(), receiver.GetPassport(), message);
+
+            Logger.Log(LogLevel.Debug, "[" + Name + "] send message to [" + receiver.Name + "]: " + message);
+            if (response != null)
+            {
+                Logger.Log(LogLevel.Debug, "[" + Name + "] received response from [" + receiver.Name + "]: " + response);
+                AddToMailbox(receiver.GetPassport(), response);
+            }
         }
 
         #endregion Communication methods

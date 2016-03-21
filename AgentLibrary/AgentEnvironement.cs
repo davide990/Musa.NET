@@ -126,6 +126,15 @@ namespace AgentLibrary
         private ILogger logger;
 
         /// <summary>
+        /// The environment server used for communications
+        /// </summary>
+        internal EnvironmentServer EnvironmentServer
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Get the unique agent environement for this MUSA.NET process instance.
         /// </summary>
         public static AgentEnvironement GetInstance()
@@ -140,9 +149,8 @@ namespace AgentLibrary
             {
                 instance.Port = MusaConfig.GetConfig().MusaAddressPort;
                 instance.IPAddress = MusaConfig.GetConfig().MusaAddress;
-
-                EnvironmentServer srv = new EnvironmentServer(instance);
-                srv.StartNetworking(instance.Port.ToString(), instance.IPAddress);
+                instance.EnvironmentServer = new EnvironmentServer(instance);
+                instance.EnvironmentServer.StartNetworking(instance.Port.ToString(), instance.IPAddress);
             }
 
             //Inject the logger

@@ -34,13 +34,13 @@ namespace FormulaLibrary
 {
     public sealed class NotFormula : Formula, INotFormula, IEquatable<NotFormula>
     {
-        public Formula Formula
+		public IFormula Formula
         {
             get;
             private set;
         }
 
-        public NotFormula(Formula f)
+		public NotFormula(IFormula f)
         {
             Formula = f;
         }
@@ -99,6 +99,11 @@ namespace FormulaLibrary
         public override bool MatchWith(IFormula f, out List<IAssignment> generatedAssignment)
         {
             return f.MatchWith(this, out generatedAssignment);
+        }
+
+        public override object Clone()
+        {
+			return new NotFormula(Formula.Clone() as IFormula);
         }
     }
 }

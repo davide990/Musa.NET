@@ -35,6 +35,7 @@ namespace AgentTest
         static void configureAndStartMusa()
         {
             AgentEnvironement env = AgentEnvironement.GetInstance();
+            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaUtils>();
 
             Agent a = new Agent("agent_1").Start();
             Agent b = new Agent("agent_2").Start();
@@ -43,13 +44,26 @@ namespace AgentTest
             BackgroundWorker wk = new BackgroundWorker();
             wk.DoWork += delegate
             {
-                Thread.Sleep(5000);
+                
+                /*Thread.Sleep(5000);
                 Console.WriteLine("Add f(x)");
                 //env.RegisterStatement(new AtomicFormula("f", new LiteralTerm("x")));
                 env.RegisterStatement(new AtomicFormula("f", new ValuedTerm<int>(3)));
                 Thread.Sleep(4000);
                 Console.WriteLine("Remove f(x)");
                 env.DeleteStatement(new AtomicFormula("f", new ValuedTerm<int>(3)));
+                */
+                Thread.Sleep(5000);
+                AgentMessage mm = new AgentMessage();
+                mm.Sender = "agent_2";
+
+                /*mm.AddInfo(FormulaParser.Parse("f(x)"));
+                mm.InfoType = InformationType.AskOne;*/
+
+                mm.AddInfo(FormulaParser.Parse("(f(x)|k(x))|(w(hello)&l(p))"));
+                mm.InfoType = InformationType.Tell;
+
+                b.SendMessage("agent_1", mm);
 
             };
             wk.RunWorkerAsync();
@@ -67,14 +81,12 @@ namespace AgentTest
             env.RegisterAgent(b);
             //env.RegisterAgent (ag_b);
 
+            a.AddBelief(new AtomicFormula("f", new ValuedTerm<int>(3)));
+            
 
-            var FormulaParser = ModuleProvider.Get().Resolve<IFormulaUtils>();
-
-            /*a.AddBelief(FormulaParser.Parse("f(x)"));*/
-            a.AddBelief(FormulaParser.Parse("k(x)"), FormulaParser.Parse("p(3)"));
-
-            var ll = new List<IFormula> { FormulaParser.Parse("w(\"hello\")"), FormulaParser.Parse("w(x)"), FormulaParser.Parse("cc(x)") };
-            a.AddBelief(ll);
+            //a.AddBelief(FormulaParser.Parse("k(x)"), FormulaParser.Parse("p(3)"));
+           // var ll = new List<IFormula> { FormulaParser.Parse("w(\"hello\")"), FormulaParser.Parse("w(x)"), FormulaParser.Parse("cc(x)") };
+            //a.AddBelief(ll);
 
 
             //env.RegisterStatement (new AtomicFormula ("f", new LiteralTerm ("x")));

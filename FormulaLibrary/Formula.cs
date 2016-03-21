@@ -21,6 +21,7 @@ namespace FormulaLibrary
         public abstract override string ToString();
         public abstract override bool Equals(object obj);
         public abstract override int GetHashCode();
+		public abstract object Clone ();
         public abstract bool MatchWith(IFormula f, out List<IAssignment> generatedAssignment);
         public abstract void Unify(List<IAssignment> assignments);
     }
