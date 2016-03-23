@@ -176,6 +176,22 @@ namespace AgentLibrary
         {
             foreach (IFormula ff in f)
             {
+                var isVerified = TestCondition(ff);
+
+                if (isVerified)
+                {
+                    if (!update)
+                    {
+                        logger.Log(LogLevel.Warn, "[" + parentAgent.Name + "] Cannot add formula '" + ff
+                        + "': is assignable from another formula in this workbench.");
+                        continue;
+                    }
+                    else
+                    {
+                        RemoveStatement(ff);
+                        Statements.Add(ff);
+                    }
+                }
                 //If the formula to be added is satisfied in this workbench, so it is
                 //assignable from another one, the formula is not added
                 if (TestCondition(ff) && !update)
@@ -184,7 +200,6 @@ namespace AgentLibrary
                         + "': is assignable from another formula in this workbench.");
                     continue;
                 }
-
 
                 if (Statements.Contains(ff) && update)
                     RemoveStatement(ff);
@@ -210,23 +225,33 @@ namespace AgentLibrary
         {
             foreach (IFormula ff in f)
             {
-                if (!ff.IsAtomic())
+                if (ff.IsAtomic())
                 {
-                    var unrolled = FormulaUtils.UnrollFormula(ff);
-
-                    foreach (IFormula unrolledFormula in unrolled)
-                    {
-                        if (Statements.Contains(unrolledFormula))
-                            Statements.Remove(unrolledFormula);
-                    }
+                    RemoveUnificablePredicates(ff);
                     continue;
                 }
-                else
-                {
-                    if (Statements.Contains(ff))
-                        Statements.Remove(ff);
-                }
+
+                var unrolled = FormulaUtils.UnrollFormula(ff);
+                foreach (IFormula unrolledFormula in unrolled)
+                    RemoveUnificablePredicates(unrolledFormula);
             }
+        }
+
+        /// <summary>
+        /// Given an atomic formula, test it in this workbench and delete the matching predicates
+        /// </summary>
+        /// <param name="formula">The formula to be deleted</param>
+        private void RemoveUnificablePredicates(IFormula formula)
+        {
+            List<IAssignment> assignments;
+            List<IFormula> unifiedPredicates;
+            var isSatisfied = TestCondition(formula, out unifiedPredicates, out assignments);
+
+            if (!isSatisfied)
+                return;
+
+            foreach (var toRemove in unifiedPredicates)
+                Statements.Remove(toRemove);
         }
 
         /// <summary>

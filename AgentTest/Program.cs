@@ -11,6 +11,7 @@ using FormulaLibrary;
 using MusaCommon;
 using PlanLibrary;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 
@@ -110,8 +111,22 @@ namespace AgentTest
             logger.AddFragment<IConsoleLoggerFragment>(LogLevel.Trace);
             //logger.GetFragment<IConsoleLoggerFragment>().SetMinimumLogLevel(LogLevel.Debug);
 
-            //var fp = ModuleProvider.Get().Resolve<IFormulaUtils>();
-            configureAndStartMusa();
+            var fp = ModuleProvider.Get().Resolve<IFormulaUtils>();
+
+            var formula_1 = fp.Parse("f(3)");
+            var formula_2 = fp.Parse("f(x)");
+            Agent aa = new Agent();
+            AgentWorkbench wb = new AgentWorkbench(aa);
+            wb.AddStatement(formula_1);
+
+            List<IAssignment> assignments;
+            List<IFormula> unifiedPredicates;
+
+            var isSatisfied = wb.TestCondition(formula_1, out unifiedPredicates, out assignments);
+
+
+
+            //configureAndStartMusa();
         }
 
         static void A_RegisterResult(string result)

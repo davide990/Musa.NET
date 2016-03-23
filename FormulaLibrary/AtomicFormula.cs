@@ -246,13 +246,12 @@ namespace FormulaLibrary
                 a = GetTermAt(i);
                 b = input_formula.GetTermAt(i);
 
-                object a_value = null;
                 if (!a.IsLiteral())
                 {
                     if (!b.IsLiteral())
                     {
                         //a and b are both variable 
-                        if (a_value.Equals(b.GetValue()))
+                        if (a.GetValue().Equals(b.GetValue()))
                             //if both valued terms have equal values, proceed with the next couple of terms
                             continue;
                         else
