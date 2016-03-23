@@ -30,6 +30,7 @@ using System.Collections.Generic;
 using System.Collections;
 using AgentLibrary;
 using System.Reflection;
+using System.Linq;
 using MusaCommon;
 
 namespace AgentLibrary
@@ -818,18 +819,36 @@ namespace AgentLibrary
         /// </summary>
         /// <param name="receiver">The receiver agent</param>
         /// <param name="message">The message to be sent</param>
-        public void SendMessage(Agent receiver, AgentMessage message)
+        public void SendMessage(AgentPassport receiver, AgentMessage message)
         {
             EnvironmentServer srv = AgentEnvironement.GetInstance().EnvironmentServer;
-            //AgentPassport receiver = srv.GetAgentinfo(AgentName);
-            AgentMessage response = srv.sendAgentMessage(GetPassport(), receiver.GetPassport(), message);
+            AgentMessage response = srv.sendAgentMessage(GetPassport(), receiver, message);
 
-            Logger.Log(LogLevel.Debug, "[" + Name + "] send message to [" + receiver.Name + "]: " + message);
+            Logger.Log(LogLevel.Debug, "[" + Name + "] send message to [" + receiver.AgentName + "]: " + message);
             if (response != null)
             {
-                Logger.Log(LogLevel.Debug, "[" + Name + "] received response from [" + receiver.Name + "]: " + response);
-                AddToMailbox(receiver.GetPassport(), response);
+                Logger.Log(LogLevel.Debug, "[" + Name + "] received response from [" + receiver.AgentName + "]: " + response);
+                AddToMailbox(receiver, response);
             }
+        }
+
+        /// <summary>
+        /// Send a brodcast message to all agents in the same environment of this agent.
+        /// </summary>
+        /// <param name="message">The message to be sent</param>
+        public void SendBroadcastMessage(AgentMessage message)
+        {
+            if (message.InfoType == InformationType.AskAll || message.InfoType == InformationType.AskOne)
+            {
+                Logger.Log(LogLevel.Error, "[" + Name + "] Sending broadcast messages of type AskOne or AskAll is not allowed. (Message: " + message + ")");
+                return;
+            }
+
+            //Get the list of agents in this environment
+            var agent_list = AgentEnvironement.GetInstance().RegisteredAgents.Where(x => !x.Name.Equals(Name));
+
+            foreach (var agent in agent_list)
+                SendMessage(agent.GetPassport(), message);
         }
 
         #endregion Communication methods

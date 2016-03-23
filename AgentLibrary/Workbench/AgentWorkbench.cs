@@ -176,6 +176,16 @@ namespace AgentLibrary
         {
             foreach (IFormula ff in f)
             {
+                //If the formula to be added is satisfied in this workbench, so it is
+                //assignable from another one, the formula is not added
+                if (TestCondition(ff) && !update)
+                {
+                    logger.Log(LogLevel.Warn, "[" + parentAgent.Name + "] Cannot add formula '" + ff
+                        + "': is assignable from another formula in this workbench.");
+                    continue;
+                }
+
+
                 if (Statements.Contains(ff) && update)
                     RemoveStatement(ff);
 
