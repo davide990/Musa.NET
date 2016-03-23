@@ -47,7 +47,7 @@ namespace FormulaLibraryTestProject
         [Test]
         public bool test1(string Formula)
         {
-            MusaInitializer.MusaInitializer.Initialize();
+            MusaInitializer.MUSAInitializer.Initialize();
             AgentWorkbench wb = new AgentWorkbench(new Agent());
             var parser = new FormulaUtils();
             wb.AddStatement(parser.Parse("f(x)"), parser.Parse("f(x,y)"), parser.Parse("g(p)"));
@@ -68,7 +68,7 @@ namespace FormulaLibraryTestProject
         [Test]
         public bool test2(string Formula)
         {
-            MusaInitializer.MusaInitializer.Initialize();
+            MusaInitializer.MUSAInitializer.Initialize();
             AgentWorkbench wb = new AgentWorkbench(new Agent());
             var parser = new FormulaUtils();
             wb.AddStatement(parser.Parse("f(\"ciao\")"), parser.Parse("f(x,y)"), parser.Parse("g(p)"));
@@ -91,7 +91,7 @@ namespace FormulaLibraryTestProject
 		[Test]
 		public bool test3(string Formula)
 		{
-			MusaInitializer.MusaInitializer.Initialize();
+			MusaInitializer.MUSAInitializer.Initialize();
 			AgentWorkbench wb = new AgentWorkbench(new Agent());
 			var parser = new FormulaUtils();
 			wb.AddStatement(parser.Parse("f(\"ciao\")"), parser.Parse("k(x)"), parser.Parse("g(p)"));

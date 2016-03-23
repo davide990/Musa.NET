@@ -9,29 +9,30 @@
   </PlanLibraries>
 
   <Logging>
-    <ConsoleLogger MinimumLogLevel="0" Enabled="true" />
+    <ConsoleLogger MinimumLogLevel="1" Enabled="true" />
     <!--<WCFLogger MinimumLogLevel="1" Enabled="true" EndpointAddress="http://localhost:8089/" />-->
     <!--<FileLogger MinimumLogLevel="0" Enabled="true" FileName="/home/davide/log.txt" Layout="${longdate}	${level:uppercase=true}	FileLogger	${message}" />-->
   </Logging>
   <Agents>
     <Agent Name="agent_1">
       <Plans>
+        <Plan>PlanForEvent</Plan>
         <!--<Plan>PlanExample</Plan>-->
         <!--<Plan>PlanExample1</Plan>-->
         <!--<Plan>PlanForEvent</Plan>-->
       </Plans>
       <BeliefBase>
-      	<!--<Belief value="f(x)"/>
+      	<Belief value="f(x)"/>
       	<Belief value="h(x)"/>
-      	<Belief value="g(3)"/>-->
+      	<Belief value="g(3)"/>
       </BeliefBase>
       <Events>
-        <!--<Event Formula="f(x)" Plan="PlanExample1" Perception="AddBelief">
+        <Event Formula="f(x)" Plan="PlanForEvent" Perception="AddBelief">
           <EventArgs>
             <EventArg Name="nome" Value="davide"/>
             <EventArg Name="eta" Value="25" Type="int"/>
           </EventArgs>
-        </Event>-->
+        </Event>
         <!--<Event Formula="f(x)" Plan="PlanExample1" Perception="RemoveBelief">
         	<EventArgs>
           		<EventArg Name="il_mio_parametro" Value="31" Type="int"/>

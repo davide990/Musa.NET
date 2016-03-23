@@ -487,7 +487,7 @@ namespace AgentLibrary
             if (EventsCatalogue.ContainsKey(the_key))
                 return;
 
-            Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkCyan);
+            Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Cyan);
             Logger.Log(LogLevel.Debug, "[" + parentAgent.Name + "] Added event {key}" + the_key + " {plan}" + Plan.Name);
 
             //Add the event

@@ -31,8 +31,11 @@ using PlanLibrary;
 
 namespace MusaInitializer
 {
-    public static class MusaInitializer
+    public static class MUSAInitializer
     {
+        /// <summary>
+        /// Initialize all the modules necessary for MUSA to work.
+        /// </summary>
         public static void Initialize()
         {
             MusaLoggerInitializer.Initialize();

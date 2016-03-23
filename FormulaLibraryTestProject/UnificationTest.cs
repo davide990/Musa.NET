@@ -48,7 +48,7 @@ namespace FormulaLibraryTestProject
         [Test]
         public bool unification_test(string formula)
         {
-            MusaInitializer.MusaInitializer.Initialize();
+            MusaInitializer.MUSAInitializer.Initialize();
             var fp = ModuleProvider.Get().Resolve<IFormulaUtils>();
             var ass_fact = ModuleProvider.Get().Resolve<IAssignmentFactory>();
             IFormula ff = fp.Parse(formula);

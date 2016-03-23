@@ -141,7 +141,7 @@ namespace AgentLibrary
         {
             if (instance != null)
                 return instance;
-            
+
             instance = new AgentEnvironement();
             instance.NetworkingEnabled = MusaConfig.GetConfig().NetworkingEnabled;
 
@@ -166,10 +166,10 @@ namespace AgentLibrary
         /// </summary>
         private AgentEnvironement()
         {
-			
+
             Statements = new ObservableCollection<IFormula>();
             RegisteredAgents = new ObservableCollection<Agent>();
-            RegisteredAgents.CollectionChanged += RegisteredAgents_CollectionChanged;            
+            RegisteredAgents.CollectionChanged += RegisteredAgents_CollectionChanged;
             Statements.CollectionChanged += Statements_CollectionChanged;
             CreationDate = DateTime.Now;
         }
@@ -185,12 +185,12 @@ namespace AgentLibrary
             {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
                     foreach (var newItem in e.NewItems)
-                        logger.Log(LogLevel.Debug, "Added agent: " + newItem);    
+                        logger.Log(LogLevel.Debug, "Added agent: " + (newItem as Agent).Name);
                     break;
 
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
                     foreach (var newItem in e.NewItems)
-                        logger.Log(LogLevel.Debug, "Removed agent: " + newItem);    
+                        logger.Log(LogLevel.Debug, "Removed agent: " + newItem);
                     break;
             }
         }
@@ -246,6 +246,11 @@ namespace AgentLibrary
                 RegisteredAgents.Add(a);
         }
 
+        public Agent GetAgent(string name)
+        {
+            return RegisteredAgents.FirstOrDefault(x => x.Name.Equals(name));
+        }
+
         /// <summary>
         /// Clears the current environment (removes all agents and all the 
         /// statements) and register agent from configuration.
@@ -279,6 +284,9 @@ namespace AgentLibrary
             //Load all the plans from the specified plan libraries dll in the config xml file
             List<Type> external_plans = GetPlansFromExternalLibraries();
 
+            //Get all the plans in the calling assembly
+            IEnumerable<Type> calling_assembly_plans = Assembly.GetCallingAssembly().GetTypes().Where(x => typeof(IPlanModel).IsAssignableFrom(x));
+
             foreach (AgentEntry ag in ae)
             {
                 Agent new_agent = new Agent(ag.Name);
@@ -296,12 +304,18 @@ namespace AgentLibrary
                     {
                         var the_plan = external_plans.Find(x => x.Name.Equals(plan));
                         if (the_plan == null)
-                            throw new Exception();
-                        new_agent.AddPlan(the_plan);
+                        {
+                            var other_plan = calling_assembly_plans.FirstOrDefault(x => x.Name.Equals(plan));
+                            if (other_plan == null)
+                                throw new Exception("Plan '" + plan + "' not found in neither external libs or current project.");
+                            new_agent.AddPlan(other_plan);
+                        }
+                        else
+                            new_agent.AddPlan(the_plan);
                     }
                     catch
                     {
-                        logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkRed);
+                        logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Red);
                         logger.Log(LogLevel.Error, "Failed to load plan '" + plan + "' for agent '" + ag.Name + "'. Make sure you have specified the correct path to the plan library dll (in the config xml) where to find this plan.\n");
                     }
                 }
@@ -333,7 +347,7 @@ namespace AgentLibrary
                 }
                 catch (FileNotFoundException)
                 {
-                    logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkRed);
+                    logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Red);
                     logger.Log(LogLevel.Error, "Failed to load assembly '" + assembly_path + "'. Make sure the path is right.");
                     continue;
                 }
@@ -451,14 +465,14 @@ namespace AgentLibrary
 
                     //Parse the plan that must be invoked when this event is triggered
                     var the_plan = ag_plans.Find(x => x.Name.Equals(ev.plan));
-                   
+
                     if (the_plan == null)
                         throw new Exception();
                     events.Add(new AgentEvent(ev.formula, perception, the_plan, event_args));
                 }
                 catch
                 {
-                    logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkRed);
+                    logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Red);
                     logger.Log(LogLevel.Error, "An error occurred while parsing event '" + ev + "' for agent '" + ag.Name + "'.\n Error: plan '" + ev.plan + "' not found.\n");
                 }
             }
@@ -483,7 +497,7 @@ namespace AgentLibrary
                     foreach (IFormula uf in unrolled)
                         Statements.Add(uf);
                 }
-                    
+
             }
         }
 

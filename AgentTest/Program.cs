@@ -9,6 +9,8 @@
 using AgentLibrary;
 using FormulaLibrary;
 using MusaCommon;
+using MusaConfiguration;
+using MusaInitializer;
 using PlanLibrary;
 using System;
 using System.Collections.Generic;
@@ -60,12 +62,12 @@ namespace AgentTest
                 /*mm.AddInfo(FormulaParser.Parse("f(x)"));
                 mm.InfoType = InformationType.AskOne;*/
 
-                mm.AddInfo(FormulaParser.Parse("(f(x)|k(x))|(w(hello)&l(p))"));
-                //mm.AddInfo("f(x)");
-                mm.InfoType = InformationType.AskOne;
-                mm.ReplyTo = "agent_3";
-                
-                b.SendMessage(a.GetPassport(), mm);
+                //mm.AddInfo(FormulaParser.Parse("(f(x)|k(x))|(w(hello)&l(p))"));
+                mm.AddInfo("k(x)");
+                mm.InfoType = InformationType.Tell;
+                //mm.ReplyTo = "agent_3";
+                b.SendBroadcastMessage(mm);
+                //b.SendMessage(a.GetPassport(), mm);
 
             };
             wk.RunWorkerAsync();
@@ -106,18 +108,21 @@ namespace AgentTest
 
         static void Main(string[] args)
         {
-            //startMUSA();
+            MUSAInitializer.Initialize();
 
-            MusaInitializer.MusaInitializer.Initialize();
+            MusaConfig.ReadFromFile("../../test_conf.xml");
+            
+            AgentEnvironement.GetInstance().RegisterAgentFromConfiguration();            
+            AgentEnvironement.GetInstance().WaitForAgents();
 
-            //MusaConfig.ReadFrom/File("../../test_conf.xml");
-            var logger = ModuleProvider.Get().Resolve<ILogger>();
-            logger.AddFragment<IConsoleLoggerFragment>(LogLevel.Trace);
+            /*var logger = ModuleProvider.Get().Resolve<ILogger>();
+            logger.AddFragment<IConsoleLoggerFragment>(LogLevel.Debug);*/
+
             //logger.GetFragment<IConsoleLoggerFragment>().SetMinimumLogLevel(LogLevel.Debug);
 
             //var fp = ModuleProvider.Get().Resolve<IFormulaUtils>();
 
-            configureAndStartMusa();
+            //configureAndStartMusa();
         }
 
         static void A_RegisterResult(string result)
@@ -128,7 +133,7 @@ namespace AgentTest
     }
 
     [Plan]
-    class PlanForEvent : PlanModel
+    public class PlanForEvent : PlanModel
     {
         [PlanEntryPoint]
         void entry_point(PlanArgs args)
