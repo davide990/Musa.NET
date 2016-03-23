@@ -164,21 +164,23 @@ namespace FormulaLibrary
             for (int i = 0; i < Terms.Count; i++)
             {
                 //if a variable term occurs
-                if (!Terms[i].IsLiteral())
-                {
-                    object varTerm = ValuedTermFacace.CreateValuedTerm((Terms[i] as ITerm).GetValue());
-
-                    //add the new instance to the cloned formula
-                    clone.Terms.Add(varTerm as Term);
-                }
-                else
+                if (Terms[i].IsLiteral())
                 {
                     clone.Terms.Add(new LiteralTerm(Terms[i].GetName()));
+                    continue;
                 }
+                object varTerm = ValuedTermFacace.CreateValuedTerm((Terms[i] as ITerm).GetValue());
+
+                //add the new instance to the cloned formula
+                clone.Terms.Add(varTerm as Term);
             }
             return clone;
         }
 
+        /// <summary>
+        /// Unify this formula using the specified assignment set.
+        /// </summary>
+        /// <param name="assignment"></param>
         public override void Unify(List<IAssignment> assignment)
         {
             for (int i = 0; i < TermsCount; i++)

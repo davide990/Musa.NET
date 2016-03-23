@@ -806,11 +806,28 @@ namespace AgentLibrary
             AgentPassport receiver = srv.GetAgentinfo(agentReceiverName);
             AgentMessage response = srv.sendAgentMessage(GetPassport(), receiver, message);
 
+            Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Yellow);
             Logger.Log(LogLevel.Debug, "[" + Name + "] send message to [" + receiver + "]: " + message);
             if (response != null)
             {
-                Logger.Log(LogLevel.Debug, "[" + Name + "] received response from [" + receiver + "]: " + response);
-                AddToMailbox(receiver, response);
+                response.InfoType = InformationType.Tell;
+                if (!string.IsNullOrEmpty(message.ReplyTo))
+                {
+                    var agentToForward = AgentEnvironement.GetInstance().RegisteredAgents.First(x => x.Name.Equals(message.ReplyTo));
+                    if (agentToForward != null)
+                    {
+                        Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Yellow);
+                        Logger.Log(LogLevel.Debug, "[" + Name + "] forwarding response to [" + agentToForward.Name + "]: " + response);
+                        //agentToForward.AddToMailbox(receiver, response);
+                        SendMessage(agentToForward.GetPassport(), response);
+                    }
+                }
+                else
+                {
+                    Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Yellow);
+                    Logger.Log(LogLevel.Debug, "[" + Name + "] received response from [" + receiver + "]: " + response);
+                    AddToMailbox(receiver, response);
+                }
             }
         }
 
@@ -823,12 +840,29 @@ namespace AgentLibrary
         {
             EnvironmentServer srv = AgentEnvironement.GetInstance().EnvironmentServer;
             AgentMessage response = srv.sendAgentMessage(GetPassport(), receiver, message);
-
+            Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Yellow);
             Logger.Log(LogLevel.Debug, "[" + Name + "] send message to [" + receiver.AgentName + "]: " + message);
             if (response != null)
             {
-                Logger.Log(LogLevel.Debug, "[" + Name + "] received response from [" + receiver.AgentName + "]: " + response);
-                AddToMailbox(receiver, response);
+                response.InfoType = InformationType.Tell;
+                if (!string.IsNullOrEmpty(message.ReplyTo))
+                {
+                    var agentToForward = AgentEnvironement.GetInstance().RegisteredAgents.First(x => x.Name.Equals(message.ReplyTo));
+                    if (agentToForward != null)
+                    {
+                        Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Yellow);
+                        Logger.Log(LogLevel.Debug, "[" + Name + "] forwarding response to [" + agentToForward.Name + "]: " + response);
+                        SendMessage(agentToForward.GetPassport(), response);
+
+                        //agentToForward.AddToMailbox(receiver, response);
+                    }
+                }
+                else
+                {
+                    Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Yellow);
+                    Logger.Log(LogLevel.Debug, "[" + Name + "] received response from [" + receiver + "]: " + response);
+                    SendMessage(receiver, response);
+                }
             }
         }
 
@@ -840,6 +874,7 @@ namespace AgentLibrary
         {
             if (message.InfoType == InformationType.AskAll || message.InfoType == InformationType.AskOne)
             {
+                Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Yellow);
                 Logger.Log(LogLevel.Error, "[" + Name + "] Sending broadcast messages of type AskOne or AskAll is not allowed. (Message: " + message + ")");
                 return;
             }

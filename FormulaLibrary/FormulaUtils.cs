@@ -58,7 +58,7 @@ namespace FormulaLibrary
             }
             else if (f is NotFormula)
             {
-                
+
                 unrolled_formula_list.AddRange(UnrollFormula((f as NotFormula).Formula));
             }
             else
@@ -89,33 +89,20 @@ namespace FormulaLibrary
             //Invoke the parser
             IParseTree tree;
 
-            tree = parser.disjunction();
-/*            try
+            try
             {
-                tree = parser.disjunction(); 
+                tree = parser.disjunction();
             }
             catch
             {
-                Console.WriteLine("Error parsing formula \"" + formula + "\"");
-                return null;
+                throw new Exception("Error parsing formula \"" + formula + "\"");
             }
-            */
-            /*
-            catch(Exception e)
-            {
-                if (e is InputMismatchException)
-                    Console.WriteLine ("Input '" + formula + "' is not a valid formula.\n" + e.Message);
-                if (e is RecognitionException)
-                    Console.WriteLine ("Recognition exception with formula '" + formula + "'.\n" + e.Message);
 
-                return null;
-            }                
-            */
             Formula formulaObject;
             using (FormulaVisitor vv = new FormulaVisitor())
             {
                 //Visit the parse tree
-                formulaObject = vv.Visit(tree);      
+                formulaObject = vv.Visit(tree);
             }
 
             stream.Reset();

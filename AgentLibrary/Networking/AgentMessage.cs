@@ -108,6 +108,24 @@ namespace AgentLibrary
         public InformationType InfoType { get; set; }
 
         /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
+        public string ReplyTo { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
+        public string ReplyBy { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
+        public string Ontology { get; set; }
+
+        /// <summary>
         /// The number of informations contained in this message
         /// </summary>
         public int InformationsCount
@@ -150,27 +168,32 @@ namespace AgentLibrary
         /// </summary>
         /// <returns>The list of informations if informations count is more than 1, otherwise
         /// return the unique information contained in this message</returns>
-        public dynamic GetInformation()
+        public object GetInformation()
         {
             if (Message.Count == 0)
                 return null;
-            if (Message.Count > 1)
-                return Message;
+            if (Message.Count == 1)
+                return Message[0];
 
-            return Message[0];
+            return Message;
         }
-
 
         /// <summary>
         /// Add an information to this message
         /// </summary>
         /// <param name="info">The information to be added. The type of object must be string or IFormula</param>
-        public void AddInfo(object info)
+        public void AddInfo(params object[] info)
         {
-            if (!(info is string | info is IFormula))
-                throw new Exception("Provided object is neither of type string or IFormula.");
+            foreach (object o in info)
+            {
+                if (!(o is string | o is IFormula))
+                    throw new Exception("Provided object is neither of type string or IFormula.");
 
-            Message.Add(info);
+                if (Message.Contains(o))
+                    continue;
+
+                Message.Add(o);
+            }
         }
 
         public override string ToString()

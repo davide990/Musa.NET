@@ -204,8 +204,8 @@ namespace AgentLibrary
 
             //Parse the received formula
             IFormula messageFormula;
-            if(message.GetInformation() is IFormula)
-                messageFormula = message.GetInformation();
+            if (message.GetInformation() is IFormula)
+                messageFormula = message.GetInformation() as IFormula;
             else
                 messageFormula = ModuleProvider.Get().Resolve<IFormulaUtils>().Parse(message.GetInformation() as string);
 
@@ -220,7 +220,6 @@ namespace AgentLibrary
             if (!success)
                 return response;
 
-            //TODO BISOGNA CLONARE QUI
             unifiedFormula = messageFormula.Clone() as IFormula;
             unifiedFormula.Unify(assignments);
             //TODO

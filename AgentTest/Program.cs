@@ -38,12 +38,13 @@ namespace AgentTest
 
             Agent a = new Agent("agent_1").Start();
             Agent b = new Agent("agent_2").Start();
+            Agent c = new Agent("agent_3").Start();
             //Agent ag_b = new Agent ("agent_2").Start();
 
             BackgroundWorker wk = new BackgroundWorker();
             wk.DoWork += delegate
             {
-                
+
                 /*Thread.Sleep(5000);
                 Console.WriteLine("Add f(x)");
                 //env.RegisterStatement(new AtomicFormula("f", new LiteralTerm("x")));
@@ -60,9 +61,11 @@ namespace AgentTest
                 mm.InfoType = InformationType.AskOne;*/
 
                 mm.AddInfo(FormulaParser.Parse("(f(x)|k(x))|(w(hello)&l(p))"));
-                mm.InfoType = InformationType.Tell;
-
-                b.SendMessage("agent_1", mm);
+                //mm.AddInfo("f(x)");
+                mm.InfoType = InformationType.AskOne;
+                mm.ReplyTo = "agent_3";
+                
+                b.SendMessage(a.GetPassport(), mm);
 
             };
             wk.RunWorkerAsync();
@@ -78,13 +81,14 @@ namespace AgentTest
             //a.AddEvent ("f(x)", AgentPerception.RemoveBelief, typeof(PlanExample2));
             env.RegisterAgent(a);
             env.RegisterAgent(b);
+            env.RegisterAgent(c);
             //env.RegisterAgent (ag_b);
 
             a.AddBelief(new AtomicFormula("f", new ValuedTerm<int>(3)));
-            
+
 
             //a.AddBelief(FormulaParser.Parse("k(x)"), FormulaParser.Parse("p(3)"));
-           // var ll = new List<IFormula> { FormulaParser.Parse("w(\"hello\")"), FormulaParser.Parse("w(x)"), FormulaParser.Parse("cc(x)") };
+            // var ll = new List<IFormula> { FormulaParser.Parse("w(\"hello\")"), FormulaParser.Parse("w(x)"), FormulaParser.Parse("cc(x)") };
             //a.AddBelief(ll);
 
 
@@ -111,22 +115,9 @@ namespace AgentTest
             logger.AddFragment<IConsoleLoggerFragment>(LogLevel.Trace);
             //logger.GetFragment<IConsoleLoggerFragment>().SetMinimumLogLevel(LogLevel.Debug);
 
-            var fp = ModuleProvider.Get().Resolve<IFormulaUtils>();
+            //var fp = ModuleProvider.Get().Resolve<IFormulaUtils>();
 
-            var formula_1 = fp.Parse("f(3)");
-            var formula_2 = fp.Parse("f(x)");
-            Agent aa = new Agent();
-            AgentWorkbench wb = new AgentWorkbench(aa);
-            wb.AddStatement(formula_1);
-
-            List<IAssignment> assignments;
-            List<IFormula> unifiedPredicates;
-
-            var isSatisfied = wb.TestCondition(formula_1, out unifiedPredicates, out assignments);
-
-
-
-            //configureAndStartMusa();
+            configureAndStartMusa();
         }
 
         static void A_RegisterResult(string result)
