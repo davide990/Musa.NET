@@ -70,9 +70,24 @@ namespace AgentLibrary
         [DataMember]
         public ObservableCollection<IFormula> Statements
         {
-            get;
-            private set;
+            get
+            {
+                lock (statementsLock)
+                {
+                    return statements;
+                }
+            }
+            private set
+            {
+                statements = value;
+                /*lock (statementsLock)
+                {
+                    statements = value;
+                }*/
+            }
         }
+        private object statementsLock = new object();
+        private ObservableCollection<IFormula> statements;
 
         /// <summary>
         /// The agent this workbench belongs to
@@ -178,34 +193,37 @@ namespace AgentLibrary
             {
                 var isVerified = TestCondition(ff);
 
-                if (isVerified)
+                if (!isVerified && update)
+                    continue;
+
+                if (!isVerified && !update)
                 {
-                    if (!update)
+                    lock (statementsLock)
                     {
-                        logger.Log(LogLevel.Warn, "[" + parentAgent.Name + "] Cannot add formula '" + ff
-                        + "': is assignable from another formula in this workbench.");
-                        continue;
-                    }
-                    else
-                    {
-                        RemoveStatement(ff);
                         Statements.Add(ff);
                     }
-                }
-                //If the formula to be added is satisfied in this workbench, so it is
-                //assignable from another one, the formula is not added
-                if (TestCondition(ff) && !update)
-                {
-                    logger.Log(LogLevel.Warn, "[" + parentAgent.Name + "] Cannot add formula '" + ff
-                        + "': is assignable from another formula in this workbench.");
                     continue;
                 }
 
-                if (Statements.Contains(ff) && update)
+                //Here, formula is verified in this workbench
+                if (!update)
+                {
+                    //If the formula to be added is satisfied in this workbench, so it is
+                    //assignable from another one, the formula is not added
+                    logger.Log(LogLevel.Warn, "[" + parentAgent.Name + "] Cannot add formula '" + ff
+                    + "': is assignable from another formula in this workbench.");
+                    continue;
+                }
+                else
+                {
+                    //RemoveStatement contains already a lock for statements collection
                     RemoveStatement(ff);
 
-                //Add the formula to this workbench
-                Statements.Add(ff);
+                    lock (statementsLock)
+                    {
+                        Statements.Add(ff);
+                    }
+                }
             }
         }
 
@@ -250,8 +268,11 @@ namespace AgentLibrary
             if (!isSatisfied)
                 return;
 
-            foreach (var toRemove in unifiedPredicates)
-                Statements.Remove(toRemove);
+            lock (statementsLock)
+            {
+                foreach (var toRemove in unifiedPredicates)
+                    Statements.Remove(toRemove);
+            }
         }
 
         /// <summary>
@@ -294,12 +315,17 @@ namespace AgentLibrary
                 return TestCondition((formula as IAndFormula).GetLeft()) & TestCondition((formula as IAndFormula).GetRight());
             else
             {
-                List<IAssignment> l;
                 //here, formula is atomic
-                foreach (IFormula f in Statements)
+                List<IAssignment> l;
+                //Lock statements both in read/write to prevent collection
+                //changes during the following iteration
+                lock (statementsLock)
                 {
-                    if (f.MatchWith(formula, out l))
-                        return true;
+                    foreach (IFormula f in Statements)
+                    {
+                        if (f.MatchWith(formula, out l))
+                            return true;
+                    }
                 }
                 return false;
             }
@@ -333,11 +359,16 @@ namespace AgentLibrary
             }
             else
             {
-                //here, formula is atomic
-                foreach (IFormula f in Statements)
+                //Lock statements both in read/write to prevent collection
+                //changes during the following iteration
+                lock (statementsLock)
                 {
-                    if (f.MatchWith(formula, out generatedAssignment))
-                        return true;
+                    //here, formula is atomic
+                    foreach (IFormula f in Statements)
+                    {
+                        if (f.MatchWith(formula, out generatedAssignment))
+                            return true;
+                    }
                 }
                 generatedAssignment = new List<IAssignment>();
                 return false;
@@ -379,15 +410,20 @@ namespace AgentLibrary
                 generatedAssignment = new List<IAssignment>();
                 bool success = false;
 
-                foreach (IFormula f in Statements)
+                //Lock statements both in read/write to prevent collection
+                //changes during the following iteration
+                lock (statementsLock)
                 {
-                    List<IAssignment> current_assignments;
-                    if (!f.MatchWith(formula, out current_assignments))
-                        continue;
+                    foreach (IFormula f in Statements)
+                    {
+                        List<IAssignment> current_assignments;
+                        if (!f.MatchWith(formula, out current_assignments))
+                            continue;
 
-                    success = true;
-                    generatedAssignment.AddRange(current_assignments);
-                    unifiedPredicates.Add(f);
+                        success = true;
+                        generatedAssignment.AddRange(current_assignments);
+                        unifiedPredicates.Add(f);
+                    }
                 }
                 return success;
             }

@@ -502,7 +502,7 @@ namespace AgentLibrary
         }
 
         /// <summary>
-        /// Given a set of atomic formulas, this method removes the matching formulas from this environment.
+        /// Given a set of atomic formulas, this method removes the exact matching formulas from this environment.
         /// </summary>
         public void DeleteStatement(params IFormula[] f)
         {

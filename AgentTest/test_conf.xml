@@ -9,7 +9,7 @@
   </PlanLibraries>
 
   <Logging>
-    <ConsoleLogger MinimumLogLevel="1" Enabled="true" />
+    <ConsoleLogger MinimumLogLevel="0" Enabled="true" />
     <!--<WCFLogger MinimumLogLevel="1" Enabled="true" EndpointAddress="http://localhost:8089/" />-->
     <!--<FileLogger MinimumLogLevel="0" Enabled="true" FileName="/home/davide/log.txt" Layout="${longdate}	${level:uppercase=true}	FileLogger	${message}" />-->
   </Logging>
@@ -22,9 +22,9 @@
         <!--<Plan>PlanForEvent</Plan>-->
       </Plans>
       <BeliefBase>
-      	<Belief value="f(x)"/>
+      	<!--<Belief value="f(x)"/>-->
       	<Belief value="h(x)"/>
-      	<Belief value="g(3)"/>
+      	<Belief value="have(beer,3)"/>
       </BeliefBase>
       <Events>
         <Event Formula="f(x)" Plan="PlanForEvent" Perception="AddBelief">
