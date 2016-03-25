@@ -86,7 +86,7 @@ namespace AgentTest
             env.RegisterAgent(c);
             //env.RegisterAgent (ag_b);
 
-            
+
             //a.AddBelief(FormulaParser.Parse("k(x)"), FormulaParser.Parse("p(3)"));
             // var ll = new List<IFormula> { FormulaParser.Parse("w(\"hello\")"), FormulaParser.Parse("w(x)"), FormulaParser.Parse("cc(x)") };
             //a.AddBelief(ll);
@@ -111,7 +111,7 @@ namespace AgentTest
             MusaConfig.ReadFromFile("../../test_conf.xml");
 
             AgentEnvironement.GetInstance().RegisterAgentFromConfiguration();
-            
+
 
             var fp = ModuleProvider.Get().Resolve<IFormulaUtils>();
             AgentEnvironement.GetInstance().RegisterStatement(fp.Parse("f(x)"));
@@ -127,7 +127,7 @@ namespace AgentTest
 
                 List<IAssignment> assgnme;
                 List<IFormula> the_formula;
-                ag.TestCondition(ff,out the_formula, out assgnme);
+                ag.TestCondition(ff, out the_formula, out assgnme);
                 if (the_formula.Count > 0)
                     Console.WriteLine("VERIFICATA");
 
@@ -138,9 +138,9 @@ namespace AgentTest
             bgwk.RunWorkerAsync();
 
 
-            
+
             AgentEnvironement.GetInstance().WaitForAgents();
-            
+
             /*var logger = ModuleProvider.Get().Resolve<ILogger>();
             logger.AddFragment<IConsoleLoggerFragment>(LogLevel.Debug);*/
 

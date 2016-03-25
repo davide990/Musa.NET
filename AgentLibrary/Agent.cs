@@ -35,7 +35,7 @@ using MusaCommon;
 
 namespace AgentLibrary
 {
-    public class Agent
+    public class Agent : IAgent
     {
         #region Fields
 
@@ -493,7 +493,7 @@ namespace AgentLibrary
             var plan_instance = PlanFacade.CreatePlanInstance(PlanModel, this, RegisterResultHandler, PlanFinishedHandler, Logger);
 
             //Set the workbench where the plan's condition will be tested.
-            plan_instance.SetAgentWorkbench(Workbench);
+            plan_instance.SetSourceAgent(this);
 
             //Add the plan to the agent's plan collection
             PlansCollection.Add(PlanModel, plan_instance);
@@ -767,7 +767,7 @@ namespace AgentLibrary
             return unrolled;
         }
 
-        public Tuple<AgentPassport, AgentMessage> GetLastMessageInMailBox()
+        internal Tuple<AgentPassport, AgentMessage> GetLastMessageInMailBox()
         {
             return MailBox.Pop();
         }
@@ -853,8 +853,6 @@ namespace AgentLibrary
                         Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Yellow);
                         Logger.Log(LogLevel.Debug, "[" + Name + "] forwarding response to [" + agentToForward.Name + "]: " + response);
                         SendMessage(agentToForward.GetPassport(), response);
-
-                        //agentToForward.AddToMailbox(receiver, response);
                     }
                 }
                 else
@@ -887,5 +885,20 @@ namespace AgentLibrary
         }
 
         #endregion Communication methods
+
+
+        #region IAgent methods
+
+        public string GetName()
+        {
+            return Name;
+        }
+
+        public IAgentWorkbench GetWorkbench()
+        {
+            return Workbench;
+        }
+
+        #endregion
     }
 }

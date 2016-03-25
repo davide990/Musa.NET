@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace AgentLibrary
+namespace MusaCommon
 {
     /// <summary>
     /// It is used for verifying agents identities when a communication between agents occurs.

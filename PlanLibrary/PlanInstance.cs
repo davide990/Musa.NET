@@ -30,12 +30,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
-
-//using MusaLogger;
 using MusaCommon;
-
-/*using FormulaLibrary;
-using FormulaLibrary.ANTLR;*/
 using System.Text;
 
 
@@ -109,6 +104,12 @@ namespace PlanLibrary
             private set;
         }
 
+        private IAgent SourceAgent
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Gets or sets the workbench of the agent that owns this plan instance. When the agent executes
         /// this plan, the workbench is used to test plan's condition.
@@ -116,8 +117,10 @@ namespace PlanLibrary
         /// <value>The agent workbench.</value>
         private IAgentWorkbench AgentWorkbench
         {
-            get;
-            set;
+            get
+            {
+                return SourceAgent.GetWorkbench();
+            }
         }
 
         #endregion Fields/Properties
@@ -412,10 +415,10 @@ namespace PlanLibrary
             return plan_model.TriggerCondition;
         }
 
-        public void SetAgentWorkbench(IAgentWorkbench wb)
+        public void SetSourceAgent(IAgent source)
         {
-            AgentWorkbench = wb;
-            plan_model.SetAgentWorkbench(wb);
+            SourceAgent = source;
+            plan_model.SetSourceAgent(source);
         }
 
         #endregion IPlanInstance inherithed methods

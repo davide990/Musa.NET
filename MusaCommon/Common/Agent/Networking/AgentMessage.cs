@@ -31,7 +31,7 @@ using System.Collections.Generic;
 using System.Text;
 using MusaCommon;
 
-namespace AgentLibrary
+namespace MusaCommon
 {
     /// <summary>
     /// As stated on Jason .send internal action documentation: "the 

@@ -148,8 +148,16 @@ namespace PlanLibrary
         /// <value>The agent workbench.</value>
         private IAgentWorkbench AgentWorkbench
         {
+            get
+            {
+                return SourceAgent.GetWorkbench();
+            }
+        }
+
+        public IAgent SourceAgent
+        {
             get;
-            set;
+            private set;
         }
 
         #endregion Fields/Properties
@@ -401,11 +409,11 @@ namespace PlanLibrary
             RegisterResultEvent(result);
         }
 
-        internal void SetAgentWorkbench(IAgentWorkbench wb)
+        internal void SetSourceAgent(IAgent source)
         {
-            AgentWorkbench = wb;
+            SourceAgent = source;
         }
-            
+    
         #endregion Methods
 
         public string GetEntryPointName()
