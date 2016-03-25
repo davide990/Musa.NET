@@ -43,5 +43,7 @@ namespace FormulaLibrary
 		public abstract object Clone ();
         public abstract bool MatchWith(IFormula f, out List<IAssignment> generatedAssignment);
         public abstract void Unify(List<IAssignment> assignments);
+        public abstract string GetSource();
+        public abstract void SetSource(string source);
     }
 }

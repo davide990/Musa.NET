@@ -150,5 +150,16 @@ namespace FormulaLibrary
         {
             return new AndFormula(Left.Clone() as IFormula, Right.Clone() as IFormula);
         }
+
+        public override string GetSource()
+        {
+            return Left.GetSource();
+        }
+
+        public override void SetSource(string source)
+        {
+            Left.SetSource(source);
+            Right.SetSource(source);
+        }
     }
 }

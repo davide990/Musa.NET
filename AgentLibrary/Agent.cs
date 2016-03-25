@@ -665,6 +665,19 @@ namespace AgentLibrary
 
         #region Beliefs related methods
 
+        public void AddBelief(IAgent source, params IFormula[] formula)
+        {
+            foreach (IFormula af in formula)
+            {
+                Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
+                Logger.Log(LogLevel.Debug, "[" + Name + "] Adding belief " + af);
+
+                var unrolled = FormulaUtils.UnrollFormula(af);
+                unrolled.ForEach(x => x.SetSource(source.GetName()));
+                PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(unrolled, AgentPerception.AddBelief));
+            }
+        }
+
         public void AddBelief(params IFormula[] formula)
         {
             foreach (IFormula af in formula)

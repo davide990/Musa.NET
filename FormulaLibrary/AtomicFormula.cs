@@ -38,7 +38,7 @@ namespace FormulaLibrary
     /// - a functor, and
     /// - a list of Terms
     /// </summary>
-    public sealed class AtomicFormula : Formula, IAtomicFormula//, ICloneable
+    public sealed class AtomicFormula : Formula, IAtomicFormula
     {
         /// <summary>
         /// The functor of this formula
@@ -72,8 +72,18 @@ namespace FormulaLibrary
             private set;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Source
+        {
+            get;
+            private set;
+        }
+
         public AtomicFormula(string functor, params ITerm[] Terms)
         {
+            Source = string.Empty;
             Functor = functor;
             this.Terms = new List<ITerm>(Terms);
             ValuedTermFacace = new ValuedTermFacace();
@@ -81,6 +91,7 @@ namespace FormulaLibrary
 
         public AtomicFormula(string functor, IEnumerable<ITerm> Terms)
         {
+            Source = string.Empty;
             Functor = functor;
             this.Terms = new List<ITerm>(Terms);
             ValuedTermFacace = new ValuedTermFacace();
@@ -293,5 +304,14 @@ namespace FormulaLibrary
             return false;
         }
 
+        public override string GetSource()
+        {
+            return Source;
+        }
+
+        public override void SetSource(string source)
+        {
+            Source = source;
+        }
     }
 }

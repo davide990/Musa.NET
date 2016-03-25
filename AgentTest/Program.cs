@@ -124,20 +124,20 @@ namespace AgentTest
 
                 var ag = AgentEnvironement.GetInstance().GetAgent("agent_1");
                 var ff = fp.Parse("have(beer,x)");
-
+                
                 List<IAssignment> assgnme;
                 List<IFormula> the_formula;
                 ag.TestCondition(ff, out the_formula, out assgnme);
                 if (the_formula.Count > 0)
+                {
                     Console.WriteLine("VERIFICATA");
+                }
 
                 //TODO QUALCOSA NON VA
                 /*Thread.Sleep(5000);
                 AgentEnvironement.GetInstance().Serialize().Save(@"C:\Users\davide\my_agent.musa");*/
             };
             bgwk.RunWorkerAsync();
-
-
 
             AgentEnvironement.GetInstance().WaitForAgents();
 

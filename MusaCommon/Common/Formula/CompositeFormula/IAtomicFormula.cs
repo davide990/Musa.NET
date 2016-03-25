@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace MusaCommon
 {
-    public interface IAtomicFormula
+    public interface IAtomicFormula : IFormula
     {
         string GetFunctor();
 

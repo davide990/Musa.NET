@@ -28,7 +28,7 @@ using System;
 
 namespace MusaCommon
 {
-    public interface INotFormula
+    public interface INotFormula : IFormula
     {
         IFormula GetFormula();
     }

@@ -105,5 +105,15 @@ namespace FormulaLibrary
         {
 			return new NotFormula(Formula.Clone() as IFormula);
         }
+
+        public override string GetSource()
+        {
+            return Formula.GetSource();
+        }
+
+        public override void SetSource(string source)
+        {
+            Formula.SetSource(source);
+        }
     }
 }

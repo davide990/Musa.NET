@@ -37,8 +37,8 @@ namespace MusaCommon
         new object Clone ();
         bool MatchWith(IFormula f, out List<IAssignment> generatedAssignment);
         bool IsAtomic();
-
-
+        string GetSource();
+        void SetSource(string source);
     }
 }
 

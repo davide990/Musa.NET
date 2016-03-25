@@ -28,7 +28,7 @@ using System;
 
 namespace MusaCommon
 {
-    public interface IOrFormula
+    public interface IOrFormula : IFormula
     {
         IFormula GetLeft();
         IFormula GetRight();
