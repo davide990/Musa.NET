@@ -46,6 +46,8 @@
     <Compile Include="Agent.cs" />
     <Compile Include="AgentEnvironement.cs" />
     <Compile Include="AgentRole.cs" />
+    <Compile Include="Attributes\AgentAttribute.cs" />
+    <Compile Include="Attributes\BeliefAttribute.cs" />
     <Compile Include="Networking\BroadcastMessage.cs" />
     <Compile Include="Networking\EnvironementServer.cs" />
     <Compile Include="Networking\IMusaCommunicationService.cs" />

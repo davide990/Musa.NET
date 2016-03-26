@@ -1,8 +1,8 @@
-﻿//          __  __                                     _   
-//         |  \/  |                                   | |  
-//         | \  / | _   _  ___   __ _     _ __    ___ | |_ 
+﻿//          __  __                                     _
+//         |  \/  |                                   | |
+//         | \  / | _   _  ___   __ _     _ __    ___ | |_
 //         | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
-//         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
+//         | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_
 //         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 //
 //  AtomicFormula.cs
@@ -25,16 +25,15 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using System;
+using MusaCommon;
 using System.Collections.Generic;
 using System.Text;
-using MusaCommon;
 
 namespace FormulaLibrary
 {
     /// <summary>
     /// A first-order logic predicate. It includes:
-    /// 
+    ///
     /// - a functor, and
     /// - a list of Terms
     /// </summary>
@@ -73,7 +72,7 @@ namespace FormulaLibrary
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string Source
         {
@@ -96,7 +95,6 @@ namespace FormulaLibrary
             this.Terms = new List<ITerm>(Terms);
             ValuedTermFacace = new ValuedTermFacace();
         }
-
 
         public override FormulaType GetFormulaType()
         {
@@ -205,7 +203,6 @@ namespace FormulaLibrary
             }
         }
 
-
         #region IAtomicFormula members
 
         public string GetFunctor()
@@ -246,11 +243,9 @@ namespace FormulaLibrary
             bool success = true;
             var input_formula = f as IAtomicFormula;
 
-
             if (GetTermsCount() != input_formula.GetTermsCount() || !GetFunctor().Equals(input_formula.GetFunctor()))
                 return false;
 
-            generatedAssignment.Clear();
             success = true;
 
             //Iterate each belief's term
@@ -263,7 +258,7 @@ namespace FormulaLibrary
                 {
                     if (!b.IsLiteral())
                     {
-                        //a and b are both variable 
+                        //a and b are both variable
                         if (a.GetValue().Equals(b.GetValue()))
                             //if both valued terms have equal values, proceed with the next couple of terms
                             continue;
