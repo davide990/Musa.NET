@@ -59,12 +59,14 @@ namespace MusaCommon
         /// Set the agent who invoke this plan instance
         /// </summary>
         /// <param name="source"></param>
-        void SetSourceAgent(IAgent source);
+        void SetSourceAgent(AgentPassport source);
 
         /// <summary>
         /// Determines whether this plan is atomic.
         /// </summary>
         bool IsAtomic();
+
+        IPlanModel GetModel();
     }
 }
 

@@ -1,4 +1,4 @@
-﻿﻿//          __  __                                     _   
+﻿//          __  __                                     _   
 //         |  \/  |                                   | |  
 //         | \  / | _   _  ___   __ _     _ __    ___ | |_ 
 //         | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
@@ -26,10 +26,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AgentLibrary.Attributes
 {

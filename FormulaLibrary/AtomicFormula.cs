@@ -26,6 +26,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using MusaCommon;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -186,18 +187,23 @@ namespace FormulaLibrary
             return clone;
         }
 
+        public override void Unify(params IAssignment[] assignments)
+        {
+            Unify(new List<IAssignment>(assignments));
+        }
+
         /// <summary>
         /// Unify this formula using the specified assignment set.
         /// </summary>
-        /// <param name="assignment"></param>
-        public override void Unify(List<IAssignment> assignment)
+        /// <param name="assignments"></param>
+        public override void Unify(List<IAssignment> assignments)
         {
             for (int i = 0; i < TermsCount; i++)
             {
                 if (!Terms[i].IsLiteral())
                     continue;
 
-                var the_assignment = assignment.Find(x => x.GetName().Equals(Terms[i].GetName()));
+                var the_assignment = assignments.Find(x => x.GetName().Equals(Terms[i].GetName()));
                 if (the_assignment != null)
                     Terms[i] = (Terms[i] as LiteralTerm).Unify(the_assignment);
             }
@@ -307,6 +313,25 @@ namespace FormulaLibrary
         public override void SetSource(string source)
         {
             Source = source;
+        }
+
+        public override IFormula Generalize()
+        {
+            var rand = new Random();
+
+            List<ITerm> terms = new List<ITerm>();
+            foreach (ITerm term in Terms)
+            {
+                if (term.IsLiteral())
+                    terms.Add(term);
+                else
+                {
+                    char c = (char)rand.Next(97, 122);
+                    terms.Add(new LiteralTerm(c.ToString()));
+                }
+            }
+
+            return new AtomicFormula(Functor, terms);
         }
     }
 }

@@ -144,12 +144,12 @@ namespace AgentLibrary
             {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
                     foreach (var item in e.NewItems)
-                        logger.Log(LogLevel.Trace, "[" + parentAgent.Name + "] Belief added: " + item);
+                        logger.Log(LogLevel.Info, "[" + parentAgent.Name + "] Belief added: " + item);
                     break;
 
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
                     foreach (var item in e.OldItems)
-                        logger.Log(LogLevel.Trace, "[" + parentAgent.Name + "] Belief removed: " + item);
+                        logger.Log(LogLevel.Info, "[" + parentAgent.Name + "] Belief removed: " + item);
                     break;
             }
         }
@@ -191,34 +191,34 @@ namespace AgentLibrary
         {
             foreach (IFormula ff in f)
             {
-                var isVerified = TestCondition(ff);
-
-                if (!isVerified && update)
-                    continue;
-
-                if (!isVerified && !update)
+                //If update is false, the formulas must be added, if possible, to this workbench
+                if (!update)
                 {
+                    //check if the formula is assignable from another formula already in this workbench
+                    if (TestCondition(ff))
+                    {
+                        //If the formula to be added is satisfied in this workbench, so it is
+                        //assignable from another one, the formula is not added
+                        logger.Log(LogLevel.Warn, "[" + parentAgent.Name + "] Cannot add formula '" + ff
+                            + "': is assignable from another formula in this workbench.");
+                        continue;
+                    }
+
+                    //Here the formula is not in the workbench, so add it.
                     lock (statementsLock)
                     {
                         Statements.Add(ff);
                     }
-                    continue;
-                }
-
-                //Here, formula is verified in this workbench
-                if (!update)
-                {
-                    //If the formula to be added is satisfied in this workbench, so it is
-                    //assignable from another one, the formula is not added
-                    logger.Log(LogLevel.Warn, "[" + parentAgent.Name + "] Cannot add formula '" + ff
-                    + "': is assignable from another formula in this workbench.");
-                    continue;
                 }
                 else
-                {
-                    //RemoveStatement contains already a lock for statements collection
-                    RemoveStatement(ff);
+                {   //Update the formula
+                    //Generalize the formula by cloning and converting each valued term to literal
+                    var generalized = ff.Generalize();
 
+                    //Remove the formula by using the generalized one
+                    RemoveStatement(generalized);
+
+                    //Add the updated formula
                     lock (statementsLock)
                     {
                         Statements.Add(ff);
@@ -228,18 +228,17 @@ namespace AgentLibrary
         }
 
         /// <summary>
-        /// Add a statement (as atomic formula) into this workbench.
-        /// </summary>
-        public void RemoveStatement(IList f)
-        {
-            foreach (IFormula ff in f)
-                RemoveStatement(ff);
-        }
-
-        /// <summary>
         /// Remove a statement from this workbench
         /// </summary>
         public void RemoveStatement(params IFormula[] f)
+        {
+            RemoveStatement(new List<IFormula>(f));
+        }
+
+        /// <summary>
+        /// Add a statement (as atomic formula) into this workbench.
+        /// </summary>
+        public void RemoveStatement(IList f)
         {
             foreach (IFormula ff in f)
             {
@@ -250,13 +249,14 @@ namespace AgentLibrary
                 }
 
                 var unrolled = FormulaUtils.UnrollFormula(ff);
-                foreach (IFormula unrolledFormula in unrolled)
-                    RemoveUnificablePredicates(unrolledFormula);
+                unrolled.ForEach(x => RemoveUnificablePredicates(x));
             }
         }
 
         /// <summary>
-        /// Given an atomic formula, test it in this workbench and delete the matching predicates
+        /// Given an atomic formula, test it in this workbench and delete the matching predicates. That is,
+        /// if a generic formula is given to be deleted, and in this workbench is found a formula that unify
+        /// with the generic one, delete the unified formula.
         /// </summary>
         /// <param name="formula">The formula to be deleted</param>
         private void RemoveUnificablePredicates(IFormula formula)

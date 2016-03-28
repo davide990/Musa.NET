@@ -34,20 +34,15 @@ namespace FormulaLibrary
 {
     public sealed class NotFormula : Formula, INotFormula, IEquatable<NotFormula>
     {
-		public IFormula Formula
+        public IFormula Formula
         {
             get;
             private set;
         }
 
-		public NotFormula(IFormula f)
+        public NotFormula(IFormula f)
         {
             Formula = f;
-        }
-
-        public override void Unify(List<IAssignment> assignment)
-        {
-            Formula.Unify(assignment);
         }
 
         public override FormulaType GetFormulaType()
@@ -103,7 +98,7 @@ namespace FormulaLibrary
 
         public override object Clone()
         {
-			return new NotFormula(Formula.Clone() as IFormula);
+            return new NotFormula(Formula.Clone() as IFormula);
         }
 
         public override string GetSource()
@@ -114,6 +109,21 @@ namespace FormulaLibrary
         public override void SetSource(string source)
         {
             Formula.SetSource(source);
+        }
+
+        public override void Unify(List<IAssignment> assignments)
+        {
+            Formula.Unify(assignments);
+        }
+
+        public override void Unify(params IAssignment[] assignments)
+        {
+            Formula.Unify(assignments);
+        }
+
+        public override IFormula Generalize()
+        {
+            return new NotFormula(Formula.Generalize());
         }
     }
 }

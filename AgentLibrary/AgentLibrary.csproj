@@ -65,6 +65,8 @@
     <Compile Include="Reasoner\AgentPerception.cs" />
     <Compile Include="AgentEvent.cs" />
     <Compile Include="Event\AgentEventKey.cs" />
+    <Compile Include="Attributes\EventAttribute.cs" />
+    <Compile Include="Event\EventTrigger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="UML\AgentLibrary.cd" />

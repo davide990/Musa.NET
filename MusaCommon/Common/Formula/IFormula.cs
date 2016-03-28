@@ -33,12 +33,14 @@ namespace MusaCommon
     {
         FormulaType GetFormulaType();
         void Unify(List<IAssignment> assignments);
+        void Unify(params IAssignment[] assignments);
 		bool IsParametric();
         new object Clone ();
         bool MatchWith(IFormula f, out List<IAssignment> generatedAssignment);
         bool IsAtomic();
         string GetSource();
         void SetSource(string source);
+        IFormula Generalize();
     }
 }
 

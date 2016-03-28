@@ -35,6 +35,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 
+
 namespace MusaInitializer
 {
     public static class MUSAInitializer
@@ -62,20 +63,27 @@ namespace MusaInitializer
             var env = AgentEnvironement.GetInstance();
 
             //Get the calling assembly
-            var entry_assembly = System.Reflection.Assembly.GetEntryAssembly();
+            var entry_assembly = Assembly.GetEntryAssembly();
 
             var class_list = from t in entry_assembly.GetExportedTypes()
-                             let attributes = t.GetCustomAttributes(typeof(AgentAttribute), false)
-                             where attributes != null && attributes.Length > 0
-                             select t;
+                                      let attributes = t.GetCustomAttributes(typeof(AgentAttribute), false)
+                                      where attributes != null && attributes.Length > 0
+                                      select t;
 
             var fp = ModuleProvider.Get().Resolve<IFormulaUtils>();
-            ConstructorInfo ctor = typeof(Agent).GetConstructor(new[] { typeof(string) });
+
 
             foreach (var agent_type in class_list)
             {
+                
+                //ConstructorInfo ctor = agent_type.GetConstructor(new[] { typeof(string) });
+
                 //Create a new instance of agent
-                var the_agent = ctor.Invoke(new object[] { agent_type.Name }) as Agent;
+                //var the_agent = ctor.Invoke(new object[] {})as Agent;
+                var the_agent = Activator.CreateInstance(agent_type) as Agent;
+                // ctor.Invoke(new object[] { agent_type.Name }) as Agent;
+
+
 
                 //Get the attributes [Belief] in the current agent type
                 var beliefs = agent_type.GetCustomAttributes<BeliefAttribute>();
@@ -87,10 +95,29 @@ namespace MusaInitializer
                     the_agent.AddBelief(the_belief);
                 }
 
+                //Get the nested plans
+                GetNestedPlans(agent_type, the_agent);
+
+                //Start the agent
+                the_agent.Start();
+
                 //Register the agent in the environment
                 env.RegisterAgent(the_agent);
             }
         }
+
+        private static void GetNestedPlans(Type agent_type, Agent agent)
+        {
+            //Get the plans classes within the input agent type
+            var plans = from t in agent_type.GetNestedTypes()
+                                 let attributes = t.GetCustomAttributes(typeof(PlanAttribute), false)
+                                 where attributes != null && attributes.Length > 0 && t.IsSubclassOf(typeof(PlanModel))
+                                 select t;
+
+            foreach (var Plan in plans)
+                agent.AddPlan(Plan);
+        }
+
     }
 }
 

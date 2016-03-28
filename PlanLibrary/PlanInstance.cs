@@ -46,14 +46,18 @@ namespace PlanLibrary
         /// <summary>
         /// The plan model this instance references to.
         /// </summary>
-        private readonly PlanModel plan_model;
+        public PlanModel PlanModel
+        {
+            get;
+            internal set;
+        }
 
         /// <summary>
         /// Gets the entry point method for this plan.
         /// </summary>
         private MethodInfo EntryPointMethod
         {
-            get { return plan_model.planEntryPointMethod; }
+            get { return PlanModel.planEntryPointMethod; }
         }
 
         /// <summary>
@@ -61,7 +65,7 @@ namespace PlanLibrary
         /// </summary>
         private List<PlanStep> PlanSteps
         {
-            get { return plan_model.Steps; }
+            get { return PlanModel.Steps; }
         }
 
         /// <summary>
@@ -104,23 +108,24 @@ namespace PlanLibrary
             private set;
         }
 
-        private IAgent SourceAgent
-        {
-            get;
-            set;
-        }
-
         /// <summary>
-        /// Gets or sets the workbench of the agent that owns this plan instance. When the agent executes
+        /// Gets or sets the workbench of the agent that owns this plan. When the agent executes
         /// this plan, the workbench is used to test plan's condition.
         /// </summary>
         /// <value>The agent workbench.</value>
         private IAgentWorkbench AgentWorkbench
         {
-            get
-            {
-                return SourceAgent.GetWorkbench();
-            }
+            get { return Parent.GetWorkbench(); }
+        }
+
+        /// <summary>
+        /// Gets the parent agent. Plans can be nested into agent classes, so this member provide an helpful way to access to parent agent
+        /// </summary>
+        /// <value>The parent.</value>
+        public IAgent Parent
+        {
+            get { return PlanModel.GetParent(); }
+            internal set { PlanModel.SetParent(value); }
         }
 
         #endregion Fields/Properties
@@ -144,12 +149,12 @@ namespace PlanLibrary
         /// </summary>
         public PlanInstance()
         {
-            plan_model = Activator.CreateInstance(typeof(T)) as PlanModel;
-            plan_model.RegisterResultEvent += OnRegisterResult;
-            plan_model.Log += Log;
+            PlanModel = Activator.CreateInstance(typeof(T)) as PlanModel;
+            PlanModel.RegisterResultEvent += OnRegisterResult;
+            PlanModel.Log += Log;
 		
             //add an event handler for step's execution
-            foreach (PlanStep step in plan_model.Steps)
+            foreach (PlanStep step in PlanModel.Steps)
                 step.ExecuteStep += onExecuteStep;
             	
             //Initialize the ManualResetEvent object
@@ -212,7 +217,7 @@ namespace PlanLibrary
         /// <param name="e">The plan's parameters. [e.Argument] is of type Dictionary<string, object></param>
         void onBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            if (plan_model == null)
+            if (PlanModel == null)
                 throw new Exception("Error: plan model is null");
 
             if (EntryPointMethod == null)
@@ -335,15 +340,15 @@ namespace PlanLibrary
 
             try
             {
-                EntryPointMethod.Invoke(plan_model, args);
+                EntryPointMethod.Invoke(PlanModel, args);
 
-                if (plan_model.StepsOrder.Count == 0)
+                if (PlanModel.StepsOrder.Count == 0)
                     return;
 
-                for (ushort i = 0; i < plan_model.StepsOrder.Count; i++)
+                for (ushort i = 0; i < PlanModel.StepsOrder.Count; i++)
                 {
-                    var the_name = plan_model.StepsOrder[i];
-                    var the_step = plan_model.Steps.Find(x => x.Name.Equals(the_name));
+                    var the_name = PlanModel.StepsOrder[i];
+                    var the_step = PlanModel.Steps.Find(x => x.Name.Equals(the_name));
 
                     if (checkTriggerCondition(the_step.TriggerCondition))
                         the_step.Execute();
@@ -407,18 +412,22 @@ namespace PlanLibrary
 
         public bool IsAtomic()
         {
-            return plan_model.IsAtomic;
+            return PlanModel.IsAtomic;
         }
 
         public IFormula GetTriggerCondition()
         {
-            return plan_model.TriggerCondition;
+            return PlanModel.TriggerCondition;
         }
 
-        public void SetSourceAgent(IAgent source)
+        public void SetSourceAgent(AgentPassport source)
         {
-            SourceAgent = source;
-            plan_model.SetSourceAgent(source);
+            PlanModel.SetSourceAgent(source);
+        }
+
+        public IPlanModel GetModel()
+        {
+            return PlanModel;   
         }
 
         #endregion IPlanInstance inherithed methods

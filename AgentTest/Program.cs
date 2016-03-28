@@ -7,7 +7,6 @@
         |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
 */
 using AgentLibrary;
-using AgentLibrary.Attributes;
 using FormulaLibrary;
 using MusaCommon;
 using MusaConfiguration;
@@ -115,7 +114,7 @@ namespace AgentTest
 
 
             var fp = ModuleProvider.Get().Resolve<IFormulaUtils>();
-            AgentEnvironement.GetInstance().RegisterStatement(fp.Parse("f(x)"));
+            AgentEnvironement.GetInstance().RegisterStatement(fp.Parse("f(3)"));
 
             BackgroundWorker bgwk = new BackgroundWorker();
             bgwk.DoWork += delegate
@@ -125,7 +124,7 @@ namespace AgentTest
 
                 var ag = AgentEnvironement.GetInstance().GetAgent("agent_1");
                 var ff = fp.Parse("have(beer,x)");
-                
+
                 List<IAssignment> assgnme;
                 List<IFormula> the_formula;
                 ag.TestCondition(ff, out the_formula, out assgnme);
@@ -150,6 +149,7 @@ namespace AgentTest
 
 
             //configureAndStartMusa();
+            
         }
 
         static void A_RegisterResult(string result)

@@ -41,25 +41,19 @@ namespace FormulaLibrary
             private set;
         }
 
-		public IFormula Right
+        public IFormula Right
         {
             get;
             private set;
         }
 
-		public AndFormula(IFormula Left, IFormula Right)
+        public AndFormula(IFormula Left, IFormula Right)
         {
             this.Left = Left;
             this.Right = Right;
         }
 
-        public override void Unify(List<IAssignment> assignment)
-        {
-            Right.Unify(assignment);
-            Left.Unify(assignment);
-        }
-
-        public IFormula this [string s]
+        public IFormula this[string s]
         {
             get
             {
@@ -70,7 +64,7 @@ namespace FormulaLibrary
             }
         }
 
-		public IFormula this [byte s]
+        public IFormula this[byte s]
         {
             get
             {
@@ -160,6 +154,23 @@ namespace FormulaLibrary
         {
             Left.SetSource(source);
             Right.SetSource(source);
+        }
+
+        public override void Unify(List<IAssignment> assignments)
+        {
+            Right.Unify(assignments);
+            Left.Unify(assignments);
+        }
+
+        public override void Unify(params IAssignment[] assignments)
+        {
+            Right.Unify(assignments);
+            Left.Unify(assignments);
+        }
+
+        public override IFormula Generalize()
+        {
+            return new AndFormula(Left.Generalize(), Right.Generalize());
         }
     }
 }

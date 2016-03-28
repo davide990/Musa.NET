@@ -89,6 +89,11 @@ namespace PlanLibrary
             return GetPlanInstanceTypeFor(PlanModel).GetMethod("Execute", BindingFlags.Public | BindingFlags.Instance);
         }
 
+        public void SetParentAgentFor(ref IPlanInstance plan, IAgent parent)
+        {
+            var planInstanceType = GetPlanInstanceTypeFor(plan.GetModel().GetType());
+            planInstanceType.GetProperty("Parent").SetValue(plan, parent);
+        }
     }
 }
 

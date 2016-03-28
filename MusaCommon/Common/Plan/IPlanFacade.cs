@@ -35,6 +35,7 @@ namespace MusaCommon
         IPlanCollection CreatePlanCollection();
         Type GetPlanInstanceTypeFor(Type planModel);
         MethodInfo GetExecuteMethodForPlan(Type PlanModel);
+        void SetParentAgentFor(ref IPlanInstance plan, IAgent parent);
     }
 }
 

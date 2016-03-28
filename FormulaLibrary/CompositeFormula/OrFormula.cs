@@ -75,12 +75,6 @@ namespace FormulaLibrary
             }
         }
 
-        public override void Unify(List<IAssignment> assignment)
-        {
-            Right.Unify(assignment);
-            Left.Unify(assignment);
-        }
-
         public bool Equals(OrFormula other)
         {
             return Left.Equals(other.Left) && Right.Equals(other.Right);
@@ -161,6 +155,23 @@ namespace FormulaLibrary
         {
             Left.SetSource(source);
             Right.SetSource(source);
+        }
+
+        public override void Unify(List<IAssignment> assignments)
+        {
+            Right.Unify(assignments);
+            Left.Unify(assignments);
+        }
+
+        public override void Unify(params IAssignment[] assignments)
+        {
+            Right.Unify(assignments);
+            Left.Unify(assignments);
+        }
+
+        public override IFormula Generalize()
+        {
+            return new OrFormula(Left.Generalize(), Right.Generalize());
         }
     }
 }

@@ -119,6 +119,7 @@ namespace AgentLibrary
                 }
             }
         }
+
         private Stack<Tuple<AgentPassport, AgentMessage>> mailBox;
         private object lock_mailBox = new object();
 
@@ -143,7 +144,8 @@ namespace AgentLibrary
         }
 
         /// <summary>
-        /// The plans collection.
+        /// The plans collection. The key is a plan model, the value is the
+        /// corresponding plan instance.
         /// </summary>
         private IPlanCollection PlansCollection;
 
@@ -230,10 +232,10 @@ namespace AgentLibrary
         /// </summary>
         public string Name
         {
-            get { return name; }
+            get;
+            private set;
         }
 
-        private readonly string name;
 
         /// <summary>
         /// Check if this agent is active (in other words, if this agent is doing a reasoning activity)
@@ -324,7 +326,7 @@ namespace AgentLibrary
         /// Create a new agent
         /// </summary>
         public Agent()
-            : this("agent_" + (new Random().Next(Int32.MaxValue)))
+            : this(null)//: this(GetType().Name)//"agent_" + (new Random().Next(Int32.MaxValue)))
         {
         }
 
@@ -335,9 +337,9 @@ namespace AgentLibrary
         public Agent(string agent_name)
         {
             if (string.IsNullOrEmpty(agent_name))
-                name = "agent_" + (new Random().Next(Int32.MaxValue));
+                Name = GetType().Name;//"agent_" + (new Random().Next(Int32.MaxValue));
             else
-                name = agent_name;
+                Name = agent_name;
 
             pause_requested = false;
             ID = Guid.NewGuid();
@@ -360,8 +362,11 @@ namespace AgentLibrary
             //Create a PlanCollection object
             PlansCollection = PlanFacade.CreatePlanCollection();
 
-            RegisterResultHandler = GetType().GetMethod("onPlanInstanceRegisterResult", BindingFlags.NonPublic | BindingFlags.Instance);
-            PlanFinishedHandler = GetType().GetMethod("onPlanInstanceFinished", BindingFlags.NonPublic | BindingFlags.Instance);
+            /*RegisterResultHandler = GetType().GetMethod("onPlanInstanceRegisterResult", BindingFlags.NonPublic | BindingFlags.Instance);
+            PlanFinishedHandler = GetType().GetMethod("onPlanInstanceFinished", BindingFlags.NonPublic | BindingFlags.Instance);*/
+
+            RegisterResultHandler = typeof(Agent).GetMethod("onPlanInstanceRegisterResult", BindingFlags.NonPublic | BindingFlags.Instance);
+            PlanFinishedHandler = typeof(Agent).GetMethod("onPlanInstanceFinished", BindingFlags.NonPublic | BindingFlags.Instance);
 
             Busy = false;
         }
@@ -404,10 +409,11 @@ namespace AgentLibrary
         internal void notifyEnvironementChanges(AgentPerception action, IList changes)
         {
             foreach (var v in changes)
-                Logger.Log(LogLevel.Trace, "[" + name + "] received " + action + " -> " + v);
+                Logger.Log(LogLevel.Trace, "[" + Name + "] received " + action + " -> " + v);
 
             PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(changes, action));
         }
+
         #region Agent's execution related methods
 
         /// <summary>
@@ -492,8 +498,12 @@ namespace AgentLibrary
             //Create a new plan instance
             var plan_instance = PlanFacade.CreatePlanInstance(PlanModel, this, RegisterResultHandler, PlanFinishedHandler, Logger);
 
+            //If the plan is nested inside the agent class
+            if (GetType().GetNestedTypes().Contains(PlanModel))
+                PlanFacade.SetParentAgentFor(ref plan_instance, this);
+            
             //Set the workbench where the plan's condition will be tested.
-            plan_instance.SetSourceAgent(this);
+            //plan_instance.SetSourceAgent(this);
 
             //Add the plan to the agent's plan collection
             PlansCollection.Add(PlanModel, plan_instance);
@@ -527,7 +537,7 @@ namespace AgentLibrary
         /// </summary>
         /// <param name="PlanModel">Plan.</param>
         /// <param name="args">Arguments.</param>
-        internal void ExecutePlan(Type PlanModel, IPlanArgs args = null)
+        internal void ExecutePlan(Type PlanModel, AgentPassport sourceAgent, IPlanArgs args = null)
         {
             if (Busy)
                 throw new Exception("Agent [" + Name + "] is currently executing plan " + CurrentExecutingPlan);
@@ -680,12 +690,13 @@ namespace AgentLibrary
 
         public void AddBelief(params IFormula[] formula)
         {
-            foreach (IFormula af in formula)
+            AddBelief(new List<IFormula>(formula));
+            /*foreach (IFormula af in formula)
             {
                 Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
                 Logger.Log(LogLevel.Debug, "[" + Name + "] Adding belief " + af);
                 PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.AddBelief));
-            }
+            }*/
         }
 
         public void AddBelief(IList formula_list)
@@ -700,12 +711,14 @@ namespace AgentLibrary
 
         public void UpdateBelief(params IFormula[] formula)
         {
+            UpdateBelief(new List<IFormula>(formula));
+/*
             foreach (IFormula af in formula)
             {
                 Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
                 Logger.Log(LogLevel.Debug, "[" + Name + "] Updating belief " + af);
                 PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.UpdateBelief));
-            }
+            }*/
         }
 
         public void UpdateBelief(IList formula_list)
@@ -714,6 +727,7 @@ namespace AgentLibrary
             {
                 Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
                 Logger.Log(LogLevel.Debug, "[" + Name + "] Updating belief " + af);
+
                 PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.UpdateBelief));
             }
         }
@@ -721,12 +735,13 @@ namespace AgentLibrary
 
         public void RemoveBelief(params IFormula[] formula)
         {
-            foreach (IFormula af in formula)
+            RemoveBelief(new List<IFormula>(formula));
+            /*foreach (IFormula af in formula)
             {
                 Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
                 Logger.Log(LogLevel.Debug, "[" + Name + "] Removing belief " + af);
                 PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.RemoveBelief));
-            }
+            }*/
         }
 
         public void RemoveBelief(IList formula_list)

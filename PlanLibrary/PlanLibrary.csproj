@@ -33,13 +33,11 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PlanEntryPoint.cs" />
-    <Compile Include="EventTrigger.cs" />
     <Compile Include="PlanCollection.cs" />
     <Compile Include="PlanInstance.cs" />
     <Compile Include="PlanModel.cs" />
     <Compile Include="PlanStep.cs" />
     <Compile Include="Attributes\AtomicPlanAttribute.cs" />
-    <Compile Include="Attributes\EventAttribute.cs" />
     <Compile Include="Attributes\PlanAttribute.cs" />
     <Compile Include="Attributes\PlanStepAttribute.cs" />
     <Compile Include="PlanFacade.cs" />

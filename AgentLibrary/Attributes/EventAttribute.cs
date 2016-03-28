@@ -27,7 +27,7 @@
 
 using System;
 
-namespace PlanLibrary
+namespace AgentLibrary.Attributes
 {
     /// <summary>
     /// Event.
@@ -81,10 +81,10 @@ namespace PlanLibrary
 
         public EventAttribute(string name, string condition, string plan_name, EventTrigger trigger = EventTrigger.AddStatement)
         {
-            this.EventName = name;
-            this.TriggerCondition = condition;
-            this.PlanName = plan_name;
-            this.Trigger = trigger;
+            EventName = name;
+            TriggerCondition = condition;
+            PlanName = plan_name;
+            Trigger = trigger;
         }
 
         public override string ToString()

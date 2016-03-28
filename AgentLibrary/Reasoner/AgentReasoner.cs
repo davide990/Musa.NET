@@ -330,7 +330,7 @@ namespace AgentLibrary
                     PlanArgs args = null;
 
                     //Achieve the goal
-                    achieveGoal(planToExecute, args);
+                    achieveGoal(planToExecute, sender_agent_passport, args);
                     break;
             }
         }
@@ -339,8 +339,10 @@ namespace AgentLibrary
         /// Achieves a goal.
         /// </summary>
         /// <param name="planToExecute">Plan to execute.</param>
+        /// <param name="sourceAgent">The source agent which communicated a knownledge for which the plan is being invoked. If null, 
+        /// this agent is executing the plan</param>
         /// <param name="args">Arguments.</param>
-        private void achieveGoal(Type planToExecute, PlanArgs args = null)
+        private void achieveGoal(Type planToExecute, AgentPassport sourceAgent, PlanArgs args = null)
         {
             //Check if user has been set any default argument to be passed when the agent perceive 
             //an Achieve type perception togheter with the specified plan. If any argument is found, is added
@@ -356,7 +358,7 @@ namespace AgentLibrary
             Logger.Log(LogLevel.Debug, "[" + parentAgent.Name + "] Achieving goal " + planToExecute.Name);
 
             //Execute the input plan to achieve the goal
-            parentAgent.ExecutePlan(planToExecute, defaultArgs);
+            parentAgent.ExecutePlan(planToExecute, sourceAgent, defaultArgs);
         }
 
         /// <summary>
@@ -380,7 +382,7 @@ namespace AgentLibrary
                     Type plan_to_execute = changes_list[0] as Type;
 
                     //Achieve the goal by executing the plan
-                    achieveGoal(plan_to_execute);
+                    achieveGoal(plan_to_execute, null);
                     break;
 
                 case AgentPerception.AddBelief:
@@ -453,7 +455,7 @@ namespace AgentLibrary
             EventsArgs.TryGetValue(new AgentEventKey(formula, perception_type), out args);
 
             //Execute the plan (if exists)
-            parentAgent.ExecutePlan(plan_to_execute, args);
+            parentAgent.ExecutePlan(plan_to_execute, null, args);
         }
 
         /// <summary>

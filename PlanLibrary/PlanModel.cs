@@ -148,16 +148,37 @@ namespace PlanLibrary
         /// <value>The agent workbench.</value>
         private IAgentWorkbench AgentWorkbench
         {
-            get
-            {
-                return SourceAgent.GetWorkbench();
-            }
+            get { return Parent.GetWorkbench(); }
         }
 
-        public IAgent SourceAgent
+        /// <summary>
+        /// Gets the source agent which communicated a knowledge for which this plan has been invoked (as result of an event trigger).
+        /// It is analogous to [source(X)] annotation in Jason/Agentspeak
+        /// </summary>
+        /// <value>The source agent.</value>
+        public AgentPassport SourceAgent
         {
             get;
             private set;
+        }
+
+        /// <summary>
+        /// Gets the parent agent. Plans can be nested into agent classes, so this member provide an helpful way to access to parent agent
+        /// </summary>
+        /// <value>The parent.</value>
+        protected IAgent Parent
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the logger.
+        /// </summary>
+        /// <value>The logger.</value>
+        protected ILogger Logger
+        {
+            get { return ModuleProvider.Get().Resolve<ILogger>(); }
         }
 
         #endregion Fields/Properties
@@ -409,11 +430,11 @@ namespace PlanLibrary
             RegisterResultEvent(result);
         }
 
-        internal void SetSourceAgent(IAgent source)
+        internal void SetSourceAgent(AgentPassport source)
         {
             SourceAgent = source;
         }
-    
+
         #endregion Methods
 
         public string GetEntryPointName()
@@ -429,6 +450,16 @@ namespace PlanLibrary
         public string GetPlanStepName()
         {
             return PlanStepName;
+        }
+
+        internal void SetParent(IAgent parent)
+        {
+            Parent = parent;
+        }
+
+        internal IAgent GetParent()
+        {
+            return Parent;
         }
 
         /// <summary>
