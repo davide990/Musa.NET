@@ -59,10 +59,9 @@ namespace AgentLibrary
         /// </summary>
         public DateTime CreatedAt
         {
-            get { return createdAt; }
+            get;
+            private set;
         }
-
-        private readonly DateTime createdAt;
 
         /// <summary>
         /// The belief set of this agent.
@@ -236,6 +235,11 @@ namespace AgentLibrary
             private set;
         }
 
+        public string CompleteName
+        {
+            get { return string.Format("{0}@{1}", Name, EnvironementIPAddress); }
+        }
+
 
         /// <summary>
         /// Check if this agent is active (in other words, if this agent is doing a reasoning activity)
@@ -369,6 +373,7 @@ namespace AgentLibrary
             PlanFinishedHandler = typeof(Agent).GetMethod("onPlanInstanceFinished", BindingFlags.NonPublic | BindingFlags.Instance);
 
             Busy = false;
+
         }
 
         #endregion
@@ -382,6 +387,11 @@ namespace AgentLibrary
         }
 
         #endregion
+
+        public virtual void onInit()
+        {
+
+        }
 
         #region Methods
 
@@ -501,7 +511,7 @@ namespace AgentLibrary
             //If the plan is nested inside the agent class
             if (GetType().GetNestedTypes().Contains(PlanModel))
                 PlanFacade.SetParentAgentFor(ref plan_instance, this);
-            
+
             //Set the workbench where the plan's condition will be tested.
             //plan_instance.SetSourceAgent(this);
 
@@ -554,6 +564,8 @@ namespace AgentLibrary
             //If the input plan has not been found within the agent's plans collection, throw an exception
             if (the_plan == null)
                 throw new Exception("Plan '" + PlanModel.Name + "' not found in agent [" + Name + "] plans collection.");
+
+            the_plan.SetSourceAgent(sourceAgent);
 
             //Get the plan's Execute() method
             MethodInfo execute_method = PlanFacade.GetExecuteMethodForPlan(PlanModel);
@@ -712,13 +724,13 @@ namespace AgentLibrary
         public void UpdateBelief(params IFormula[] formula)
         {
             UpdateBelief(new List<IFormula>(formula));
-/*
-            foreach (IFormula af in formula)
-            {
-                Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
-                Logger.Log(LogLevel.Debug, "[" + Name + "] Updating belief " + af);
-                PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.UpdateBelief));
-            }*/
+            /*
+                        foreach (IFormula af in formula)
+                        {
+                            Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
+                            Logger.Log(LogLevel.Debug, "[" + Name + "] Updating belief " + af);
+                            PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.UpdateBelief));
+                        }*/
         }
 
         public void UpdateBelief(IList formula_list)

@@ -48,11 +48,8 @@ namespace PlanLibrary
             private set;
         }
 
-        /// <summary>
-        /// Gets the expected result.
-        /// </summary>
-        /// <value>The expected result.</value>
-        public string ExpectedResult
+
+        public Type RescuePlan
         {
             get;
             private set;
@@ -253,7 +250,7 @@ namespace PlanLibrary
                                           where t != null
                                           select new {    AllowedRoles = attributes.AllowedRoles, 
                 TriggerCondition = attributes.TriggerCondition,
-                ExpectedResult = attributes.ExpectedResult};
+                RescuePlan = attributes.RescuePlan};
             
             //Raise an exception if the class/plan is not decorated with [Plan] attribute
             if (plan_attribute.ToList().Count <= 0)
@@ -266,7 +263,7 @@ namespace PlanLibrary
             parseTriggerCondition(triggerCondition);
 
             //Get the expected result
-            ExpectedResult = plan_attribute.ToList()[0].ExpectedResult;
+            RescuePlan = plan_attribute.ToList()[0].RescuePlan;
 
             foreach (var v in plan_attribute)
             {
@@ -475,6 +472,10 @@ namespace PlanLibrary
                 Log(LogLevel, message);
         }
 
+        public Type GetRescuePlan()
+        {
+            return RescuePlan;
+        }
 
     }
 }

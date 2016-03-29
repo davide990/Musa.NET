@@ -41,7 +41,7 @@ namespace AgentLibrary
 
         //TODO questi campi andranno rimossi in futuro
         private int currentReasoningCycle = 0;
-        private readonly int ReasoningUpdateTime = 2000;
+        private readonly int ReasoningUpdateTime = 100;
 
         /// <summary>
         /// The agent this reasoner belongs to
@@ -276,6 +276,9 @@ namespace AgentLibrary
             //Restore the time interval for the next reasoning cycle
             if (!Paused && !parentAgent.Busy)
                 reasoning_timer.Change(ReasoningUpdateTime, ReasoningUpdateTime);
+
+            if (currentReasoningCycle <= 1)
+                parentAgent.onInit();
         }
 
         /// <summary>
@@ -327,7 +330,10 @@ namespace AgentLibrary
 
                     Type planToExecute = parentAgent.Plans.Find(x => x.Name.Equals(msg.GetInformation() as string));
                     //TODO i parametri do stanno?
-                    PlanArgs args = null;
+
+                    PlanArgs args = new PlanArgs();
+                    foreach (var a in msg.Args)
+                        args.Add(a.Key, a.Value);
 
                     //Achieve the goal
                     achieveGoal(planToExecute, sender_agent_passport, args);
@@ -350,6 +356,8 @@ namespace AgentLibrary
             PlanArgs defaultArgs;
             EventsArgs.TryGetValue(new AgentEventKey(planToExecute.Name, AgentPerception.Achieve), out defaultArgs);
 
+            if (defaultArgs == null)
+                defaultArgs = new PlanArgs();
             //Merge the input args and the default args
             if (args != null)
                 defaultArgs.Merge(args);

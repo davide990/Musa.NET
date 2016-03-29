@@ -104,6 +104,9 @@ namespace MusaInitializer
                 //Register the agent in the environment
                 env.RegisterAgent(the_agent);
             }
+
+			/*foreach (var ag in env.RegisteredAgents)
+				ag.onInit ();*/
         }
 
         private static void GetNestedPlans(Type agent_type, Agent agent)

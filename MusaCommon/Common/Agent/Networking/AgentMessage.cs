@@ -30,6 +30,7 @@ using System.Runtime.Serialization;
 using System.Collections.Generic;
 using System.Text;
 using MusaCommon;
+using MusaCommon.Common.Agent.Networking;
 
 namespace MusaCommon
 {
@@ -87,7 +88,7 @@ namespace MusaCommon
         /// </summary>
         /// <value>The arguments.</value>
         [DataMember]
-        public IList<object> Args { get; set; }
+        public IList<AgentMessageArg> Args { get; set; }
 
         /// <summary>
         /// A timestamp indicating the period within which the message is to be considered valid
@@ -139,6 +140,8 @@ namespace MusaCommon
         public AgentMessage(object Info = null)
         {
             Message = new List<object>();
+            Args = new List<AgentMessageArg>();
+
             if (!string.IsNullOrEmpty(Info as string))
                 Message.Add(Info);
         }

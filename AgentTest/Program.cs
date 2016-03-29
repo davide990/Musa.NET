@@ -11,6 +11,7 @@ using FormulaLibrary;
 using MusaCommon;
 using MusaConfiguration;
 using MusaInitializer;
+using MusaLogger;
 using PlanLibrary;
 using System;
 using System.Collections.Generic;
@@ -108,9 +109,11 @@ namespace AgentTest
         {
             MUSAInitializer.Initialize();
 
-            MusaConfig.ReadFromFile("../../test_conf.xml");
+            //MusaConfig.ReadFromFile("../../test_conf.xml");
+            ModuleProvider.Get().Resolve<ILogger>().AddFragment(new ConsoleLoggerFragment());
+            ModuleProvider.Get().Resolve<ILogger>().SetMinimumLogLevel(1);
 
-            AgentEnvironement.GetInstance().RegisterAgentFromConfiguration();
+            //AgentEnvironement.GetInstance().RegisterAgentFromConfiguration();
 
 
             var fp = ModuleProvider.Get().Resolve<IFormulaUtils>();

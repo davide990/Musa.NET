@@ -12,12 +12,42 @@ namespace AgentTest
     [Belief("k(p)")]
     public class myAgent : Agent
     {
-
-
-        public myAgent()
+        public override void onInit()
         {
-            AddEvent("f(3)", AgentPerception.AddBelief, typeof(myPlan));
+            //AddEvent("f(3)", AgentPerception.AddBelief, typeof(myPlan));       
+            PlanArgs args = new PlanArgs();
+            args.Add("name", "davide");
+            AchieveGoal(typeof(get),args);
+        }
 
+
+        [Plan("has(\"beer\")", typeof(get2))]
+        public class get : PlanModel
+        {
+            [PlanEntryPoint]
+            void entry(PlanArgs args)
+            {
+
+                string name = args.GetArg<string>("name");
+
+                Console.WriteLine("Ciao " + name);
+                
+                //Console.WriteLine("WEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+                //.send(robot, achieve, has(owner,beer)).
+            }
+        }
+
+
+        [Plan("!has(\"beer\")")]
+        public class get2 : PlanModel
+        {
+            [PlanEntryPoint]
+            void entry(PlanArgs args)
+            {
+                //string product = args.GetArg<string>("product");
+                Console.WriteLine("WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                //.send(robot, achieve, has(owner,beer)).
+            }
         }
 
         [Plan]

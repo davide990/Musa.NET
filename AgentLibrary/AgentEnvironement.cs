@@ -242,8 +242,8 @@ namespace AgentLibrary
         /// </summary>
         public void RegisterAgent(Agent a)
         {
-            if (!RegisteredAgents.Contains(a))
-                RegisteredAgents.Add(a);
+			if (!RegisteredAgents.Contains (a)) 
+				RegisteredAgents.Add(a);
         }
 
         public Agent GetAgent(string name)

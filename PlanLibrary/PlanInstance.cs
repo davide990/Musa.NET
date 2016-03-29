@@ -152,11 +152,11 @@ namespace PlanLibrary
             PlanModel = Activator.CreateInstance(typeof(T)) as PlanModel;
             PlanModel.RegisterResultEvent += OnRegisterResult;
             PlanModel.Log += Log;
-		
+
             //add an event handler for step's execution
             foreach (PlanStep step in PlanModel.Steps)
                 step.ExecuteStep += onExecuteStep;
-            	
+
             //Initialize the ManualResetEvent object
             _busy = new ManualResetEvent(true);
         }
@@ -224,7 +224,7 @@ namespace PlanLibrary
                 throw new Exception("In plan " + Name + ": invalid entry point method.");
 
             //Takes the plan's arguments
-            IPlanArgs args = e.Argument as IPlanArgs;
+            PlanArgs args = e.Argument as PlanArgs;
 
             //If the plan step method has parameters
             if (EntryPointMethod.GetParameters().Length > 0)
@@ -238,12 +238,14 @@ namespace PlanLibrary
                         throw new Exception("In plan step" + Name + ": plan steps supports only a maximum of 1 parameter of type IAgentEventArgs.");
 
                     //Invoke the method
-                    InvokePlan(new object[]{ args });
+                    //InvokePlan(new object[]{ args });
+                    InvokePlan(args);
                 }
                 else
                 {
                     //If the passed args are null, invoke the method with an empty dictionary
-                    InvokePlan(new object[]{ new object() as IPlanArgs });
+                    //InvokePlan(new object[]{ new object() as IPlanArgs });
+                    InvokePlan(new PlanArgs());
                 }
             }
             else
@@ -317,7 +319,7 @@ namespace PlanLibrary
         {
             if (!background_worker.IsBusy)
                 return;
-			
+
             _busy.Close();
             background_worker.CancelAsync();
             background_worker.Dispose();
@@ -328,19 +330,27 @@ namespace PlanLibrary
         /// <summary>
         /// Invokes this plan's entry point method.
         /// </summary>
-        private void InvokePlan(object[] args)
+        private void InvokePlan(PlanArgs args)
         {
             //Check if plan's trigger condition is satisfied in invoking's parent workbench
             if (!checkTriggerCondition(GetTriggerCondition()))
             {
-                Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.DarkRed);
+                if (PlanModel.RescuePlan != null)
+                {
+                    Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Red);
+                    Logger.Log(LogLevel.Error, "Plan '" + Name + "' cannot be executed: trigger condition '" + GetTriggerCondition() + "' not satisfied. Trying to execute '" + PlanModel.RescuePlan.Name + "'");
+                    Parent.AchieveGoal(PlanModel.RescuePlan, args);
+                    return;
+                }
+
+                Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Red);
                 Logger.Log(LogLevel.Error, "Plan '" + Name + "' cannot be executed: trigger condition '" + GetTriggerCondition() + "' not satisfied in agent belief base.");
                 return;
             }
 
             try
             {
-                EntryPointMethod.Invoke(PlanModel, args);
+                EntryPointMethod.Invoke(PlanModel, new object[] { args });
 
                 if (PlanModel.StepsOrder.Count == 0)
                     return;
@@ -427,7 +437,7 @@ namespace PlanLibrary
 
         public IPlanModel GetModel()
         {
-            return PlanModel;   
+            return PlanModel;
         }
 
         #endregion IPlanInstance inherithed methods

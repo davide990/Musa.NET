@@ -1,4 +1,5 @@
 ﻿using MusaCommon;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -12,6 +13,7 @@ namespace MusaCommon
         bool TestCondition(IFormula formula);
         bool TestCondition(IFormula formula, out List<IAssignment> generated_assignments);
         bool TestCondition(IFormula formula, out List<IFormula> unifiedPredicates, out List<IAssignment> generated_assignments);
+        void AchieveGoal(Type Plan, PlanArgs Args = null);
         void AddBelief(IAgent source, params IFormula[] formula);
         void AddBelief(params IFormula[] formula);
         void AddBelief(IList formula_list);

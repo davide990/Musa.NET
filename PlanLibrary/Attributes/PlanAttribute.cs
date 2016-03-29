@@ -55,11 +55,7 @@ namespace PlanLibrary
             private set;
         }
 
-        /// <summary>
-        /// Gets the expected result.
-        /// </summary>
-        /// <value>The expected result.</value>
-        public string ExpectedResult
+        public Type RescuePlan
         {
             get;
             private set;
@@ -74,7 +70,6 @@ namespace PlanLibrary
             AllowedRoles = new List<string>();
             AllowedRoles.Add("all");
             TriggerCondition = "";
-            ExpectedResult = "";
         }
 
         public PlanAttribute(string trigger_condition)
@@ -82,23 +77,19 @@ namespace PlanLibrary
             AllowedRoles = new List<string>();
             AllowedRoles.Add("all");
             TriggerCondition = trigger_condition;
-            ExpectedResult = "";
         }
 
-        public PlanAttribute(string trigger_condition, string expected_result)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="trigger_condition"></param>
+        /// <param name="RescuePlan">The plan to invoke in case the trigger condition is not satisfied</param>
+        public PlanAttribute(string trigger_condition, Type rescuePlan)
         {
             AllowedRoles = new List<string>();
             AllowedRoles.Add("all");
             TriggerCondition = trigger_condition;
-            ExpectedResult = expected_result;
-        }
-
-        public PlanAttribute(string trigger_condition, string expected_result, params string[] allowed_roles)
-        {
-            AllowedRoles = new List<string>();
-            AllowedRoles.AddRange(allowed_roles);
-            TriggerCondition = trigger_condition;
-            ExpectedResult = expected_result;
+            RescuePlan = rescuePlan;
         }
 
         #endregion Constructors
