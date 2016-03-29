@@ -352,7 +352,7 @@ namespace AgentLibrary
             reasoner = new AgentReasoner(this);
             PerceivedEnvironementChanges = new Stack<Tuple<IList, AgentPerception>>();
             mailBox = new Stack<Tuple<AgentPassport, AgentMessage>>();
-            createdAt = DateTime.Now;
+            CreatedAt = DateTime.Now;
             resume_reasoning = false;
 
             //Inject the logger

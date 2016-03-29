@@ -29,6 +29,8 @@ namespace MusaLogger
         public WCFLoggerFragment()
         {
             Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
+            Enabled = true;
+            configured = false;
         }
 
 		public void configure()

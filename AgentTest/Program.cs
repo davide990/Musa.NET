@@ -111,7 +111,10 @@ namespace AgentTest
 
             //MusaConfig.ReadFromFile("../../test_conf.xml");
             ModuleProvider.Get().Resolve<ILogger>().AddFragment(new ConsoleLoggerFragment());
+            ModuleProvider.Get().Resolve<ILogger>().AddFragment<IFileLoggerFragment>();
+            ModuleProvider.Get().Resolve<ILogger>().GetFragment<IFileLoggerFragment>().SetFilename("/home/davide/musa_log.txt");
             ModuleProvider.Get().Resolve<ILogger>().SetMinimumLogLevel(1);
+
 
             //AgentEnvironement.GetInstance().RegisterAgentFromConfiguration();
 

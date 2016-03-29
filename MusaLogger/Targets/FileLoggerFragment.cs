@@ -30,7 +30,9 @@ namespace MusaLogger
 
 		public FileLoggerFragment ()
 		{
+            Layout = @"${date:format=HH\:mm\:ss}|${logger}|${level:uppercase=true}| ${message}";
 			configured = false;
+            Enabled = true;
 		}
 
 		void configure ()
