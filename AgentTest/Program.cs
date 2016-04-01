@@ -111,7 +111,8 @@ namespace AgentTest
 
             //MusaConfig.ReadFromFile("../../test_conf.xml");
             ModuleProvider.Get().Resolve<ILogger>().AddFragment(new ConsoleLoggerFragment());
-            ModuleProvider.Get().Resolve<ILogger>().SetMinimumLogLevel(0);
+            ModuleProvider.Get().Resolve<ILogger>().SetMinimumLogLevel(1);
+
 
             //AgentEnvironement.GetInstance().RegisterAgentFromConfiguration();
 

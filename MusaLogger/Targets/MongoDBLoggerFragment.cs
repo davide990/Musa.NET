@@ -63,6 +63,7 @@ namespace MusaLogger
 		public MongoDBLoggerFragment ()
 		{
 			configured = false;
+            Enabled = true;
 		}
 
 		/// <summary>
