@@ -25,15 +25,18 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+using MusaCommon;
+using System;
+using System.Collections.Generic;
 namespace AgentLibrary
 {
     /// <summary>
     /// A convinient enum to mark the changes that could occur within the 
     /// environment. These changes are perceived by the agents.
     /// </summary>
-    public enum AgentPerception
+    public enum AgentPerceptionType
     {
-        
+
         Null,                       //No changes occurred
         AddBelief,                  //A belief has been added
         RemoveBelief,               //A belief has been removed
@@ -43,6 +46,45 @@ namespace AgentLibrary
         UnSetBeliefValue,           //A belief's value must be unset
         Achieve,
         Test
+    }
+
+    public class AgentPerception
+    {
+        public string Formula
+        {
+            get;
+            private set;
+        }
+
+        public AgentPerceptionType PerceptionType
+        {
+            get;
+            private set;
+        }
+
+        public Type PlanToExecute
+        {
+            get;
+            private set;
+        }
+
+        public List<IAssignment> Args
+        {
+            get;
+            private set;
+        }
+
+        public AgentPerception(string formula, AgentPerceptionType perceptionType, Type planToExecute, List<IAssignment> args = null)
+        {
+            Formula = formula;
+            PerceptionType = perceptionType;
+            PlanToExecute = planToExecute;
+
+            Args = new List<IAssignment>();
+            if (args != null)
+                Args.AddRange(args);
+        }
+
     }
 }
 

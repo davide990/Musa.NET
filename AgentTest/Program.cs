@@ -79,7 +79,7 @@ namespace AgentTest
             a.AddPlan(typeof(HelloWorldPlan));
 
             var argss = new PlanArgs { { "nome", "davide" } };
-            a.AddEvent("f(3)", AgentPerception.AddBelief, typeof(HelloWorldPlan), argss);
+            a.AddEvent("f(3)", AgentPerceptionType.AddBelief, typeof(HelloWorldPlan), argss);
 
             //a.AddEvent ("f(x)", AgentPerception.RemoveBelief, typeof(PlanExample2));
             env.RegisterAgent(a);
@@ -111,7 +111,7 @@ namespace AgentTest
 
             //MusaConfig.ReadFromFile("../../test_conf.xml");
             ModuleProvider.Get().Resolve<ILogger>().AddFragment(new ConsoleLoggerFragment());
-            ModuleProvider.Get().Resolve<ILogger>().SetMinimumLogLevel(1);
+            ModuleProvider.Get().Resolve<ILogger>().SetMinimumLogLevel(0);
 
             //AgentEnvironement.GetInstance().RegisterAgentFromConfiguration();
 
@@ -122,10 +122,12 @@ namespace AgentTest
             BackgroundWorker bgwk = new BackgroundWorker();
             bgwk.DoWork += delegate
             {
-                Thread.Sleep(9000);
+                Thread.Sleep(3000);
                 //AgentEnvironement.GetInstance().RegisterStatement(fp.Parse("f(x)"));
 
-                var ag = AgentEnvironement.GetInstance().GetAgent("agent_1");
+                AgentEnvironement.GetInstance().RegisterStatement(fp.Parse("delivered(\"beer\",1,1)"));
+                
+                /*var ag = AgentEnvironement.GetInstance().GetAgent("agent_1");
                 var ff = fp.Parse("have(beer,x)");
 
                 List<IAssignment> assgnme;
@@ -135,7 +137,7 @@ namespace AgentTest
                 {
                     Console.WriteLine("VERIFICATA");
                 }
-
+                */
                 //TODO QUALCOSA NON VA
                 /*Thread.Sleep(5000);
                 AgentEnvironement.GetInstance().Serialize().Save(@"C:\Users\davide\my_agent.musa");*/

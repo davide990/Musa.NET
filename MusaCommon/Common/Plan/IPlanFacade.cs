@@ -25,6 +25,7 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace MusaCommon
@@ -34,6 +35,7 @@ namespace MusaCommon
         IPlanInstance CreatePlanInstance(Type PlanModel, object sender, MethodInfo RegisterResultDelegate, MethodInfo PlanFinishedDelegate, ILogger Logger);
         IPlanCollection CreatePlanCollection();
         Type GetPlanInstanceTypeFor(Type planModel);
+        List<string> GetPlanParameter(Type plan);
         MethodInfo GetExecuteMethodForPlan(Type PlanModel);
         void SetParentAgentFor(ref IPlanInstance plan, IAgent parent);
     }

@@ -5,6 +5,8 @@ using AgentLibrary;
 using MusaCommon;
 using System.Collections.Generic;
 using FormulaLibrary;
+using System.Threading;
+using PlanLibrary.Attributes;
 
 namespace AgentTest
 {
@@ -14,14 +16,23 @@ namespace AgentTest
     {
         public override void onInit()
         {
+            AddEvent("delivered(product,quantity,ID)", AgentPerceptionType.AddBelief, typeof(get));
+
             //AddEvent("f(3)", AgentPerception.AddBelief, typeof(myPlan));       
-            PlanArgs args = new PlanArgs();
+
+
+            /*PlanArgs args = new PlanArgs();
             args.Add("name", "davide");
-            AchieveGoal(typeof(get),args);
+            AchieveGoal(typeof(get),args);*/
+
+
+
+
+
         }
 
 
-        [Plan("has(\"beer\")", typeof(get2))]
+        [Plan]//("has(\"beer\")", typeof(get2))]
         public class get : PlanModel
         {
             [PlanEntryPoint]
@@ -30,22 +41,32 @@ namespace AgentTest
 
                 string name = args.GetArg<string>("name");
 
-                Console.WriteLine("Ciao " + name);
-                
+                for (int i = 0; i < 2; i++)
+                {
+                    Thread.Sleep(i * 1000);
+                    Console.WriteLine("Ciao " + name + "(" + i + ")");
+                }
+
+                AgentMessage msg = new AgentMessage("get2(\"beer\")", InformationType.Achieve);
+                Parent.SendMessage("myAgent", msg);
+
+
+
                 //Console.WriteLine("WEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
                 //.send(robot, achieve, has(owner,beer)).
             }
         }
 
 
-        [Plan("!has(\"beer\")")]
+        [Plan]//("!has(\"beer\")")]
+        [Parameter("product")]
         public class get2 : PlanModel
         {
             [PlanEntryPoint]
             void entry(PlanArgs args)
             {
-                //string product = args.GetArg<string>("product");
-                Console.WriteLine("WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                string product = args.GetArg<string>("product");
+                Console.WriteLine("WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA "+product);
                 //.send(robot, achieve, has(owner,beer)).
             }
         }
@@ -68,7 +89,7 @@ namespace AgentTest
                 Parent.UpdateBelief(the_formula);
 
                 var parent_name = Parent.GetName();
-                
+
             }
         }
 

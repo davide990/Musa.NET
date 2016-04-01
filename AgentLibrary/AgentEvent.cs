@@ -48,7 +48,7 @@ namespace AgentLibrary
         /// Gets the type of perception this event reacts to.
         /// </summary>
         /// <value>The perception.</value>
-        public AgentPerception Perception
+        public AgentPerceptionType Perception
         {
             get;
             private set;
@@ -98,7 +98,7 @@ namespace AgentLibrary
             Args = args;
         }
 
-        public AgentEvent(string formula, AgentPerception perception, Type plan,
+        public AgentEvent(string formula, AgentPerceptionType perception, Type plan,
                           PlanArgs args = null)
         {
             Formula = formula;

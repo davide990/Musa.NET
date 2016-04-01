@@ -47,7 +47,7 @@ namespace AgentLibrary
         /// The perception which the event that has this key reacts to.
         /// </summary>
         /// <value>The perception.</value>
-        public AgentPerception Perception
+        public AgentPerceptionType Perception
         {
             get;
             private set;
@@ -58,7 +58,7 @@ namespace AgentLibrary
         /// </summary>
         /// <param name="Formula">The formula which the event that has this key reacts to.</param>
         /// <param name="Perception">The perception which the event that has this key reacts to.</param>
-        public AgentEventKey(string Formula, AgentPerception Perception)
+        public AgentEventKey(string Formula, AgentPerceptionType Perception)
         {
             this.Formula = Formula;
             this.Perception = Perception;

@@ -32,6 +32,7 @@ using System;
 using AgentLibrary;
 using MusaCommon;
 using System.Text;
+using System.Linq;
 
 namespace AgentLibrary
 {
@@ -41,7 +42,7 @@ namespace AgentLibrary
 
         //TODO questi campi andranno rimossi in futuro
         private int currentReasoningCycle = 0;
-        private readonly int ReasoningUpdateTime = 100;
+        private readonly int ReasoningUpdateTime = 1000;
 
         /// <summary>
         /// The agent this reasoner belongs to
@@ -100,7 +101,7 @@ namespace AgentLibrary
         /// collection, and therefore it's triggered during the reasoning cycle 
         /// of the agent.
         /// </summary>
-        private Stack<Tuple<string, AgentPerception, Type>> PerceivedEvents
+        private Stack<AgentPerception> PerceivedEvents
         {
             get { return perceived_events; }
             set
@@ -112,7 +113,7 @@ namespace AgentLibrary
             }
         }
 
-        private Stack<Tuple<string, AgentPerception, Type>> perceived_events;
+        private Stack<AgentPerception> perceived_events;
         private object events_lock;
 
         /// <summary>
@@ -180,7 +181,7 @@ namespace AgentLibrary
             is_running_lock = new object();
 
             EventsCatalogue = new Dictionary<AgentEventKey, Type>();
-            PerceivedEvents = new Stack<Tuple<string, AgentPerception, Type>>();
+            PerceivedEvents = new Stack<AgentPerception>();
             EventsArgs = new Dictionary<AgentEventKey, PlanArgs>();
 
             Paused = false;
@@ -325,20 +326,50 @@ namespace AgentLibrary
                     break;
 
                 case InformationType.Achieve:
-                    if (string.IsNullOrEmpty(messageContent))
-                        throw new Exception("Received an empty message. Cannot achieve any goal.");
-
-                    Type planToExecute = parentAgent.Plans.Find(x => x.Name.Equals(msg.GetInformation() as string));
-                    //TODO i parametri do stanno?
-
-                    PlanArgs args = new PlanArgs();
-                    foreach (var a in msg.Args)
-                        args.Add(a.Key, a.Value);
-
-                    //Achieve the goal
-                    achieveGoal(planToExecute, sender_agent_passport, args);
+                    HandleAchieveTypeMessage(sender_agent_passport, msg);
                     break;
             }
+        }
+
+        /// <summary>
+        /// Handle the messages of type "Achieve"
+        /// </summary>
+        /// <param name="sender">The sender of the message</param>
+        /// <param name="msg">The message</param>
+        private void HandleAchieveTypeMessage(AgentPassport sender, AgentMessage msg)
+        {
+            dynamic messageContent = msg.GetInformation();
+
+            if (string.IsNullOrEmpty(messageContent))
+                throw new Exception("Received an empty message. Cannot achieve any goal.");
+
+            //Get the formula inside the message
+            var the_formula = ModuleProvider.Get().Resolve<IFormulaUtils>().Parse(messageContent) as IAtomicFormula;
+
+            //The plan to execute is the functor of the received atomic formula
+            var plan_name = the_formula.GetFunctor();
+
+            //Get the valued terms into the formula
+            var valuedTerms = the_formula.GetTerms().Where(x => !x.IsLiteral()).ToList();
+
+            //Get the plan's type 
+            Type planToExecute = parentAgent.Plans.Find(x => x.Name.Equals(plan_name));
+
+            //Get the parameters name of the parameters of the plan
+            var planParamNames = ModuleProvider.Get().Resolve<IPlanFacade>().GetPlanParameter(planToExecute);
+
+            //Link plan's parameters to the passed user values
+            PlanArgs args = new PlanArgs();
+            int limit = Math.Min(planParamNames.Count, valuedTerms.Count);
+            for (int i = 0; i < limit; i++)
+                args.Add(planParamNames[i], valuedTerms[i].GetValue());
+
+            //Add the other args contained into the message
+            foreach (var a in msg.Args)
+                args.Add(a.Key, a.Value);
+
+            //Achieve the goal
+            achieveGoal(planToExecute, sender, args);
         }
 
         /// <summary>
@@ -354,7 +385,7 @@ namespace AgentLibrary
             //an Achieve type perception togheter with the specified plan. If any argument is found, is added
             //to the input argument list.
             PlanArgs defaultArgs;
-            EventsArgs.TryGetValue(new AgentEventKey(planToExecute.Name, AgentPerception.Achieve), out defaultArgs);
+            EventsArgs.TryGetValue(new AgentEventKey(planToExecute.Name, AgentPerceptionType.Achieve), out defaultArgs);
 
             if (defaultArgs == null)
                 defaultArgs = new PlanArgs();
@@ -379,13 +410,14 @@ namespace AgentLibrary
                 return;
 
             //Get the last change within the environment
-            Tuple<IList, AgentPerception> p = parentAgent.PerceivedEnvironementChanges.Pop();
+            //Tuple<IList, AgentPerceptionType> p = parentAgent.PerceivedEnvironementChanges.Pop();
+            Tuple<IList, AgentPerceptionType> p = parentAgent.PerceivedEnvironementChanges.Dequeue();
             IList changes_list = p.Item1;
-            AgentPerception perception_type = p.Item2;
+            AgentPerceptionType perception_type = p.Item2;
 
             switch (perception_type)
             {
-                case AgentPerception.Achieve:
+                case AgentPerceptionType.Achieve:
                     //Get the agent which has to be executed
                     Type plan_to_execute = changes_list[0] as Type;
 
@@ -393,22 +425,22 @@ namespace AgentLibrary
                     achieveGoal(plan_to_execute, null);
                     break;
 
-                case AgentPerception.AddBelief:
+                case AgentPerceptionType.AddBelief:
                     //Tell the agent to add the beliefs to its workbench
                     parentAgent.Workbench.AddStatement(changes_list);
                     checkExternalEvents(changes_list, perception_type);
                     break;
 
-                case AgentPerception.RemoveBelief:
+                case AgentPerceptionType.RemoveBelief:
                     parentAgent.Workbench.RemoveStatement(changes_list);
                     checkExternalEvents(changes_list, perception_type);
                     break;
 
-                case AgentPerception.UpdateBelief:
+                case AgentPerceptionType.UpdateBelief:
                     parentAgent.Workbench.UpdateStatement(changes_list);
                     break;
 
-                case AgentPerception.Null:
+                case AgentPerceptionType.Null:
                 default:
                     throw new NotImplementedException();
             }
@@ -420,22 +452,38 @@ namespace AgentLibrary
         /// 
         /// The perceived changes in the environment could trigger (external) events.
         /// </summary>
-        private void checkExternalEvents(IList changes_list, AgentPerception perception_type)
+        private void checkExternalEvents(IList changes_list, AgentPerceptionType perception_type)
         {
             Type plan_to_execute = null;
+
+            var allEventsFormula = EventsCatalogue.Keys;
+            var fp = ModuleProvider.Get().Resolve<IFormulaUtils>();
 
             //Iterate each agent's perceived change in the environment
             foreach (IAtomicFormula formula in changes_list)
             {
-                //Check if an handler for the perceived change exists.
-                EventsCatalogue.TryGetValue(new AgentEventKey(formula.ToString(), perception_type), out plan_to_execute);
+                //For each registered event in the events catalogue
+                foreach (var Event in EventsCatalogue)
+                {
+                    //Check if the formula of an event match with the perceived formula
+                    List<IAssignment> assignments;
+                    if (!formula.MatchWith(fp.Parse(Event.Key.Formula), out assignments))
+                        continue;
 
-                //If exists, an external event is triggered, and a specific plan is triggered.
-                if (plan_to_execute != null)
-                    PerceivedEvents.Push(new Tuple<string, AgentPerception, Type>(formula.ToString(), perception_type, plan_to_execute));
+                    //If a match occour, unify the 
+                    var trigger = formula.Clone() as IFormula;
+                    trigger.Unify(assignments);
 
-                //set plan_to_execute to null for the next iteration
-                plan_to_execute = null;
+                    //Search for the plan that has to be invoked as result of the event
+                    EventsCatalogue.TryGetValue(new AgentEventKey(Event.Key.Formula, perception_type), out plan_to_execute);
+
+                    //Add a new event to the event stack
+                    if (plan_to_execute != null)
+                        PerceivedEvents.Push(new AgentPerception(trigger.ToString(), perception_type, plan_to_execute, assignments));
+
+                    //set plan_to_execute to null for the next iteration
+                    plan_to_execute = null;
+                }
             }
         }
 
@@ -449,18 +497,23 @@ namespace AgentLibrary
                 return;
 
             //Get the top event, and its info
-            Tuple<string, AgentPerception, Type> eventTuple = PerceivedEvents.Pop();
+            AgentPerception perception = PerceivedEvents.Pop();
 
-            string formula = eventTuple.Item1;
-            AgentPerception perception_type = eventTuple.Item2;
-            Type plan_to_execute = eventTuple.Item3;
+            string formula = perception.Formula;
+            AgentPerceptionType perception_type = perception.PerceptionType;
+            Type plan_to_execute = perception.PlanToExecute;
 
             Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Cyan);
             Logger.Log(LogLevel.Debug, "[{0}] Triggering event {" + "[" + parentAgent.Name + "] Triggering event {" + formula + "->" + perception_type + "->" + plan_to_execute.Name + "}");
 
             //Try get values related to this event
-            PlanArgs args = null;
+            PlanArgs args;
             EventsArgs.TryGetValue(new AgentEventKey(formula, perception_type), out args);
+
+            if (args == null)
+                args = new PlanArgs();
+
+            args.Add(perception.Args.ToArray());
 
             //Execute the plan (if exists)
             parentAgent.ExecutePlan(plan_to_execute, null, args);
@@ -485,7 +538,7 @@ namespace AgentLibrary
         /// <param name="Plan">The plan to execute.</param>
         /// <param name="Args">The arguments to be passed to the plan invoked
         /// when this event is being triggered.</param>
-        public void AddEvent(string formula, AgentPerception perception, Type Plan, PlanArgs Args = null)
+        public void AddEvent(string formula, AgentPerceptionType perception, Type Plan, PlanArgs Args = null)
         {
             //If Plan is not of type PlanModel, then throw an exception
             if (!(typeof(IPlanModel).IsAssignableFrom(Plan)))

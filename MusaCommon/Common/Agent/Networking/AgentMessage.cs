@@ -146,6 +146,16 @@ namespace MusaCommon
                 Message.Add(Info);
         }
 
+        public AgentMessage(object Info, InformationType infoType = InformationType.Tell)
+        {
+            Message = new List<object>();
+            Args = new List<AgentMessageArg>();
+            InfoType = infoType;
+
+            if (!string.IsNullOrEmpty(Info as string))
+                Message.Add(Info);
+        }
+
         /// <summary>
         /// Return a clone of this message. By default, the cloned message
         /// doesn't contains the information.

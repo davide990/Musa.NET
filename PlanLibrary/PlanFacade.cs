@@ -27,6 +27,8 @@
 using System;
 using MusaCommon;
 using System.Reflection;
+using System.Collections.Generic;
+using PlanLibrary.Attributes;
 
 
 namespace PlanLibrary
@@ -83,6 +85,20 @@ namespace PlanLibrary
         {
             return typeof(PlanInstance<>).MakeGenericType(planModel);
         }
+
+        public List<string> GetPlanParameter(Type plan)
+        {
+            if (!typeof(IPlanModel).IsAssignableFrom(plan))
+                return null;
+
+            List<string> prm = new List<string>();
+
+            foreach (var p in plan.GetCustomAttributes<ParameterAttribute>())
+                prm.AddRange(p.Params);
+
+            return prm;
+        }
+
 
         public MethodInfo GetExecuteMethodForPlan(Type PlanModel)
         {

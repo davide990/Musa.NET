@@ -31,12 +31,22 @@ using System.Reflection;
 using System;
 using MusaCommon;
 using System.Text;
+using PlanLibrary.Attributes;
 
 namespace PlanLibrary
 {
     public abstract class PlanModel : IPlanModel
     {
         #region Fields/Properties
+
+        /// <summary>
+        /// The names of the parameters this plan supports
+        /// </summary>
+        public List<string> Parameters
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// Gets the allowed roles.
@@ -206,6 +216,7 @@ namespace PlanLibrary
             AllowedRoles = new HashSet<string>();
             Steps = new List<PlanStep>();
             StepsOrder = new List<string>();
+            Parameters = new List<string>();
 
             try
             {
@@ -270,6 +281,10 @@ namespace PlanLibrary
                 foreach (string role in v.AllowedRoles)
                     AllowedRoles.Add(role);
             }
+
+            //Parse the parameters name
+            foreach(var p in GetType().GetCustomAttributes<ParameterAttribute>())
+                Parameters.AddRange(p.Params);
         }
 
         /// <summary>

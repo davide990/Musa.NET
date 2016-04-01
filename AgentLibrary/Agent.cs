@@ -79,7 +79,7 @@ namespace AgentLibrary
         /// 
         /// Ogni percezione può coinvolgere più di una singola credenza
         /// </summary>
-        public Stack<Tuple<IList, AgentPerception>> PerceivedEnvironementChanges
+        public Queue<Tuple<IList, AgentPerceptionType>> PerceivedEnvironementChanges
         {
             get
             {
@@ -97,7 +97,7 @@ namespace AgentLibrary
             }
         }
 
-        private Stack<Tuple<IList, AgentPerception>> perceivedEnvironementChanges;
+        private Queue<Tuple<IList, AgentPerceptionType>> perceivedEnvironementChanges;
         private object lock_perceivedEnvironmentChanges = new object();
 
         /// <summary>
@@ -350,9 +350,9 @@ namespace AgentLibrary
             roles = new List<AgentRole>();
             Workbench = new AgentWorkbench(this);
             reasoner = new AgentReasoner(this);
-            PerceivedEnvironementChanges = new Stack<Tuple<IList, AgentPerception>>();
+            PerceivedEnvironementChanges = new Queue<Tuple<IList, AgentPerceptionType>>();
             mailBox = new Stack<Tuple<AgentPassport, AgentMessage>>();
-            createdAt = DateTime.Now;
+            CreatedAt = DateTime.Now;
             resume_reasoning = false;
 
             //Inject the logger
@@ -388,10 +388,12 @@ namespace AgentLibrary
 
         #endregion
 
+        /// <summary>
+        /// This method is invoked after agent's preliminary initialization. Put agent's events or
+        /// belief here.
+        /// </summary>
         public virtual void onInit()
-        {
-
-        }
+        {}
 
         #region Methods
 
@@ -416,12 +418,12 @@ namespace AgentLibrary
         /// <param name="changes">The data that involved in the environment 
         /// change. Each element of [changes] is a formula to be added to this 
         /// agent's workbench</param>
-        internal void notifyEnvironementChanges(AgentPerception action, IList changes)
+        internal void notifyEnvironementChanges(AgentPerceptionType action, IList changes)
         {
             foreach (var v in changes)
                 Logger.Log(LogLevel.Trace, "[" + Name + "] received " + action + " -> " + v);
 
-            PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(changes, action));
+            PerceivedEnvironementChanges.Enqueue(new Tuple<IList, AgentPerceptionType>(changes, action));
         }
 
         #region Agent's execution related methods
@@ -549,8 +551,8 @@ namespace AgentLibrary
         /// <param name="args">Arguments.</param>
         internal void ExecutePlan(Type PlanModel, AgentPassport sourceAgent, IPlanArgs args = null)
         {
-            if (Busy)
-                throw new Exception("Agent [" + Name + "] is currently executing plan " + CurrentExecutingPlan);
+            //if (Busy)
+            //    throw new Exception("Agent [" + Name + "] is currently executing plan " + CurrentExecutingPlan);
 
             //If Plan doesn't implement IPlanModel, then throw an exception
             if (!(typeof(IPlanModel).IsAssignableFrom(PlanModel)))
@@ -571,7 +573,7 @@ namespace AgentLibrary
             MethodInfo execute_method = PlanFacade.GetExecuteMethodForPlan(PlanModel);
 
             //Set the agent to busy
-            Busy = true;
+            //Busy = true;
 
             //Set the value for CurrentExecutingPlan 
             CurrentExecutingPlan = the_plan;
@@ -581,8 +583,8 @@ namespace AgentLibrary
 
             //TODO [ALTA PRIORITÀ] migliorare il sistema di bloccaggio dell'agente
             //Lock the agent's reasoning life cycle until the invoked plan terminates its execution
-            while (Busy)
-                ;
+            /*while (Busy)
+                ;*/
         }
 
         #endregion Agent's plans related methods
@@ -655,12 +657,12 @@ namespace AgentLibrary
                 throw new ArgumentNullException("Plan", "Argument #1 'Plan' cannot be null.");
 
             //Set the achievement of the plan [Plan] as an agent's perception
-            PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(new List<Type> { Plan }, AgentPerception.Achieve));
+            PerceivedEnvironementChanges.Enqueue(new Tuple<IList, AgentPerceptionType>(new List<Type> { Plan }, AgentPerceptionType.Achieve));
 
             //Set the parameters to be used when the plan [Plan] is invoked
             //TODO ATTENZIONE QUI
             if (Args != null)
-                reasoner.EventsArgs.Add(new AgentEventKey(Plan.Name, AgentPerception.Achieve), Args);
+                reasoner.EventsArgs.Add(new AgentEventKey(Plan.Name, AgentPerceptionType.Achieve), Args);
         }
 
         /// <summary>
@@ -671,7 +673,7 @@ namespace AgentLibrary
         /// <param name="Plan">The plan to be invoked when the event is triggered.</param>
         /// <param name="Args">The argument to be passed to the invoked plan
         /// when the event is triggered.</param>
-        public void AddEvent(string formula, AgentPerception perception, Type Plan, PlanArgs Args = null)
+        public void AddEvent(string formula, AgentPerceptionType perception, Type Plan, PlanArgs Args = null)
         {
             reasoner.AddEvent(formula, perception, Plan, Args);
         }
@@ -696,7 +698,7 @@ namespace AgentLibrary
 
                 var unrolled = FormulaUtils.UnrollFormula(af);
                 unrolled.ForEach(x => x.SetSource(source.GetName()));
-                PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(unrolled, AgentPerception.AddBelief));
+                PerceivedEnvironementChanges.Enqueue(new Tuple<IList, AgentPerceptionType>(unrolled, AgentPerceptionType.AddBelief));
             }
         }
 
@@ -717,7 +719,7 @@ namespace AgentLibrary
             {
                 Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
                 Logger.Log(LogLevel.Debug, "[" + Name + "] Adding belief " + af);
-                PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.AddBelief));
+                PerceivedEnvironementChanges.Enqueue(new Tuple<IList, AgentPerceptionType>(FormulaUtils.UnrollFormula(af), AgentPerceptionType.AddBelief));
             }
         }
 
@@ -740,7 +742,7 @@ namespace AgentLibrary
                 Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
                 Logger.Log(LogLevel.Debug, "[" + Name + "] Updating belief " + af);
 
-                PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.UpdateBelief));
+                PerceivedEnvironementChanges.Enqueue(new Tuple<IList, AgentPerceptionType>(FormulaUtils.UnrollFormula(af), AgentPerceptionType.UpdateBelief));
             }
         }
 
@@ -762,7 +764,7 @@ namespace AgentLibrary
             {
                 Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
                 Logger.Log(LogLevel.Debug, "[" + Name + "] Removing belief " + af);
-                PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.RemoveBelief));
+                PerceivedEnvironementChanges.Enqueue(new Tuple<IList, AgentPerceptionType>(FormulaUtils.UnrollFormula(af), AgentPerceptionType.RemoveBelief));
             }
         }
 

@@ -36,7 +36,7 @@ namespace MusaCommon
     /// </summary>
     public class PlanArgs : IPlanArgs
     {
-        readonly Dictionary<string,object> internalDict = new Dictionary<string,object>();
+        readonly Dictionary<string, object> internalDict = new Dictionary<string, object>();
 
         public String Name { get; set; }
 
@@ -47,7 +47,9 @@ namespace MusaCommon
         {
             object the_value;
             TryGetValue(key, out the_value);
-            return (T)the_value;
+            if (the_value != null)
+                return (T)the_value;
+            return default(T);
         }
 
         public object GetArg(string key)
@@ -68,12 +70,12 @@ namespace MusaCommon
                 return null;
 
             return GetArg(key).GetType();
-            
+
         }
 
         public ICollection<object> GetAllArgs()
         {
-            return Values;   
+            return Values;
         }
 
         #endregion Custom methods
@@ -81,6 +83,13 @@ namespace MusaCommon
         public void Add(string key, object value)
         {
             internalDict.Add(key, value);
+        }
+
+
+        public void Add(params IAssignment[] assignments)
+        {
+            foreach (IAssignment a in assignments)
+                internalDict.Add(a.GetName(), a.GetValue());
         }
 
         public bool ContainsKey(string key)
@@ -108,7 +117,7 @@ namespace MusaCommon
             get { return internalDict.Values; }
         }
 
-        public object this [string key]
+        public object this[string key]
         {
             get
             {
@@ -167,7 +176,7 @@ namespace MusaCommon
         #region IEnumerable<KeyValuePair<string,object>> Members
 
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
-        {    
+        {
             return internalDict.GetEnumerator();
         }
 

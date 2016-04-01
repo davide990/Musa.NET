@@ -212,11 +212,11 @@ namespace AgentLibrary
             foreach (Agent a in RegisteredAgents)
             {
                 if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
-                    a.notifyEnvironementChanges(AgentPerception.SetBeliefValue, e.NewItems);
+                    a.notifyEnvironementChanges(AgentPerceptionType.SetBeliefValue, e.NewItems);
                 else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
-                    a.notifyEnvironementChanges(AgentPerception.UnSetBeliefValue, e.OldItems);
+                    a.notifyEnvironementChanges(AgentPerceptionType.UnSetBeliefValue, e.OldItems);
                 else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
-                    a.notifyEnvironementChanges(AgentPerception.UpdateBeliefValue, e.OldItems);
+                    a.notifyEnvironementChanges(AgentPerceptionType.UpdateBeliefValue, e.OldItems);
             }
         }
 
@@ -229,9 +229,9 @@ namespace AgentLibrary
             foreach (Agent a in RegisteredAgents)
             {
                 if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
-                    a.notifyEnvironementChanges(AgentPerception.AddBelief, e.NewItems);
+                    a.notifyEnvironementChanges(AgentPerceptionType.AddBelief, e.NewItems);
                 else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
-                    a.notifyEnvironementChanges(AgentPerception.RemoveBelief, e.OldItems);
+                    a.notifyEnvironementChanges(AgentPerceptionType.RemoveBelief, e.OldItems);
             }
         }
 
@@ -461,7 +461,7 @@ namespace AgentLibrary
                 try
                 {
                     //Parse the perception this event reacts to
-                    var perception = (AgentPerception)Enum.Parse(typeof(AgentPerception), ev.perception);
+                    var perception = (AgentPerceptionType)Enum.Parse(typeof(AgentPerceptionType), ev.perception);
 
                     //Parse the plan that must be invoked when this event is triggered
                     var the_plan = ag_plans.Find(x => x.Name.Equals(ev.plan));

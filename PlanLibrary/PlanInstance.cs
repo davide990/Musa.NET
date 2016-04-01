@@ -168,7 +168,7 @@ namespace PlanLibrary
         {
             background_worker = new BackgroundWorker();
 
-            background_worker.DoWork += onBackgroundWorker_DoWork;
+            //background_worker.DoWork += onBackgroundWorker_DoWork;
             background_worker.RunWorkerCompleted += onBackgroundWorker_WorkCompleted;
             background_worker.ProgressChanged += onBackgroundWorker_ProgressChanged;
 
@@ -214,8 +214,8 @@ namespace PlanLibrary
         /// Execute this plan in background.
         /// </summary>
         /// <param name="sender">Sender.</param>
-        /// <param name="e">The plan's parameters. [e.Argument] is of type Dictionary<string, object></param>
-        void onBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        /// <param name="e">The plan's parameters. [e.Argument] is of type PlanArgs<string, object></param>
+        void onBackgroundWorker_DoWork(object sender, PlanArgs args)//DoWorkEventArgs e)
         {
             if (PlanModel == null)
                 throw new Exception("Error: plan model is null");
@@ -224,7 +224,7 @@ namespace PlanLibrary
                 throw new Exception("In plan " + Name + ": invalid entry point method.");
 
             //Takes the plan's arguments
-            PlanArgs args = e.Argument as PlanArgs;
+            //PlanArgs args = e.Argument as PlanArgs;
 
             //If the plan step method has parameters
             if (EntryPointMethod.GetParameters().Length > 0)
@@ -238,13 +238,11 @@ namespace PlanLibrary
                         throw new Exception("In plan step" + Name + ": plan steps supports only a maximum of 1 parameter of type IAgentEventArgs.");
 
                     //Invoke the method
-                    //InvokePlan(new object[]{ args });
                     InvokePlan(args);
                 }
                 else
                 {
                     //If the passed args are null, invoke the method with an empty dictionary
-                    //InvokePlan(new object[]{ new object() as IPlanArgs });
                     InvokePlan(new PlanArgs());
                 }
             }
@@ -281,6 +279,9 @@ namespace PlanLibrary
         /// </summary>
         public void Execute(IPlanArgs args = null)
         {
+            onBackgroundWorker_DoWork(null, args as PlanArgs);
+
+            /*
             if (background_worker == null)
                 initializeBackgroundWorker();
 
@@ -291,7 +292,7 @@ namespace PlanLibrary
             {
                 //TODO decidere se generare una eccezione o non fare nulla
                 throw new Exception("Plan '" + Name + "' already running.");
-            }
+            }*/
         }
 
         /// <summary>
@@ -339,6 +340,7 @@ namespace PlanLibrary
                 {
                     Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Red);
                     Logger.Log(LogLevel.Error, "Plan '" + Name + "' cannot be executed: trigger condition '" + GetTriggerCondition() + "' not satisfied. Trying to execute '" + PlanModel.RescuePlan.Name + "'");
+                    
                     Parent.AchieveGoal(PlanModel.RescuePlan, args);
                     return;
                 }
