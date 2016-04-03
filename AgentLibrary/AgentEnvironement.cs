@@ -35,6 +35,7 @@ using System.Reflection;
 using MusaCommon;
 using System.Linq;
 using System.IO;
+using System.Collections.Specialized;
 
 namespace AgentLibrary
 {
@@ -134,7 +135,7 @@ namespace AgentLibrary
 
         #endregion Properties
 
-        private static AgentEnvironement instance;
+        private static AgentEnvironement rootInstance;
 
         /// <summary>
         /// The logger this environment uses.
@@ -153,28 +154,33 @@ namespace AgentLibrary
         /// <summary>
         /// Get the unique agent environement for this MUSA.NET process instance.
         /// </summary>
-        public static AgentEnvironement GetInstance()
+        public static AgentEnvironement GetRootEnv()
         {
-            if (instance != null)
-                return instance;
+            if (rootInstance != null)
+                return rootInstance;
 
-            instance = new AgentEnvironement();
-            instance.NetworkingEnabled = MusaConfig.GetConfig().NetworkingEnabled;
+            rootInstance = new AgentEnvironement();
+            rootInstance.EnvironementName = "ROOT";
+            rootInstance.NetworkingEnabled = MusaConfig.GetConfig().NetworkingEnabled;
 
-            if (instance.NetworkingEnabled)
+            if (rootInstance.NetworkingEnabled)
             {
-                instance.Port = MusaConfig.GetConfig().MusaAddressPort;
-                instance.IPAddress = MusaConfig.GetConfig().MusaAddress;
-                instance.EnvironmentServer = new EnvironmentServer(instance);
-                instance.EnvironmentServer.StartNetworking(instance.Port.ToString(), instance.IPAddress);
+                rootInstance.Port = MusaConfig.GetConfig().MusaAddressPort;
+                rootInstance.IPAddress = MusaConfig.GetConfig().MusaAddress;
+                rootInstance.EnvironmentServer = new EnvironmentServer(rootInstance);
+                rootInstance.EnvironmentServer.StartNetworking(rootInstance.Port.ToString(), rootInstance.IPAddress);
             }
 
             //Inject the logger
-            instance.logger = ModuleProvider.Get().Resolve<ILogger>();
+            rootInstance.logger = ModuleProvider.Get().Resolve<ILogger>();
 
-            return instance;
+            return rootInstance;
         }
 
+        /// <summary>
+        /// Gets the parent environment.
+        /// </summary>
+        /// <value>The parent environment.</value>
         public AgentEnvironement ParentEnvironment
         {
             get;
@@ -186,12 +192,9 @@ namespace AgentLibrary
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public AgentEnvironement this[string name]
+        public AgentEnvironement this [string name]
         {
-            get
-            {
-                return SubEnvironements.Find(x => x.EnvironementName.Equals(name));
-            }
+            get { return GetEnvironement(name); }
         }
 
         #region Constructors
@@ -201,40 +204,63 @@ namespace AgentLibrary
         /// </summary>
         private AgentEnvironement()
         {
-
             Statements = new ObservableCollection<IFormula>();
             RegisteredAgents = new ObservableCollection<Agent>();
             RegisteredAgents.CollectionChanged += RegisteredAgents_CollectionChanged;
             Statements.CollectionChanged += Statements_CollectionChanged;
             CreationDate = DateTime.Now;
             SubEnvironements = new List<AgentEnvironement>();
-
-
-            NetworkingEnabled = MusaConfig.GetConfig().NetworkingEnabled;
-
-            if (NetworkingEnabled)
-            {
-                Port = MusaConfig.GetConfig().MusaAddressPort;
-                IPAddress = MusaConfig.GetConfig().MusaAddress;
-                EnvironmentServer = new EnvironmentServer(instance);
-                EnvironmentServer.StartNetworking(instance.Port.ToString(), instance.IPAddress);
-            }
+            ParentEnvironment = null;
 
             //Inject the logger
             logger = ModuleProvider.Get().Resolve<ILogger>();
         }
 
-        public void AddEnvironement(AgentEnvironement env)
+        /// <summary>
+        /// Gets the sub-environement named as specified.
+        /// </summary>
+        /// <returns>The environement.</returns>
+        /// <param name="name">Name.</param>
+        public AgentEnvironement GetEnvironement(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return null;
+
+            if (EnvironementName.Equals(name))
+                return this;
+
+            foreach (var senv in SubEnvironements)
+            {
+                AgentEnvironement subenv;
+                if ((subenv = senv.GetEnvironement(name)) != null)
+                    return subenv;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Adds a sub-environement.
+        /// </summary>
+        /// <param name="envName">Env name.</param>
+        public void AddEnvironement(string envName)
         {
             //Check if an environement with the same name exists
-            if (SubEnvironements.Exists(x => x.EnvironementName.Equals(env.EnvironementName)))
-                throw new Exception("An environement named '" + env.EnvironementName + "' already exists.");
+            if (SubEnvironements.Exists(x => x.EnvironementName.Equals(envName)))
+                throw new Exception("An environement named '" + envName + "' already exists.");
 
+            AgentEnvironement env = new AgentEnvironement();
+            env.EnvironementName = envName;
+            env.NetworkingEnabled = MusaConfig.GetConfig().NetworkingEnabled;
+            env.EnvironmentServer = rootInstance.EnvironmentServer;
+            env.Port = MusaConfig.GetConfig().MusaAddressPort;
+            env.IPAddress = MusaConfig.GetConfig().MusaAddress;
+
+            env.logger = rootInstance.logger;
             env.ParentEnvironment = this;
             SubEnvironements.Add(env);
         }
 
-        private void RegisteredAgents_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void RegisteredAgents_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (RegisteredAgents.Count > 0)
                 mre.Reset();
@@ -267,7 +293,7 @@ namespace AgentLibrary
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Attributes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void Attributes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             foreach (Agent a in RegisteredAgents)
             {
@@ -284,7 +310,7 @@ namespace AgentLibrary
         /// Method invoked when a changes that involves the statements occurs into the environment's statement 
         /// list. It is responsible for communicating the changes to the registered agents.
         /// </summary>
-        private void Statements_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void Statements_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             foreach (Agent a in RegisteredAgents)
             {
@@ -302,8 +328,11 @@ namespace AgentLibrary
         /// </summary>
         public void RegisterAgent(Agent a)
         {
-			if (!RegisteredAgents.Contains (a)) 
-				RegisteredAgents.Add(a);
+            if (!RegisteredAgents.Contains(a))
+            {
+                a.EnvironementName = EnvironementName;
+                RegisteredAgents.Add(a);
+            }
         }
 
         public Agent GetAgent(string name)

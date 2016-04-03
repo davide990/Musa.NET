@@ -60,7 +60,7 @@ namespace MusaInitializer
         /// </summary>
         private static void DiscoverAgents()
         {
-            var env = AgentEnvironement.GetInstance();
+            var env = AgentEnvironement.GetRootEnv();
 
             //Get the calling assembly
             var entry_assembly = Assembly.GetEntryAssembly();

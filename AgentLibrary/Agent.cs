@@ -218,7 +218,7 @@ namespace AgentLibrary
         /// </summary>
         public string EnvironementIPAddress
         {
-            get { return AgentEnvironement.GetInstance().IPAddress; }
+            get { return AgentEnvironement.GetRootEnv().IPAddress; }
         }
 
         /// <summary>
@@ -239,9 +239,20 @@ namespace AgentLibrary
             private set;
         }
 
+        /// <summary>
+        /// Gets the name of the environement in which this agent is located.
+        /// </summary>
+        /// <value>The name of the environement.</value>
+        public string EnvironementName
+        {
+            get;
+            internal set;
+        }
+
+
         public string CompleteName
         {
-            get { return string.Format("{0}@{1}", Name, EnvironementIPAddress); }
+            get { return string.Format("{0}:{1}@{2}", Name, EnvironementName, EnvironementIPAddress); }
         }
 
 
@@ -397,7 +408,8 @@ namespace AgentLibrary
         /// belief here.
         /// </summary>
         public virtual void onInit()
-        {}
+        {
+        }
 
         #region Methods
 
@@ -874,7 +886,7 @@ namespace AgentLibrary
         /// <param name="message">The message to be sent</param>
         public void SendMessage(string agentReceiverName, AgentMessage message)
         {
-            EnvironmentServer srv = AgentEnvironement.GetInstance().EnvironmentServer;
+            EnvironmentServer srv = AgentEnvironement.GetRootEnv().EnvironmentServer;
             AgentPassport receiver = srv.GetAgentinfo(agentReceiverName);
             AgentMessage response = srv.sendAgentMessage(GetPassport(), receiver, message);
 
@@ -885,7 +897,7 @@ namespace AgentLibrary
                 response.InfoType = InformationType.Tell;
                 if (!string.IsNullOrEmpty(message.ReplyTo))
                 {
-                    var agentToForward = AgentEnvironement.GetInstance().RegisteredAgents.First(x => x.Name.Equals(message.ReplyTo));
+                    var agentToForward = AgentEnvironement.GetRootEnv().RegisteredAgents.First(x => x.Name.Equals(message.ReplyTo));
                     if (agentToForward != null)
                     {
                         Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Yellow);
@@ -910,7 +922,7 @@ namespace AgentLibrary
         /// <param name="message">The message to be sent</param>
         public void SendMessage(AgentPassport receiver, AgentMessage message)
         {
-            EnvironmentServer srv = AgentEnvironement.GetInstance().EnvironmentServer;
+            EnvironmentServer srv = AgentEnvironement.GetRootEnv().EnvironmentServer;
             AgentMessage response = srv.sendAgentMessage(GetPassport(), receiver, message);
             Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Yellow);
             Logger.Log(LogLevel.Debug, "[" + Name + "] send message to [" + receiver.AgentName + "]: " + message);
@@ -919,7 +931,7 @@ namespace AgentLibrary
                 response.InfoType = InformationType.Tell;
                 if (!string.IsNullOrEmpty(message.ReplyTo))
                 {
-                    var agentToForward = AgentEnvironement.GetInstance().RegisteredAgents.First(x => x.Name.Equals(message.ReplyTo));
+                    var agentToForward = AgentEnvironement.GetRootEnv().RegisteredAgents.First(x => x.Name.Equals(message.ReplyTo));
                     if (agentToForward != null)
                     {
                         Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Yellow);
@@ -950,7 +962,7 @@ namespace AgentLibrary
             }
 
             //Get the list of agents in this environment
-            var agent_list = AgentEnvironement.GetInstance().RegisteredAgents.Where(x => !x.Name.Equals(Name));
+            var agent_list = AgentEnvironement.GetRootEnv().RegisteredAgents.Where(x => !x.Name.Equals(Name));
 
             foreach (var agent in agent_list)
                 SendMessage(agent.GetPassport(), message);

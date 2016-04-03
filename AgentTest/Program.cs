@@ -1,23 +1,11 @@
-﻿/**
-         __  __                                     _   
-        |  \/  |                                   | |  
-        | \  / | _   _  ___   __ _     _ __    ___ | |_ 
-        | |\/| || | | |/ __| / _` |   | '_ \  / _ \| __|
-        | |  | || |_| |\__ \| (_| | _ | | | ||  __/| |_ 
-        |_|  |_| \__,_||___/ \__,_|(_)|_| |_| \___| \__|
-*/
-using AgentLibrary;
-using FormulaLibrary;
+﻿using AgentLibrary;
 using MusaCommon;
-using MusaConfiguration;
 using MusaInitializer;
 using MusaLogger;
 using PlanLibrary;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
-
 
 namespace AgentTest
 {
@@ -25,7 +13,7 @@ namespace AgentTest
     {
         private static void startMUSA()
         {
-            AgentEnvironement env = AgentEnvironement.GetInstance();
+            AgentEnvironement env = AgentEnvironement.GetRootEnv();
             Agent a = new Agent("agent_1").Start();
             Agent b = new Agent("agent_2").Start();
             Agent c = new Agent("agent_3").Start();
@@ -36,7 +24,7 @@ namespace AgentTest
 
         static void configureAndStartMusa()
         {
-            AgentEnvironement env = AgentEnvironement.GetInstance();
+            AgentEnvironement env = AgentEnvironement.GetRootEnv();
             var FormulaParser = ModuleProvider.Get().Resolve<IFormulaUtils>();
 
             Agent a = new Agent("agent_1").Start();
@@ -107,6 +95,7 @@ namespace AgentTest
 
         static void Main(string[] args)
         {
+
             MUSAInitializer.Initialize();
 
             //MusaConfig.ReadFromFile("../../test_conf.xml");
@@ -118,17 +107,17 @@ namespace AgentTest
 
 
             var fp = ModuleProvider.Get().Resolve<IFormulaUtils>();
-            AgentEnvironement.GetInstance().RegisterStatement(fp.Parse("f(3)"));
+            AgentEnvironement.GetRootEnv().RegisterStatement(fp.Parse("f(3)"));
 
             BackgroundWorker bgwk = new BackgroundWorker();
             bgwk.DoWork += delegate
-            {
-                Thread.Sleep(3000);
-                //AgentEnvironement.GetInstance().RegisterStatement(fp.Parse("f(x)"));
+                {
+                    Thread.Sleep(3000);
+                    //AgentEnvironement.GetInstance().RegisterStatement(fp.Parse("f(x)"));
 
-                AgentEnvironement.GetInstance().RegisterStatement(fp.Parse("delivered(\"beer\",1,1)"));
-                
-                /*var ag = AgentEnvironement.GetInstance().GetAgent("agent_1");
+                    AgentEnvironement.GetRootEnv().RegisterStatement(fp.Parse("delivered(\"beer\",1,1)"));
+
+                    /*var ag = AgentEnvironement.GetInstance().GetAgent("agent_1");
                 var ff = fp.Parse("have(beer,x)");
 
                 List<IAssignment> assgnme;
@@ -139,13 +128,13 @@ namespace AgentTest
                     Console.WriteLine("VERIFICATA");
                 }
                 */
-                //TODO QUALCOSA NON VA
-                /*Thread.Sleep(5000);
+                    //TODO QUALCOSA NON VA
+                    /*Thread.Sleep(5000);
                 AgentEnvironement.GetInstance().Serialize().Save(@"C:\Users\davide\my_agent.musa");*/
-            };
+                };
             bgwk.RunWorkerAsync();
 
-            AgentEnvironement.GetInstance().WaitForAgents();
+            AgentEnvironement.GetRootEnv().WaitForAgents();
 
             /*var logger = ModuleProvider.Get().Resolve<ILogger>();
             logger.AddFragment<IConsoleLoggerFragment>(LogLevel.Debug);*/
@@ -155,6 +144,7 @@ namespace AgentTest
 
 
             //configureAndStartMusa();
+
             
         }
 
