@@ -6,6 +6,8 @@ using PlanLibrary;
 using System;
 using System.ComponentModel;
 using System.Threading;
+using MusaConfiguration;
+using System.Net;
 
 namespace AgentTest
 {
@@ -101,6 +103,9 @@ namespace AgentTest
         {
             MUSAInitializer.Initialize();
 
+            MusaConfig.ReadFromFile("../../test_conf.xml");
+            //AgentEnvironement.GetInstance().RegisterAgentFromConfiguration();
+
             AgentEnvironement env = AgentEnvironement.GetRootEnv();
             env.AddEnvironement("env1");
             env.AddEnvironement("env2");
@@ -109,12 +114,12 @@ namespace AgentTest
             MUSAInitializer.DiscoverAgents();
 
 
-            //MusaConfig.ReadFromFile("../../test_conf.xml");
-            ModuleProvider.Get().Resolve<ILogger>().AddFragment(new ConsoleLoggerFragment());
-            ModuleProvider.Get().Resolve<ILogger>().SetMinimumLogLevel(1);
+
+            /*ModuleProvider.Get().Resolve<ILogger>().AddFragment(new ConsoleLoggerFragment());
+            ModuleProvider.Get().Resolve<ILogger>().SetMinimumLogLevel(0);
+            */
 
 
-            //AgentEnvironement.GetInstance().RegisterAgentFromConfiguration();
 
 
             var fp = ModuleProvider.Get().Resolve<IFormulaUtils>();

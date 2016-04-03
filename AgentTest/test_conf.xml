@@ -2,6 +2,7 @@
 <MusaConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <MaxNumAgent>100</MaxNumAgent>
   <MusaAddressPort>8081</MusaAddressPort>
+  <MusaAddress>192.168.13.17</MusaAddress>
   <NetworkingEnabled>true</NetworkingEnabled>
 
   <PlanLibraries>

@@ -6,17 +6,17 @@ namespace AgentLibrary
     public enum MessageScope
     {
         /// <summary>
-        /// The scope of a message is restricted to all the agents/environments in the machine hosting the sender agent
+        /// The scope of a message has no restriction, and it is sent to all the environments in the machine hosting the sender agent
         /// </summary>
         [EnumMember]
         All,
         /// <summary>
-        /// The scope of a message is restricted to a specific environment
+        /// The scope of a message is restricted to the specific environment in which the communicating agent is located
         /// </summary>
         [EnumMember]
-        Environment,
+        AgentEnvironment,
         /// <summary>
-        /// The scope of a message is restricted to a specific workgroup
+        /// The scope of a message is restricted to the same workgroup of the communicating agent
         /// </summary>
         [EnumMember]
         Workgroup
@@ -32,22 +32,22 @@ namespace AgentLibrary
         [DataMember]
         public string AddressIP
         {
-            get;// { return address_ip; }
-            set;// { address_ip = value; }
+            get;
+            set;
         }
 
         [DataMember]
         public string AddressPort
         {
-            get;// { return address_port; }
-            set;// { address_port = value; }
+            get;
+            set;
         }
 
         [DataMember]
         public string EnvironmentName
         {
-            get;// { return env_name; }
-            set;// { env_name = value; }
+            get;
+            set;
         }
 
         public override string ToString()
@@ -65,15 +65,15 @@ namespace AgentLibrary
         [DataMember]
         public object Message
         {
-            get;// { return message; }
-            set;// { message = value; }
+            get;
+            set;
         }
 
         [DataMember]
         public MessageScope MessageScope
         {
-            get;// { return scope; }
-            set;// { scope = value; }
+            get;
+            set;
         }
     }
 }

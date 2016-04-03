@@ -52,7 +52,7 @@ namespace MusaCommon
 
         public override string ToString()
         {
-            return string.Format("[AgentPassport: AgentName={0}, AgentRole={1}, AuthorizationToken={2}]", AgentName, AgentRole, AuthorizationToken);
+            return string.Format("[AgentPassport: WorkgroupName={0}, EnvironementName={1}, EnvironementAddress={2}, AgentName={3}, AgentRole={4}, AuthorizationToken={5}, CreatedAt={6}]", WorkgroupName, EnvironementName, EnvironementAddress, AgentName, AgentRole, AuthorizationToken, CreatedAt);
         }
     }
 }

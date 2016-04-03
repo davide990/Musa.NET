@@ -35,7 +35,7 @@ namespace AgentLibrary
             ResponseFormat = WebMessageFormat.Json,
             RequestFormat = WebMessageFormat.Json)]
         [OperationContract]
-        bool sendBroadcastMessage(AgentPassport senderData, EnvironementData receiverData, AgentMessage message);
+        bool sendBroadcastMessage(AgentPassport senderData, MessageScope scope, AgentMessage message);
 
         /// <summary>
         /// Check if an agent is active. E' una sorta di metodo per tuppuliare un agente

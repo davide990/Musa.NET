@@ -162,14 +162,14 @@ namespace AgentLibrary
                 return rootInstance;
 
             rootInstance = new AgentEnvironement();
-            rootInstance.EnvironementName = "ROOT";
+            rootInstance.EnvironementName = RootEnvironementName;
             rootInstance.NetworkingEnabled = MusaConfig.GetConfig().NetworkingEnabled;
 
             if (rootInstance.NetworkingEnabled)
             {
                 rootInstance.Port = MusaConfig.GetConfig().MusaAddressPort;
                 rootInstance.IPAddress = MusaConfig.GetConfig().MusaAddress;
-                rootInstance.EnvironmentServer = new EnvironmentServer(rootInstance);
+                rootInstance.EnvironmentServer = new EnvironmentServer();
                 rootInstance.EnvironmentServer.StartNetworking(rootInstance.Port.ToString(), rootInstance.IPAddress);
             }
 

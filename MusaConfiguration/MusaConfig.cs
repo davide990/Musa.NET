@@ -36,6 +36,7 @@ using System.Text;
 using System.Xml;
 using System.Text.RegularExpressions;
 using System.Security;
+using System.Net;
 
 namespace MusaConfiguration
 {
@@ -222,17 +223,18 @@ namespace MusaConfiguration
             PlanLibraries = new List<Assembly>();
 
             MaxNumAgent = "100";
-            MusaAddress = "127.0.0.1";
+
+            //Set the default IP address as the current local machine's IP address
+            MusaAddress = Dns.GetHostEntry(Dns.GetHostName()).AddressList[0].ToString();
+
             MusaAddressPort = 8089;
             NetworkingEnabled = true;
-
         }
 
         #region Logger methods
 
         public void AddLoggerFragment(object loggerFragment)
         {
-			
             if (loggerFragment is LoggerFragment)
                 LoggerFragments.Add(loggerFragment as LoggerFragment);	
         }

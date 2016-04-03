@@ -50,11 +50,12 @@ namespace AgentLibrary
         /// <summary>
         /// 
         /// </summary>
-        public AgentEnvironement Environment
+        /*public AgentEnvironement Environment
         {
             get;
             private set;
-        }
+        }*/
+
         private bool HostOpened;
 
         public ILogger Logger
@@ -75,9 +76,9 @@ namespace AgentLibrary
 
         #endregion
 
-        public EnvironmentServer(AgentEnvironement env)
+        public EnvironmentServer()
         {
-            Environment = env;
+            
             HostOpened = false;
 
             //Inject the logger
@@ -154,12 +155,18 @@ namespace AgentLibrary
 
         #region IMusaCommunicationService interface methods
 
+
+
         public bool AgentIsActive(AgentPassport sender, AgentPassport receiver)
         {
             if (!AgentIsAuthorized(sender))
                 return false;
 
-            return Environment.RegisteredAgents.FirstOrDefault(x => x.Name.Equals(receiver.AgentName)).IsActive;
+            var receiverEnv = AgentEnvironement.GetRootEnv();
+            if (receiver.EnvironementName != AgentEnvironement.RootEnvironementName)
+                receiverEnv = AgentEnvironement.GetRootEnv().GetEnvironement(receiver.EnvironementName);
+
+            return receiverEnv.RegisteredAgents.FirstOrDefault(x => x.Name.Equals(receiver.AgentName)).IsActive;
         }
 
         public bool RequestAuthorizationKey(EnvironementData env)
@@ -170,13 +177,14 @@ namespace AgentLibrary
         public AgentMessage sendAgentMessage(AgentPassport senderData, AgentPassport receiverData, AgentMessage message)
         {
             if (!AgentIsAuthorized(senderData))
-            {
                 throw new Exception("Agent '" + senderData.AgentName + "' is not authorized.");
-                //return null;
-            }
+
+            var receiverEnv = AgentEnvironement.GetRootEnv();
+            if (receiverData.EnvironementName != AgentEnvironement.RootEnvironementName)
+                receiverEnv = AgentEnvironement.GetRootEnv().GetEnvironement(receiverData.EnvironementName);
 
             //find the agent to which the message must be forwarded
-            Agent receiver = Environment.RegisteredAgents.FirstOrDefault(x => x.Name.Equals(receiverData.AgentName));
+            Agent receiver = receiverEnv.RegisteredAgents.FirstOrDefault(x => x.Name.Equals(receiverData.AgentName));
 
             if (receiver == null)
                 return null;
@@ -255,30 +263,65 @@ namespace AgentLibrary
             return response;
         }
 
-        public bool sendBroadcastMessage(AgentPassport senderData, EnvironementData receiverData, AgentMessage message)
+        public bool sendBroadcastMessage(AgentPassport senderData, MessageScope scope, AgentMessage message)
         {
             if (!AgentIsAuthorized(senderData))
                 return false;
+            
+            /*foreach (Agent a in GetEnvironement(senderData).RegisteredAgents)
+                a.AddToMailbox(senderData, message);*/
 
-            foreach (Agent a in Environment.RegisteredAgents)
-                a.AddToMailbox(senderData, message);
+            switch (scope)
+            {
+                case MessageScope.AgentEnvironment:
+                    doSendBroadcastMessageToAgentEnv(senderData, message);
+                    break;
+
+                case MessageScope.All:
+                    doSendBroadcastMessageToAllEnv(senderData, AgentEnvironement.GetRootEnv(), message);
+                    break;
+
+                case MessageScope.Workgroup:
+                    doSendBroadcastMessageToAgentWorkgroup(senderData, message);
+                    break;
+            }    
 
             return true;
+        }
+
+        private void doSendBroadcastMessageToAgentWorkgroup(AgentPassport senderData, AgentMessage message)
+        {
+            //TODO 
+        }
+
+        private void doSendBroadcastMessageToAgentEnv(AgentPassport senderData, AgentMessage message)
+        {
+            foreach (Agent a in GetEnvironement(senderData).RegisteredAgents)
+                a.AddToMailbox(senderData, message);
+        }
+
+        private void doSendBroadcastMessageToAllEnv(AgentPassport senderData, AgentEnvironement env, AgentMessage message)
+        {
+            foreach (Agent a in env.RegisteredAgents)
+                a.AddToMailbox(senderData, message);
+
+            if (env.SubEnvironements.Count > 0)
+                env.SubEnvironements.ForEach(x => doSendBroadcastMessageToAllEnv(senderData, x, message));
         }
 
         public List<string> GetAgentList(AgentPassport sender)
         {
             if (!AgentIsAuthorized(sender))
                 return null;
-
-            return Environment.RegisteredAgents.Select(s => s.Name).ToList();
+            
+            return GetEnvironement(sender).RegisteredAgents.Select(s => s.Name).ToList();
         }
 
         public List<string> GetAgentStatements(AgentPassport agent)
         {
             List<string> outList = new List<string>();
 
-            foreach (IFormula f in Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(agent.AgentName)).Beliefs)
+            foreach (IFormula f in GetEnvironement(agent).RegisteredAgents.FirstOrDefault(s => s.Name.Equals(agent.AgentName)).Beliefs)
                 outList.Add(f.ToString());
 
             return outList;
@@ -287,7 +330,7 @@ namespace AgentLibrary
         public List<string> GetAgentPlans(AgentPassport agent)
         {
             List<string> the_plan_list = new List<string>();
-            Agent the_agent = Environment.RegisteredAgents.First(x => x.Name.Equals(agent.AgentName));
+            Agent the_agent = GetEnvironement(agent).RegisteredAgents.First(x => x.Name.Equals(agent.AgentName));
 
             foreach (var the_plan in the_agent.Plans)
                 the_plan_list.Add(the_plan.Name);
@@ -302,7 +345,7 @@ namespace AgentLibrary
 
             var FormulaParser = ModuleProvider.Get().Resolve<IFormulaUtils>();
             IFormula ff = FormulaParser.Parse(formula);
-            var receiver_agent = Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(receiver.AgentName));
+            var receiver_agent = GetEnvironement(receiver).RegisteredAgents.FirstOrDefault(s => s.Name.Equals(receiver.AgentName));
 
             if (receiver_agent != null)
                 return receiver_agent.TestCondition(ff);
@@ -330,7 +373,7 @@ namespace AgentLibrary
         /// <param name="agent_name">Agent name.</param>
         public AgentPassport GetAgentinfo(string agent_name)
         {
-            Agent ag = Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(agent_name));
+            Agent ag = AgentEnvironement.GetRootEnv().RegisteredAgents.FirstOrDefault(s => s.Name.Equals(agent_name));
 
             AgentPassport ag_passport = new AgentPassport();
             ag_passport.AgentName = ag.Name;
@@ -341,14 +384,29 @@ namespace AgentLibrary
             return ag_passport;
         }
 
+        //DA ELIMINARE
         public bool AddStatement(string agent_name, string statement)
         {
             var FormulaParser = ModuleProvider.Get().Resolve<IFormulaUtils>();
 
-            Agent ag = Environment.RegisteredAgents.FirstOrDefault(s => s.Name.Equals(agent_name));
+            Agent ag = AgentEnvironement.GetRootEnv().RegisteredAgents.FirstOrDefault(s => s.Name.Equals(agent_name));
             ag.AddBelief(new IFormula[] { FormulaParser.Parse(statement) });
-            //ag.Workbench.AddStatement (FormulaParser.Parse (statement));
+
             return true;
+        }
+
+        /// <summary>
+        /// Gets the environement in which the specified agent is located.
+        /// </summary>
+        /// <returns>The environement.</returns>
+        /// <param name="agent">Agent.</param>
+        private AgentEnvironement GetEnvironement(AgentPassport agent)
+        {
+            var env = AgentEnvironement.GetRootEnv();
+            if (agent.EnvironementName != AgentEnvironement.RootEnvironementName)
+                env = AgentEnvironement.GetRootEnv().GetEnvironement(agent.EnvironementName);
+
+            return env;
         }
 
         #endregion

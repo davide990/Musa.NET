@@ -421,6 +421,8 @@ namespace AgentLibrary
         {
             AgentPassport ps = new AgentPassport();
             ps.AgentName = Name;
+            ps.EnvironementName = EnvironementName;
+            ps.EnvironementAddress = EnvironementIPAddress;
             ps.AgentRole = Role;
             ps.EnvironementAddress = EnvironementIPAddress;
             return ps;
@@ -733,12 +735,6 @@ namespace AgentLibrary
         public void AddBelief(params IFormula[] formula)
         {
             AddBelief(new List<IFormula>(formula));
-            /*foreach (IFormula af in formula)
-            {
-                Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
-                Logger.Log(LogLevel.Debug, "[" + Name + "] Adding belief " + af);
-                PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.AddBelief));
-            }*/
         }
 
         public void AddBelief(IList formula_list)
@@ -759,13 +755,6 @@ namespace AgentLibrary
         public void UpdateBelief(params IFormula[] formula)
         {
             UpdateBelief(new List<IFormula>(formula));
-            /*
-                        foreach (IFormula af in formula)
-                        {
-                            Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
-                            Logger.Log(LogLevel.Debug, "[" + Name + "] Updating belief " + af);
-                            PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.UpdateBelief));
-                        }*/
         }
 
         public void UpdateBelief(IList formula_list)
@@ -784,16 +773,9 @@ namespace AgentLibrary
             }
         }
 
-
         public void RemoveBelief(params IFormula[] formula)
         {
             RemoveBelief(new List<IFormula>(formula));
-            /*foreach (IFormula af in formula)
-            {
-                Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Magenta);
-                Logger.Log(LogLevel.Debug, "[" + Name + "] Removing belief " + af);
-                PerceivedEnvironementChanges.Push(new Tuple<IList, AgentPerception>(FormulaUtils.UnrollFormula(af), AgentPerception.RemoveBelief));
-            }*/
         }
 
         public void RemoveBelief(IList formula_list)
