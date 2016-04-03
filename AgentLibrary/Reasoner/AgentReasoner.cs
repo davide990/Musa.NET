@@ -406,12 +406,17 @@ namespace AgentLibrary
         /// </summary>
         private void perceive()
         {
-            if (parentAgent.PerceivedEnvironementChanges.Count <= 0)
-                return;
+            Tuple<IList, AgentPerceptionType> p;
+            lock (parentAgent.lock_perceivedEnvironmentChanges)
+            {
+                if (parentAgent.PerceivedEnvironementChanges.Count <= 0)
+                    return;
 
-            //Get the last change within the environment
-            //Tuple<IList, AgentPerceptionType> p = parentAgent.PerceivedEnvironementChanges.Pop();
-            Tuple<IList, AgentPerceptionType> p = parentAgent.PerceivedEnvironementChanges.Dequeue();
+                //Get the last change within the environment
+                //Tuple<IList, AgentPerceptionType> p = parentAgent.PerceivedEnvironementChanges.Pop();
+                p = parentAgent.PerceivedEnvironementChanges.Dequeue();
+            }
+            
             IList changes_list = p.Item1;
             AgentPerceptionType perception_type = p.Item2;
 

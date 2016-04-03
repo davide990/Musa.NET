@@ -16,6 +16,7 @@ namespace AgentTest
     {
         public override void onInit()
         {
+            
             AddEvent("delivered(product,quantity,ID)", AgentPerceptionType.AddBelief, typeof(get));
 
             //AddEvent("f(3)", AgentPerception.AddBelief, typeof(myPlan));       
