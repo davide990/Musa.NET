@@ -67,6 +67,7 @@
     <Compile Include="Event\AgentEventKey.cs" />
     <Compile Include="Attributes\EventAttribute.cs" />
     <Compile Include="Event\EventTrigger.cs" />
+    <Compile Include="Attributes\EnvironementAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="UML\AgentLibrary.cd" />

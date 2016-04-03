@@ -25,6 +25,10 @@ namespace AgentTest
         static void configureAndStartMusa()
         {
             AgentEnvironement env = AgentEnvironement.GetRootEnv();
+            env.AddEnvironement("env1");
+            env.AddEnvironement("env2");
+            env.AddEnvironement("env3");
+
             var FormulaParser = ModuleProvider.Get().Resolve<IFormulaUtils>();
 
             Agent a = new Agent("agent_1").Start();
@@ -95,8 +99,15 @@ namespace AgentTest
 
         static void Main(string[] args)
         {
-
             MUSAInitializer.Initialize();
+
+            AgentEnvironement env = AgentEnvironement.GetRootEnv();
+            env.AddEnvironement("env1");
+            env.AddEnvironement("env2");
+            env.AddEnvironement("env3");
+
+            MUSAInitializer.DiscoverAgents();
+
 
             //MusaConfig.ReadFromFile("../../test_conf.xml");
             ModuleProvider.Get().Resolve<ILogger>().AddFragment(new ConsoleLoggerFragment());
@@ -111,13 +122,13 @@ namespace AgentTest
 
             BackgroundWorker bgwk = new BackgroundWorker();
             bgwk.DoWork += delegate
-                {
-                    Thread.Sleep(3000);
-                    //AgentEnvironement.GetInstance().RegisterStatement(fp.Parse("f(x)"));
+            {
+                Thread.Sleep(3000);
+                //AgentEnvironement.GetInstance().RegisterStatement(fp.Parse("f(x)"));
 
-                    AgentEnvironement.GetRootEnv().RegisterStatement(fp.Parse("delivered(\"beer\",1,1)"));
+                AgentEnvironement.GetRootEnv().RegisterStatement(fp.Parse("delivered(\"beer\",1,1)"));
 
-                    /*var ag = AgentEnvironement.GetInstance().GetAgent("agent_1");
+                /*var ag = AgentEnvironement.GetInstance().GetAgent("agent_1");
                 var ff = fp.Parse("have(beer,x)");
 
                 List<IAssignment> assgnme;
@@ -128,10 +139,10 @@ namespace AgentTest
                     Console.WriteLine("VERIFICATA");
                 }
                 */
-                    //TODO QUALCOSA NON VA
-                    /*Thread.Sleep(5000);
+                //TODO QUALCOSA NON VA
+                /*Thread.Sleep(5000);
                 AgentEnvironement.GetInstance().Serialize().Save(@"C:\Users\davide\my_agent.musa");*/
-                };
+            };
             bgwk.RunWorkerAsync();
 
             AgentEnvironement.GetRootEnv().WaitForAgents();

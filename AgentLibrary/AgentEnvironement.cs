@@ -41,6 +41,8 @@ namespace AgentLibrary
 {
     public sealed class AgentEnvironement
     {
+        public static readonly string RootEnvironementName = "ROOT";
+
         public List<AgentEnvironement> SubEnvironements
         {
             get;

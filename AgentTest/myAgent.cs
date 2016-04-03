@@ -11,6 +11,7 @@ using PlanLibrary.Attributes;
 namespace AgentTest
 {
     [Agent]
+    [Environement("env2")]
     [Belief("k(p)")]
     public class myAgent : Agent
     {

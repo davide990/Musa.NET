@@ -984,5 +984,10 @@ namespace AgentLibrary
         }
 
         #endregion
+
+        public override string ToString()
+        {
+            return CompleteName;
+        }
     }
 }

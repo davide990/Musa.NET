@@ -48,19 +48,20 @@ namespace MusaInitializer
             MusaLoggerInitializer.Initialize();
             PlanLibraryInitializer.Initialize();
             FormulaLibraryInitializer.Initialize();
-            //...
-            //Initialize other modules (projects) here
 
+            /*
+                Initialize other modules (projects) here
+            */
 
-            DiscoverAgents();
+            //DiscoverAgents();
         }
 
         /// <summary>
         /// Discover automatically all the classes in the entry assembly which are decorated with [Agent] attribute
         /// </summary>
-        private static void DiscoverAgents()
+        public static void DiscoverAgents()
         {
-            var env = AgentEnvironement.GetRootEnv();
+            var rootEnvironement = AgentEnvironement.GetRootEnv();
 
             //Get the calling assembly
             var entry_assembly = Assembly.GetEntryAssembly();
@@ -75,15 +76,8 @@ namespace MusaInitializer
 
             foreach (var agent_type in class_list)
             {
-                
-                //ConstructorInfo ctor = agent_type.GetConstructor(new[] { typeof(string) });
-
                 //Create a new instance of agent
-                //var the_agent = ctor.Invoke(new object[] {})as Agent;
                 var the_agent = Activator.CreateInstance(agent_type) as Agent;
-                // ctor.Invoke(new object[] { agent_type.Name }) as Agent;
-
-
 
                 //Get the attributes [Belief] in the current agent type
                 var beliefs = agent_type.GetCustomAttributes<BeliefAttribute>();
@@ -101,12 +95,27 @@ namespace MusaInitializer
                 //Start the agent
                 the_agent.Start();
 
-                //Register the agent in the environment
-                env.RegisterAgent(the_agent);
-            }
+                //Get the environement's name in which this agent must be placed
+                var environementNameAttribute = agent_type.GetCustomAttributes<EnvironementAttribute>();
+                string destEnvironement = AgentEnvironement.RootEnvironementName;
+                if(environementNameAttribute != null)
+                {
+                    if (!(string.IsNullOrEmpty(environementNameAttribute.ToArray()[0].Environementname)))
+                    {
+                        destEnvironement = environementNameAttribute.ToArray()[0].Environementname;
+                        var theEnv = rootEnvironement.GetEnvironement(destEnvironement);
 
-			/*foreach (var ag in env.RegisteredAgents)
-				ag.onInit ();*/
+                        if (theEnv != null)
+                        {
+                            theEnv.RegisterAgent(the_agent);
+                            continue;
+                        }
+                    }
+                }
+
+                //Register the agent in the environment
+                rootEnvironement.RegisterAgent(the_agent);
+            }
         }
 
         private static void GetNestedPlans(Type agent_type, Agent agent)
