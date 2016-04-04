@@ -9,7 +9,7 @@ namespace AgentLibrary
     /// An interface that define the communication protocol between agents and environements
     /// </summary>
     [ServiceContract]
-    public interface IMusaCommunicationService
+    public interface IMusaServer
     {
         /// <summary>
         /// Sends a message to an agent

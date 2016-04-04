@@ -60,6 +60,7 @@
     <Reference Include="NLog">
       <HintPath>..\packages\NLog.4.2.2\lib\net45\NLog.dll</HintPath>
     </Reference>
+    <Reference Include="System.ServiceModel" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="myAgent.cs" />

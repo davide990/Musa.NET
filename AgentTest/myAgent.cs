@@ -50,7 +50,7 @@ namespace AgentTest
                 }
 
                 AgentMessage msg = new AgentMessage("get2(\"beer\")", InformationType.Achieve);
-                Parent.SendMessage("myAgent", msg);
+                Parent.SendLocalMessage("myAgent", msg);
 
 
 

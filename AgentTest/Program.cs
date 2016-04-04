@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Threading;
 using MusaConfiguration;
 using System.Net;
+using System.ServiceModel;
 
 namespace AgentTest
 {
@@ -61,7 +62,7 @@ namespace AgentTest
                 mm.AddInfo("k(x)");
                 mm.InfoType = InformationType.Tell;
                 //mm.ReplyTo = "agent_3";
-                b.SendBroadcastMessage(mm);
+                b.SendLocalBroadcastMessage(mm);
                 //b.SendMessage(a.GetPassport(), mm);
 
             };
@@ -99,8 +100,41 @@ namespace AgentTest
             env.WaitForAgents();
         }
 
+
+        static void minimalEnv()
+        {
+            MUSAInitializer.Initialize();
+            MusaConfig.ReadFromFile("../../test_conf.xml");
+
+            AgentEnvironement.GetRootEnv().RegisterAgentFromConfiguration();
+
+
+            BackgroundWorker bg = new BackgroundWorker();
+            bg.DoWork += async delegate
+            {
+                Thread.Sleep(4000);
+                Agent a = AgentEnvironement.GetRootEnv().GetAgent("agent_1");
+                a.ConnectTo("http://localhost:8089");
+                var receiver = a.GetAgentinfo("myAgent");
+                a.sendAgentMessage(receiver, new AgentMessage("f(x)", InformationType.Tell));        
+            };
+            bg.RunWorkerAsync();
+
+            AgentEnvironement.GetRootEnv().WaitForAgents();
+
+        }
+
         static void Main(string[] args)
         {
+            minimalEnv();
+
+            
+        }
+
+
+        static void ilsolito()
+        {
+
             MUSAInitializer.Initialize();
 
             MusaConfig.ReadFromFile("../../test_conf.xml");
@@ -160,8 +194,6 @@ namespace AgentTest
 
 
             //configureAndStartMusa();
-
-            
         }
 
         static void A_RegisterResult(string result)

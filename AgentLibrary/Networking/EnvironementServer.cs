@@ -38,7 +38,7 @@ namespace AgentLibrary
     /// This object handles the communications betweeen agents and environement.
     /// </summary>
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
-    internal class EnvironmentServer : IMusaCommunicationService
+    internal class EnvironmentServer : IMusaServer
     {
         #region Fields/Properties
 
@@ -118,7 +118,7 @@ namespace AgentLibrary
 
             Uri address = new Uri("http://" + local_ip_address + ":" + port);
             Host = new ServiceHost(this);
-            Host.AddServiceEndpoint(typeof(IMusaCommunicationService), new BasicHttpBinding(), address);
+            Host.AddServiceEndpoint(typeof(IMusaServer), new BasicHttpBinding(), address);
             Host.Opened += delegate
             {
                 HostOpened = true;
@@ -378,6 +378,9 @@ namespace AgentLibrary
             AgentPassport ag_passport = new AgentPassport();
             ag_passport.AgentName = ag.Name;
             ag_passport.AgentRole = ag.Role;
+            ag_passport.EnvironementName = ag.EnvironementName;
+            ag_passport.EnvironementAddress = ag.EnvironementIPAddress;
+
             ag_passport.CreatedAt = ag.CreatedAt.ToString(@"hh\:mm\:ss");
             //TODO set other agent informations here
 

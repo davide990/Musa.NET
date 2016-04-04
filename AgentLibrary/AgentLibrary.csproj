@@ -50,7 +50,6 @@
     <Compile Include="Attributes\BeliefAttribute.cs" />
     <Compile Include="Networking\BroadcastMessage.cs" />
     <Compile Include="Networking\EnvironementServer.cs" />
-    <Compile Include="Networking\IMusaCommunicationService.cs" />
     <Compile Include="Reasoner\AgentReasoner.cs" />
     <Compile Include="Workbench\AgentWorkbench.cs" />
     <Compile Include="Scheduler\SchedulingType.cs" />
@@ -68,6 +67,9 @@
     <Compile Include="Attributes\EventAttribute.cs" />
     <Compile Include="Event\EventTrigger.cs" />
     <Compile Include="Attributes\EnvironementAttribute.cs" />
+    <Compile Include="Networking\EnvironementClient.cs" />
+    <Compile Include="Networking\IMusaClient.cs" />
+    <Compile Include="Networking\IMusaServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="UML\AgentLibrary.cd" />

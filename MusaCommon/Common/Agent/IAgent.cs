@@ -21,8 +21,8 @@ namespace MusaCommon
         void UpdateBelief(IList formula_list);
         void RemoveBelief(params IFormula[] formula);
         void RemoveBelief(IList formula_list);
-        void SendMessage(string agentReceiverName, AgentMessage message);
-        void SendMessage(AgentPassport receiver, AgentMessage message);
-        void SendBroadcastMessage(AgentMessage message);
+        void SendLocalMessage(string agentReceiverName, AgentMessage message);
+        void SendLocalMessage(AgentPassport receiver, AgentMessage message);
+        void SendLocalBroadcastMessage(AgentMessage message);
     }
 }

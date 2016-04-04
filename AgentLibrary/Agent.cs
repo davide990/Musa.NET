@@ -35,7 +35,7 @@ using MusaCommon;
 
 namespace AgentLibrary
 {
-    public class Agent : IAgent
+    public class Agent : IAgent, IMusaClient
     {
         #region Fields
 
@@ -81,25 +81,10 @@ namespace AgentLibrary
         /// </summary>
         public Queue<Tuple<IList, AgentPerceptionType>> PerceivedEnvironementChanges
         {
-            get
-            {
-                return perceivedEnvironementChanges;
-                /*lock (lock_perceivedEnvironmentChanges)
-                {
-                    
-                }*/
-            }
-            private set
-            {
-                perceivedEnvironementChanges = value;
-                /*lock (lock_perceivedEnvironmentChanges)
-                {
-                    
-                }*/
-            }
+            get;
+            private set;
         }
 
-        private Queue<Tuple<IList, AgentPerceptionType>> perceivedEnvironementChanges;
         internal object lock_perceivedEnvironmentChanges = new object();
 
         /// <summary>
@@ -175,11 +160,9 @@ namespace AgentLibrary
         /// </summary>
         public bool Busy
         {
-            get { return agent_is_busy; }
-            private set { agent_is_busy = value; }
+            get;
+            private set;
         }
-
-        private bool agent_is_busy;
 
         /// <summary>
         /// Gets the plan's name that this agent is currently executing.
@@ -219,6 +202,15 @@ namespace AgentLibrary
         public string EnvironementIPAddress
         {
             get { return AgentEnvironement.GetRootEnv().IPAddress; }
+        }
+
+        /// <summary>
+        /// Gets the environement port.
+        /// </summary>
+        /// <value>The environement port.</value>
+        public int EnvironementPort
+        {
+            get { return AgentEnvironement.GetRootEnv().Port; }
         }
 
         /// <summary>
@@ -320,6 +312,18 @@ namespace AgentLibrary
             set;
         }
 
+        /// <summary>
+        /// Gets or sets the client used to communicate to external environements.
+        /// </summary>
+        /// <value>The client.</value>
+        public EnvironementClient Client
+        {
+            get;
+            private set;
+        }
+
+        private bool ExternalConnectionOpened;
+
         #endregion Properties
 
         #region Injectable modules
@@ -345,7 +349,7 @@ namespace AgentLibrary
         /// Create a new agent
         /// </summary>
         public Agent()
-            : this(null)//: this(GetType().Name)//"agent_" + (new Random().Next(Int32.MaxValue)))
+            : this(null)
         {
         }
 
@@ -356,7 +360,7 @@ namespace AgentLibrary
         public Agent(string agent_name)
         {
             if (string.IsNullOrEmpty(agent_name))
-                Name = GetType().Name;//"agent_" + (new Random().Next(Int32.MaxValue));
+                Name = GetType().Name;
             else
                 Name = agent_name;
 
@@ -381,14 +385,10 @@ namespace AgentLibrary
             //Create a PlanCollection object
             PlansCollection = PlanFacade.CreatePlanCollection();
 
-            /*RegisterResultHandler = GetType().GetMethod("onPlanInstanceRegisterResult", BindingFlags.NonPublic | BindingFlags.Instance);
-            PlanFinishedHandler = GetType().GetMethod("onPlanInstanceFinished", BindingFlags.NonPublic | BindingFlags.Instance);*/
-
             RegisterResultHandler = typeof(Agent).GetMethod("onPlanInstanceRegisterResult", BindingFlags.NonPublic | BindingFlags.Instance);
             PlanFinishedHandler = typeof(Agent).GetMethod("onPlanInstanceFinished", BindingFlags.NonPublic | BindingFlags.Instance);
 
             Busy = false;
-
         }
 
         #endregion
@@ -861,12 +861,14 @@ namespace AgentLibrary
 
         #region Communication methods
 
+        #region Local communication methods
+
         /// <summary>
         /// Send a message to an agent that is located in the same environment of this agent.
         /// </summary>
         /// <param name="agentReceiverName">The receiver agent</param>
         /// <param name="message">The message to be sent</param>
-        public void SendMessage(string agentReceiverName, AgentMessage message)
+        public void SendLocalMessage(string agentReceiverName, AgentMessage message)
         {
             EnvironmentServer srv = AgentEnvironement.GetRootEnv().EnvironmentServer;
             AgentPassport receiver = srv.GetAgentinfo(agentReceiverName);
@@ -885,7 +887,7 @@ namespace AgentLibrary
                         Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Yellow);
                         Logger.Log(LogLevel.Debug, "[" + Name + "] forwarding response to [" + agentToForward.Name + "]: " + response);
                         //agentToForward.AddToMailbox(receiver, response);
-                        SendMessage(agentToForward.GetPassport(), response);
+                        SendLocalMessage(agentToForward.GetPassport(), response);
                     }
                 }
                 else
@@ -902,7 +904,7 @@ namespace AgentLibrary
         /// </summary>
         /// <param name="receiver">The receiver agent</param>
         /// <param name="message">The message to be sent</param>
-        public void SendMessage(AgentPassport receiver, AgentMessage message)
+        public void SendLocalMessage(AgentPassport receiver, AgentMessage message)
         {
             EnvironmentServer srv = AgentEnvironement.GetRootEnv().EnvironmentServer;
             AgentMessage response = srv.sendAgentMessage(GetPassport(), receiver, message);
@@ -918,14 +920,14 @@ namespace AgentLibrary
                     {
                         Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Yellow);
                         Logger.Log(LogLevel.Debug, "[" + Name + "] forwarding response to [" + agentToForward.Name + "]: " + response);
-                        SendMessage(agentToForward.GetPassport(), response);
+                        SendLocalMessage(agentToForward.GetPassport(), response);
                     }
                 }
                 else
                 {
                     Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Yellow);
                     Logger.Log(LogLevel.Debug, "[" + Name + "] received response from [" + receiver + "]: " + response);
-                    SendMessage(receiver, response);
+                    SendLocalMessage(receiver, response);
                 }
             }
         }
@@ -934,7 +936,7 @@ namespace AgentLibrary
         /// Send a brodcast message to all agents in the same environment of this agent.
         /// </summary>
         /// <param name="message">The message to be sent</param>
-        public void SendBroadcastMessage(AgentMessage message)
+        public void SendLocalBroadcastMessage(AgentMessage message)
         {
             if (message.InfoType == InformationType.AskAll || message.InfoType == InformationType.AskOne)
             {
@@ -947,11 +949,215 @@ namespace AgentLibrary
             var agent_list = AgentEnvironement.GetRootEnv().RegisteredAgents.Where(x => !x.Name.Equals(Name));
 
             foreach (var agent in agent_list)
-                SendMessage(agent.GetPassport(), message);
+                SendLocalMessage(agent.GetPassport(), message);
         }
 
-        #endregion Communication methods
+        #endregion
 
+        #region External connection methods
+
+        private bool CheckConnection()
+        {
+            if (!ExternalConnectionOpened)
+            {
+                Logger.Log(LogLevel.Error, "Cannot communicate with external environement. Connection is not opened.");
+                return false;
+            }
+
+            return true;
+        }
+
+        public void ConnectTo(string externalEnvAddress)
+        {
+            if (Client != null)
+                Client.Close();
+
+            try
+            {
+                Client = ClientFactory.GetClientForAddress(externalEnvAddress);
+                Client.Open();
+                ExternalConnectionOpened = true;
+            }
+            catch (Exception e)
+            {
+                Logger.Log(LogLevel.Error, "Cannot connect to address '" + externalEnvAddress + "'." + e);
+                ExternalConnectionOpened = false;
+            }
+        }
+
+        public void CloseExternalConnections()
+        {
+            Client.Close();
+            ExternalConnectionOpened = false;
+        }
+
+        #endregion
+
+        #region IMusaClient methods
+
+        public AgentMessage sendAgentMessage(AgentPassport receiverData, AgentMessage message)
+        {
+            if (!CheckConnection())
+                return null;
+            
+            try
+            {
+                return Client.sendAgentMessage(GetPassport(), receiverData, message);
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Log(LogLevel.Error, "Cannot send message: timeout exception. " + ex);
+                return null;
+            }
+        }
+
+        public bool sendBroadcastMessage(MessageScope scope, AgentMessage message)
+        {
+            if (!CheckConnection())
+                return false;
+
+            try
+            {
+                return Client.sendBroadcastMessage(GetPassport(), scope, message);
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Log(LogLevel.Error, "Cannot send message: timeout exception. " + ex);
+                return false;
+            }
+        }
+
+        public bool AgentIsActive(AgentPassport receiverData)
+        {
+            if (!CheckConnection())
+                return false;
+
+            try
+            {
+                return Client.AgentIsActive(GetPassport(), receiverData);
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Log(LogLevel.Error, "Cannot get agent " + receiverData.AgentName + " state: timeout exception. " + ex);
+                return false;
+            }
+        }
+
+        public bool RequestAuthorizationKey(EnvironementData env)
+        {
+            if (!CheckConnection())
+                return false;
+
+            try
+            {
+                return Client.RequestAuthorizationKey(env);
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Log(LogLevel.Error, "Cannot get auth key: timeout exception. " + ex);
+                return false;
+            }
+        }
+
+        public List<string> GetAgentList(AgentPassport agent)
+        {
+            if (!CheckConnection())
+                return null;
+
+            try
+            {
+                return Client.GetAgentList(agent);
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Log(LogLevel.Error, "Cannot get agent list: timeout exception. " + ex);
+                return null;
+            }
+        }
+
+        public List<string> GetAgentStatements(AgentPassport agent)
+        {
+            if (!CheckConnection())
+                return null;
+
+            try
+            {
+                return Client.GetAgentStatements(agent);
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Log(LogLevel.Error, "Cannot get agent " + agent.AgentName + " statements: timeout exception. " + ex);
+                return null;
+            }
+        }
+
+        public List<string> GetAgentPlans(AgentPassport agent)
+        {
+            if (!CheckConnection())
+                return null;
+
+            try
+            {
+                return Client.GetAgentPlans(agent);
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Log(LogLevel.Error, "Cannot get agent " + agent.AgentName + " plans: timeout exception. " + ex);
+                return null;
+            }
+        }
+
+        public bool QueryAgent(AgentPassport receiver, string formula)
+        {
+            if (!CheckConnection())
+                return false;
+
+            try
+            {
+                return Client.QueryAgent(GetPassport(), receiver, formula);
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Log(LogLevel.Error, "Cannot query agent " + receiver.AgentName + ": timeout exception. " + ex);
+                return false;
+            }
+        }
+
+        public bool RegisterAgent(AgentPassport newAgent)
+        {
+            if (!CheckConnection())
+                return false;
+
+            try
+            {
+                return Client.RegisterAgent(newAgent);
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Log(LogLevel.Error, "Cannot register agent " + newAgent.AgentName + ": timeout exception. " + ex);
+                return false;
+            }
+        }
+
+        public AgentPassport GetAgentinfo(string agent_name)
+        {
+            if (!CheckConnection())
+                return null;
+
+            try
+            {
+                return Client.GetAgentinfo(agent_name);
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Log(LogLevel.Error, "Cannot get agent " + agent_name + " info: timeout exception. " + ex);
+                return null;
+            }
+        }
+
+        #endregion
+
+        #endregion Communication methods
 
         #region IAgent methods
 
