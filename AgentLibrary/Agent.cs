@@ -324,6 +324,11 @@ namespace AgentLibrary
 
         private bool ExternalConnectionOpened;
 
+        /// <summary>
+        /// The current IP address to which this agent is connected to.
+        /// </summary>
+        private string CurrentConnectionAddress;
+
         #endregion Properties
 
         #region Injectable modules
@@ -977,11 +982,13 @@ namespace AgentLibrary
                 Client = ClientFactory.GetClientForAddress(externalEnvAddress);
                 Client.Open();
                 ExternalConnectionOpened = true;
+                CurrentConnectionAddress = externalEnvAddress.Replace("http://", "");
             }
             catch (Exception e)
             {
                 Logger.Log(LogLevel.Error, "Cannot connect to address '" + externalEnvAddress + "'." + e);
                 ExternalConnectionOpened = false;
+                CurrentConnectionAddress = string.Empty;
             }
         }
 
@@ -989,6 +996,7 @@ namespace AgentLibrary
         {
             Client.Close();
             ExternalConnectionOpened = false;
+            CurrentConnectionAddress = string.Empty;
         }
 
         #endregion
@@ -1002,6 +1010,8 @@ namespace AgentLibrary
             
             try
             {
+                var inf = string.Format("Sending [{0}] to [{1}] at {2}@{3}", message.GetInformation(), receiverData.AgentName, CurrentConnectionAddress, receiverData.EnvironementName);
+                Logger.Log(LogLevel.Debug, inf);
                 return Client.sendAgentMessage(GetPassport(), receiverData, message);
             }
             catch (TimeoutException ex)
@@ -1018,6 +1028,8 @@ namespace AgentLibrary
 
             try
             {
+                var inf = string.Format("Sending [{0}] to [{1}]", message.GetInformation(), CurrentConnectionAddress);
+                Logger.Log(LogLevel.Debug, inf);
                 return Client.sendBroadcastMessage(GetPassport(), scope, message);
             }
             catch (TimeoutException ex)
@@ -1034,6 +1046,8 @@ namespace AgentLibrary
 
             try
             {
+                var inf = string.Format("Checking agent [{0}] at {1}", receiverData.AgentName, CurrentConnectionAddress);
+                Logger.Log(LogLevel.Debug, inf);
                 return Client.AgentIsActive(GetPassport(), receiverData);
             }
             catch (TimeoutException ex)
@@ -1050,6 +1064,9 @@ namespace AgentLibrary
 
             try
             {
+                var inf = string.Format("Requesting authorization at {0}", CurrentConnectionAddress);
+                Logger.Log(LogLevel.Debug, inf);
+
                 return Client.RequestAuthorizationKey(env);
             }
             catch (TimeoutException ex)
@@ -1066,6 +1083,8 @@ namespace AgentLibrary
 
             try
             {
+                var inf = string.Format("Getting agent [{0}] list at {1}", agent.AgentName, CurrentConnectionAddress);
+                Logger.Log(LogLevel.Debug, inf);
                 return Client.GetAgentList(agent);
             }
             catch (TimeoutException ex)
@@ -1082,6 +1101,8 @@ namespace AgentLibrary
 
             try
             {
+                var inf = string.Format("Getting agent [{0}] statements at {1}", agent.AgentName, CurrentConnectionAddress);
+                Logger.Log(LogLevel.Debug, inf);
                 return Client.GetAgentStatements(agent);
             }
             catch (TimeoutException ex)
@@ -1098,6 +1119,8 @@ namespace AgentLibrary
 
             try
             {
+                var inf = string.Format("Getting agent [{0}] plans at {1}", agent.AgentName, CurrentConnectionAddress);
+                Logger.Log(LogLevel.Debug, inf);
                 return Client.GetAgentPlans(agent);
             }
             catch (TimeoutException ex)
@@ -1114,6 +1137,8 @@ namespace AgentLibrary
 
             try
             {
+                var inf = string.Format("Querying agent [{0}] statements at {1}", receiver.AgentName, CurrentConnectionAddress);
+                Logger.Log(LogLevel.Debug, inf);
                 return Client.QueryAgent(GetPassport(), receiver, formula);
             }
             catch (TimeoutException ex)
@@ -1130,6 +1155,8 @@ namespace AgentLibrary
 
             try
             {
+                var inf = string.Format("Registering agent [{0}] statements at {1}", newAgent.AgentName, CurrentConnectionAddress);
+                Logger.Log(LogLevel.Debug, inf);
                 return Client.RegisterAgent(newAgent);
             }
             catch (TimeoutException ex)
@@ -1146,6 +1173,8 @@ namespace AgentLibrary
 
             try
             {
+                var inf = string.Format("Getting agent [{0}] info at {1}", agent_name, CurrentConnectionAddress);
+                Logger.Log(LogLevel.Debug, inf);
                 return Client.GetAgentinfo(agent_name);
             }
             catch (TimeoutException ex)

@@ -374,17 +374,7 @@ namespace AgentLibrary
         public AgentPassport GetAgentinfo(string agent_name)
         {
             Agent ag = AgentEnvironement.GetRootEnv().RegisteredAgents.FirstOrDefault(s => s.Name.Equals(agent_name));
-
-            AgentPassport ag_passport = new AgentPassport();
-            ag_passport.AgentName = ag.Name;
-            ag_passport.AgentRole = ag.Role;
-            ag_passport.EnvironementName = ag.EnvironementName;
-            ag_passport.EnvironementAddress = ag.EnvironementIPAddress;
-
-            ag_passport.CreatedAt = ag.CreatedAt.ToString(@"hh\:mm\:ss");
-            //TODO set other agent informations here
-
-            return ag_passport;
+            return ag.GetPassport();
         }
 
         //DA ELIMINARE

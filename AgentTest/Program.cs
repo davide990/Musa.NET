@@ -108,7 +108,7 @@ namespace AgentTest
 
             AgentEnvironement.GetRootEnv().RegisterAgentFromConfiguration();
 
-
+/*
             BackgroundWorker bg = new BackgroundWorker();
             bg.DoWork += async delegate
             {
@@ -118,7 +118,7 @@ namespace AgentTest
                 var receiver = a.GetAgentinfo("myAgent");
                 a.sendAgentMessage(receiver, new AgentMessage("f(x)", InformationType.Tell));        
             };
-            bg.RunWorkerAsync();
+            bg.RunWorkerAsync();*/
 
             AgentEnvironement.GetRootEnv().WaitForAgents();
 
