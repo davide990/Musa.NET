@@ -27,6 +27,13 @@ namespace MusaCommon
         public string EnvironementAddress { get; set; }
 
         /// <summary>
+        /// Gets or sets the environement port.
+        /// </summary>
+        /// <value>The environement port.</value>
+        [DataMember]
+        public int EnvironementPort { get; set; }
+
+        /// <summary>
         /// The name of the agent
         /// </summary>
         [DataMember]

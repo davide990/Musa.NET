@@ -414,21 +414,6 @@ namespace AgentLibrary
         #region Methods
 
         /// <summary>
-        /// Get the passport of this agent.
-        /// </summary>
-        /// <returns></returns>
-        public AgentPassport GetPassport()
-        {
-            AgentPassport ps = new AgentPassport();
-            ps.AgentName = Name;
-            ps.EnvironementName = EnvironementName;
-            ps.EnvironementAddress = EnvironementIPAddress;
-            ps.AgentRole = Role;
-            ps.EnvironementAddress = EnvironementIPAddress;
-            return ps;
-        }
-
-        /// <summary>
         /// Notify to this agent a change occurred within the environment this 
         /// agent is located.
         /// </summary>
@@ -860,6 +845,21 @@ namespace AgentLibrary
         #endregion Test condition methods
 
         #region Communication methods
+
+        /// <summary>
+        /// Get the passport of this agent.
+        /// </summary>
+        /// <returns></returns>
+        public AgentPassport GetPassport()
+        {
+            AgentPassport ps = new AgentPassport();
+            ps.AgentName = Name;
+            ps.EnvironementName = EnvironementName;
+            ps.EnvironementAddress = EnvironementIPAddress;
+            ps.EnvironementPort = EnvironementPort;
+            ps.AgentRole = Role;
+            return ps;
+        }
 
         #region Local communication methods
 
