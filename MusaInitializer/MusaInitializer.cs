@@ -97,18 +97,22 @@ namespace MusaInitializer
 
                 //Get the environement's name in which this agent must be placed
                 var environementNameAttribute = agent_type.GetCustomAttributes<EnvironementAttribute>();
-                string destEnvironement = AgentEnvironement.RootEnvironementName;
-                if(environementNameAttribute != null)
+                if (environementNameAttribute != null)
                 {
-                    if (!(string.IsNullOrEmpty(environementNameAttribute.ToArray()[0].Environementname)))
+                    if (environementNameAttribute.ToArray().Length > 0)
                     {
-                        destEnvironement = environementNameAttribute.ToArray()[0].Environementname;
-                        var theEnv = rootEnvironement.GetEnvironement(destEnvironement);
-
-                        if (theEnv != null)
+                        var envName = environementNameAttribute.ToArray()[0].Environementname;
+                        if (!(string.IsNullOrEmpty(envName)))
                         {
-                            theEnv.RegisterAgent(the_agent);
-                            continue;
+                            //Get the destination environement for the current agent to be registered
+                            var theEnv = rootEnvironement.GetEnvironement(envName);
+
+                            //Register the agent to the specified sub-environement, if exists.
+                            if (theEnv != null)
+                            {
+                                theEnv.RegisterAgent(the_agent);
+                                continue;
+                            }
                         }
                     }
                 }

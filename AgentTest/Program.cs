@@ -126,8 +126,8 @@ namespace AgentTest
 
         static void Main(string[] args)
         {
-            minimalEnv();
-
+           // minimalEnv();
+            ilsolito();
             
         }
 
