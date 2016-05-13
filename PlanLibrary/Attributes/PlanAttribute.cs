@@ -55,7 +55,12 @@ namespace PlanLibrary
             private set;
         }
 
-        public Type RescuePlan
+        /// <summary>
+        /// Gets the alternative plan, that is, the plan invoked if this
+        /// plan's trigger condition is satisfied.
+        /// </summary>
+        /// <value>The rescue plan.</value>
+        public Type AlternativePlan
         {
             get;
             private set;
@@ -83,13 +88,13 @@ namespace PlanLibrary
         /// 
         /// </summary>
         /// <param name="trigger_condition"></param>
-        /// <param name="RescuePlan">The plan to invoke in case the trigger condition is not satisfied</param>
-        public PlanAttribute(string trigger_condition, Type rescuePlan)
+        /// <param name="alternativePlan">The plan to invoke in case the trigger condition is not satisfied</param>
+        public PlanAttribute(string trigger_condition, Type alternativePlan)
         {
             AllowedRoles = new List<string>();
             AllowedRoles.Add("all");
             TriggerCondition = trigger_condition;
-            RescuePlan = rescuePlan;
+            AlternativePlan = alternativePlan;
         }
 
         #endregion Constructors

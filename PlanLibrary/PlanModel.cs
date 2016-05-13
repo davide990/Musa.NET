@@ -58,8 +58,11 @@ namespace PlanLibrary
             private set;
         }
 
-
-        public Type RescuePlan
+        /// <summary>
+        /// Gets the alternative plan, that is, the plan to invoke in case this plan's trigger condition is not satisfied.
+        /// </summary>
+        /// <value>The alternative plan.</value>
+        public Type AlternativePlan
         {
             get;
             private set;
@@ -261,7 +264,7 @@ namespace PlanLibrary
                                           where t != null
                                           select new {    AllowedRoles = attributes.AllowedRoles, 
                 TriggerCondition = attributes.TriggerCondition,
-                RescuePlan = attributes.RescuePlan};
+                AlternativePlan = attributes.AlternativePlan};
             
             //Raise an exception if the class/plan is not decorated with [Plan] attribute
             if (plan_attribute.ToList().Count <= 0)
@@ -273,8 +276,8 @@ namespace PlanLibrary
             //Convert the string trigger condition to a IFormula object
             parseTriggerCondition(triggerCondition);
 
-            //Get the expected result
-            RescuePlan = plan_attribute.ToList()[0].RescuePlan;
+            //Get the alternative plan
+            AlternativePlan = plan_attribute.ToList()[0].AlternativePlan;
 
             foreach (var v in plan_attribute)
             {
@@ -489,7 +492,7 @@ namespace PlanLibrary
 
         public Type GetRescuePlan()
         {
-            return RescuePlan;
+            return AlternativePlan;
         }
 
     }

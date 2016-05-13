@@ -336,12 +336,12 @@ namespace PlanLibrary
             //Check if plan's trigger condition is satisfied in invoking's parent workbench
             if (!checkTriggerCondition(GetTriggerCondition()))
             {
-                if (PlanModel.RescuePlan != null)
+                if (PlanModel.AlternativePlan != null)
                 {
                     Logger.SetColorForNextConsoleLog(ConsoleColor.Black, ConsoleColor.Red);
-                    Logger.Log(LogLevel.Error, "Plan '" + Name + "' cannot be executed: trigger condition '" + GetTriggerCondition() + "' not satisfied. Trying to execute '" + PlanModel.RescuePlan.Name + "'");
+                    Logger.Log(LogLevel.Error, "Plan '" + Name + "' cannot be executed: trigger condition '" + GetTriggerCondition() + "' not satisfied. Trying to execute '" + PlanModel.AlternativePlan.Name + "'");
                     
-                    Parent.AchieveGoal(PlanModel.RescuePlan, args);
+                    Parent.AchieveGoal(PlanModel.AlternativePlan, args);
                     return;
                 }
 
@@ -407,9 +407,9 @@ namespace PlanLibrary
         }
 
         /// <summary>
-        /// Returns a string that represents the current <see cref="PlanLibrary.PlanInstance`1"/>.
+        /// Returns a string that represents the current <see cref="PlanLibrary.PlanInstance"/>.
         /// </summary>
-        /// <returns>A <see cref="System.String"/> that represents the current <see cref="PlanLibrary.PlanInstance`1"/>.</returns>
+        /// <returns>A <see cref="System.String"/> that represents the current <see cref="PlanLibrary.PlanInstance/c>"/>.</returns>
         public override string ToString()
         {
             return Name;
